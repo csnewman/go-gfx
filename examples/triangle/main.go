@@ -13,12 +13,24 @@ func main() {
 		Init: func() {
 			log.Println("init")
 
-			if err := appkit.NewWindow(800, 600); err != nil {
+			if _, err := appkit.NewWindow(800, 600); err != nil {
 				panic(err)
 			}
+		},
+		CloseRequested: func(w appkit.Window) {
+			log.Println("close requested", w)
+
+			w.Close()
+		},
+		Closed: func(w appkit.Window) {
+			log.Println("closed", w)
+
+			appkit.Stop()
 		},
 	})
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println("main returned")
 }

@@ -41,6 +41,10 @@ int gfx_ak_run() {
     }
 }
 
+void gfx_ak_stop() {
+    [NSApp stop:NSApp];
+}
+
 @class GfxWindow;
 
 @interface GfxWindowContext : NSObject {
@@ -103,6 +107,7 @@ int gfx_ak_run() {
     gfx_ak_window_closed_callback(context->wid);
 
     [self release];
+    [context release];
 }
 
 @end
@@ -141,5 +146,21 @@ int gfx_ak_new_window(uint32_t wid, int width, int height, id *res) {
         [ctx->window orderFrontRegardless];
 
         return GFX_SUCCESS;
+    }
+}
+
+void gfx_ak_close_window(id w) {
+    @autoreleasepool {
+        GfxWindowContext *ctx = w;
+
+        [ctx->window close];
+    }
+}
+
+void gfx_ak_free_context(id w) {
+    @autoreleasepool {
+        GfxWindowContext *ctx = w;
+
+        [ctx release];
     }
 }
