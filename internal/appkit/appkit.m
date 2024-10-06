@@ -16,8 +16,6 @@
 }
 @end
 
-GfxApplicationDelegate *appDelegate;
-
 int gfx_ak_run() {
     @autoreleasepool {
         if (![NSThread isMainThread]) {
@@ -26,7 +24,7 @@ int gfx_ak_run() {
 
         [NSApplication sharedApplication];
 
-        appDelegate = [[GfxApplicationDelegate alloc] init];
+        GfxApplicationDelegate *appDelegate = [[[GfxApplicationDelegate alloc] init] autorelease];
 
         // Ensure we are in multi-threading mode
         [NSThread detachNewThreadSelector:@selector(stubThread:)
@@ -46,11 +44,13 @@ void gfx_ak_stop() {
 }
 
 @class GfxWindow;
+@class GfxWindowDelegate;
 
 @interface GfxWindowContext : NSObject {
 @public
     uint32_t wid;
     GfxWindow *window;
+    GfxWindowDelegate *delegate;
 }
 
 - (instancetype)initWithWID:(uint32_t)wid;
@@ -80,7 +80,7 @@ void gfx_ak_stop() {
 @end
 
 @interface GfxWindowDelegate : NSObject <NSWindowDelegate> {
-    GfxWindowContext *context;
+     GfxWindowContext *context;
 }
 
 - (instancetype)initWithContext:(GfxWindowContext *)ctx;
@@ -102,12 +102,7 @@ void gfx_ak_stop() {
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-    [context->window setDelegate:nil];
-
     gfx_ak_window_closed_callback(context->wid);
-
-    [self release];
-    [context release];
 }
 
 @end
@@ -127,10 +122,10 @@ int gfx_ak_new_window(uint32_t wid, int width, int height, id *res) {
                             backing:NSBackingStoreBuffered
                               defer:NO
         ];
+        [ctx->window setReleasedWhenClosed:NO];
 
-
-        GfxWindowDelegate *delegate = [[GfxWindowDelegate alloc] initWithContext:ctx];
-        [ctx->window setDelegate:delegate];
+        ctx->delegate = [[GfxWindowDelegate alloc] initWithContext:ctx];
+        [ctx->window setDelegate:ctx->delegate];
 
         // todo: setcontentview, makefirstresponder
 
@@ -161,6 +156,9 @@ void gfx_ak_free_context(id w) {
     @autoreleasepool {
         GfxWindowContext *ctx = w;
 
+        [ctx->window setDelegate:nil];
+        [ctx->delegate release];
+        [ctx->window release];
         [ctx release];
     }
 }
