@@ -70,3 +70,14 @@ func (wid Window) Close() {
 
 	C.gfx_ak_close_window(ptr)
 }
+
+//export gfx_ak_draw_callback
+func gfx_ak_draw_callback(id uint32) {
+	wid := Window(id)
+
+	if _, ok := windows.Load(wid); !ok {
+		return
+	}
+
+	callbacks.Render(wid)
+}
