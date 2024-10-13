@@ -1,6 +1,7 @@
 package appkit
 
 import (
+	"github.com/csnewman/go-gfx/hal"
 	"sync"
 	"sync/atomic"
 )
@@ -15,14 +16,12 @@ var (
 	windows       sync.Map
 )
 
-type Window uint32
-
-func NewWindow(width int, height int) (Window, error) {
+func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, error) {
 	var res C.id
 
-	id := Window(windowCounter.Add(1))
+	id := hal.Window(windowCounter.Add(1))
 
-	r := C.gfx_ak_new_window(C.uint32_t(id), C.int(width), C.int(height), &res)
+	r := C.gfx_ak_new_window(C.uint64_t(id), C.int(cfg.Width), C.int(cfg.Height), &res)
 
 	switch r {
 	case C.GFX_SUCCESS:
@@ -34,50 +33,35 @@ func NewWindow(width int, height int) (Window, error) {
 	}
 }
 
-//export gfx_ak_close_requested_callback
-func gfx_ak_close_requested_callback(id uint32) {
-	wid := Window(id)
-
-	if _, ok := windows.Load(wid); !ok {
+func (p *Platform) CloseWindow(id hal.Window) {
+	raw, ok := windows.Load(id)
+	if !ok {
 		return
 	}
 
-	callbacks.CloseRequested(wid)
+	C.gfx_ak_close_window(raw.(C.id))
+}
+
+//export gfx_ak_close_requested_callback
+func gfx_ak_close_requested_callback(id uint64) {
+	halCfg.WindowCloseRequested(hal.Window(id))
 }
 
 //export gfx_ak_window_closed_callback
-func gfx_ak_window_closed_callback(id uint32) {
-	wid := Window(id)
+func gfx_ak_window_closed_callback(id uint64) {
+	wid := hal.Window(id)
+
+	halCfg.WindowClosed(wid)
 
 	raw, ok := windows.LoadAndDelete(wid)
 	if !ok {
 		return
 	}
 
-	callbacks.Closed(wid)
-
-	ptr := raw.(C.id)
-	C.gfx_ak_free_context(ptr)
-}
-
-func (wid Window) Close() {
-	raw, ok := windows.Load(wid)
-	if !ok {
-		return
-	}
-
-	ptr := raw.(C.id)
-
-	C.gfx_ak_close_window(ptr)
+	C.gfx_ak_free_context(raw.(C.id))
 }
 
 //export gfx_ak_draw_callback
-func gfx_ak_draw_callback(id uint32) {
-	wid := Window(id)
-
-	if _, ok := windows.Load(wid); !ok {
-		return
-	}
-
-	callbacks.Render(wid)
+func gfx_ak_draw_callback(id uint64) {
+	halCfg.WindowRender(hal.Window(id))
 }

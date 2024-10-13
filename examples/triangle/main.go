@@ -1,36 +1,71 @@
 package main
 
 import (
+	"github.com/csnewman/go-gfx/gfx"
 	"log"
-
-	"github.com/csnewman/go-gfx/internal/appkit"
+	"time"
 )
 
-func main() {
-	log.Println("hello world")
+var lastPrint time.Time
+var count int
 
-	err := appkit.Run(appkit.Callbacks{
-		Init: func() {
-			log.Println("init")
+type Example struct {
+	app    *gfx.Application
+	window *gfx.Window
+}
 
-			if _, err := appkit.NewWindow(800, 600); err != nil {
-				panic(err)
-			}
-		},
-		CloseRequested: func(w appkit.Window) {
-			log.Println("close requested", w)
+func (e *Example) init(app *gfx.Application) error {
+	e.app = app
 
-			w.Close()
-		},
-		Closed: func(w appkit.Window) {
-			log.Println("closed", w)
+	log.Println("Creating main window")
 
-			appkit.Stop()
-		},
+	window, err := e.app.NewWindow(gfx.WindowConfig{
+		Title:    "Triangle",
+		Width:    800,
+		Height:   600,
+		OnClosed: e.closed,
+		OnRender: e.render,
 	})
 	if err != nil {
+		return err
+	}
+
+	e.window = window
+
+	return nil
+}
+
+func (e *Example) Run() error {
+	return gfx.Run(gfx.ApplicationConfig{
+		Init: e.init,
+	})
+}
+
+func (e *Example) closed() {
+	log.Println("Main window closed")
+
+	e.app.Exit()
+}
+
+func (e *Example) render() {
+	count++
+
+	if time.Since(lastPrint) > time.Second {
+		lastPrint = time.Now()
+
+		log.Println("FPS", count)
+		count = 0
+	}
+}
+
+func main() {
+	log.Println("Triangle Example")
+
+	ex := &Example{}
+
+	if err := ex.Run(); err != nil {
 		panic(err)
 	}
 
-	log.Println("main returned")
+	log.Println("App exited")
 }

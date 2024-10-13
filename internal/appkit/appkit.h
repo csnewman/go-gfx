@@ -17,13 +17,13 @@ void gfx_ak_stop();
 
 void gfx_ak_init_callback();
 
-int gfx_ak_new_window(uint32_t wid, int width, int height, id *res);
+int gfx_ak_new_window(uint64_t wid, int width, int height, id *res);
 
-void gfx_ak_close_requested_callback(uint32_t wid);
+void gfx_ak_close_requested_callback(uint64_t wid);
 
-void gfx_ak_window_closed_callback(uint32_t wid);
+void gfx_ak_window_closed_callback(uint64_t wid);
 
-void gfx_ak_draw_callback(uint32_t wid);
+void gfx_ak_draw_callback(uint64_t wid);
 
 void gfx_ak_close_window(id w);
 

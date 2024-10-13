@@ -50,18 +50,18 @@ void gfx_ak_stop() {
 
 @interface GfxWindowContext : NSObject {
 @public
-    uint32_t wid;
+    uint64_t wid;
     GfxWindow *window;
     GfxWindowDelegate *delegate;
     GfxView *view;
     CAMetalLayer *layer;
 }
 
-- (instancetype)initWithWID:(uint32_t)wid;
+- (instancetype)initWithWID:(uint64_t)wid;
 @end
 
 @implementation GfxWindowContext
-- (instancetype)initWithWID:(uint32_t)pwid {
+- (instancetype)initWithWID:(uint64_t)pwid {
     self = [super init];
     if (self != nil)
         self->wid = pwid;
@@ -201,7 +201,7 @@ void gfx_ak_stop() {
 
 @end
 
-int gfx_ak_new_window(uint32_t wid, int width, int height, id *res) {
+int gfx_ak_new_window(uint64_t wid, int width, int height, id *res) {
     @autoreleasepool {
         GfxWindowContext *ctx = [[GfxWindowContext alloc] initWithWID:wid];
         *res = ctx;
