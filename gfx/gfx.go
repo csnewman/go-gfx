@@ -1,6 +1,9 @@
 package gfx
 
-import "github.com/csnewman/go-gfx/hal"
+import (
+	"fmt"
+	"github.com/csnewman/go-gfx/hal"
+)
 
 type ApplicationConfig struct {
 	Init func(app *Application) error
@@ -8,18 +11,24 @@ type ApplicationConfig struct {
 
 type Application struct {
 	platform hal.Platform
+	graphics hal.Graphics
 	cfg      ApplicationConfig
 	windows  tmap[hal.Window, *Window]
 }
 
 func Run(cfg ApplicationConfig) error {
-	return RunWith(cfg, DefaultPlatform())
+	return RunWith(cfg, DefaultPlatform(), DefaultGraphics())
 }
 
-func RunWith(cfg ApplicationConfig, platform hal.Platform) error {
+func RunWith(cfg ApplicationConfig, platform hal.Platform, graphics hal.Graphics) error {
 	app := &Application{
 		platform: platform,
+		graphics: graphics,
 		cfg:      cfg,
+	}
+
+	if err := app.graphics.Init(hal.GPUConfig{}); err != nil {
+		return fmt.Errorf("failed to init graphics: %w", err)
 	}
 
 	return app.run()

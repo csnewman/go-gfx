@@ -1,6 +1,7 @@
 package gfx
 
 import (
+	"fmt"
 	"github.com/csnewman/go-gfx/hal"
 )
 
@@ -14,9 +15,10 @@ type WindowConfig struct {
 }
 
 type Window struct {
-	app *Application
-	id  hal.Window
-	cfg WindowConfig
+	app     *Application
+	id      hal.Window
+	cfg     WindowConfig
+	surface hal.Surface
 }
 
 func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
@@ -25,17 +27,22 @@ func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
 		cfg: cfg,
 	}
 
-	id, err := a.platform.NewWindow(hal.WindowConfig{
+	id, wh, err := a.platform.NewWindow(hal.WindowConfig{
 		Width:  cfg.Width,
 		Height: cfg.Height,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create window: %w", err)
 	}
 
 	w.id = id
 
 	a.windows.Set(id, w)
+
+	w.surface, err = a.graphics.CreateSurface(wh)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create surface: %w", err)
+	}
 
 	return w, nil
 }

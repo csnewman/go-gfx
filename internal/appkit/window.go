@@ -4,6 +4,7 @@ import (
 	"github.com/csnewman/go-gfx/hal"
 	"sync"
 	"sync/atomic"
+	"unsafe"
 )
 
 /*
@@ -16,17 +17,20 @@ var (
 	windows       sync.Map
 )
 
-func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, error) {
-	var res C.id
+func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, hal.WindowHandle, error) {
+	var (
+		res   C.id
+		resWH C.id
+	)
 
 	id := hal.Window(windowCounter.Add(1))
 
-	r := C.gfx_ak_new_window(C.uint64_t(id), C.int(cfg.Width), C.int(cfg.Height), &res)
+	r := C.gfx_ak_new_window(C.uint64_t(id), C.int(cfg.Width), C.int(cfg.Height), &res, &resWH)
 
 	switch r {
 	case C.GFX_SUCCESS:
 		windows.Store(id, res)
-		return id, nil
+		return id, hal.MetalWindowHandle{Layer: unsafe.Pointer(resWH)}, nil
 
 	default:
 		panic("unexpected response")

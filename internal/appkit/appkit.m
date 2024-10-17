@@ -201,7 +201,7 @@ void gfx_ak_stop() {
 
 @end
 
-int gfx_ak_new_window(uint64_t wid, int width, int height, id *res) {
+int gfx_ak_new_window(uint64_t wid, int width, int height, id *res, id *res_wh) {
     @autoreleasepool {
         GfxWindowContext *ctx = [[GfxWindowContext alloc] initWithWID:wid];
         *res = ctx;
@@ -236,6 +236,8 @@ int gfx_ak_new_window(uint64_t wid, int width, int height, id *res) {
         [ctx->window center];
         [ctx->window makeKeyAndOrderFront:NSApp];
         [ctx->window orderFrontRegardless];
+
+        *res_wh = ctx->layer;
 
         return GFX_SUCCESS;
     }

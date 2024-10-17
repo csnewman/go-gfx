@@ -1,5 +1,7 @@
 package hal
 
+import "unsafe"
+
 type PlatformConfig struct {
 	Init                 func() error
 	WindowCloseRequested func(w Window)
@@ -18,6 +20,23 @@ type Platform interface {
 	Run(cfg PlatformConfig) error
 	Exit()
 
-	NewWindow(cfg WindowConfig) (Window, error)
+	NewWindow(cfg WindowConfig) (Window, WindowHandle, error)
 	CloseWindow(id Window)
+}
+
+type GPUConfig struct {
+}
+
+type Surface uint64
+
+type Graphics interface {
+	Init(cfg GPUConfig) error
+
+	CreateSurface(windowHandle WindowHandle) (Surface, error)
+}
+
+type WindowHandle interface{}
+
+type MetalWindowHandle struct {
+	Layer unsafe.Pointer
 }
