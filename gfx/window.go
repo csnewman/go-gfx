@@ -89,3 +89,33 @@ func (a *Application) windowRender(id hal.Window) {
 		w.cfg.OnRender()
 	}
 }
+
+type Frame struct {
+	presented bool
+	texture   hal.SurfaceTexture
+}
+
+func (w *Window) BeginFrame() (*Frame, error) {
+	texture, err := w.surface.AcquireTexture()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Frame{
+		texture: texture,
+	}, nil
+}
+
+func (f *Frame) Close() {
+	if f.presented {
+		return
+	}
+
+	f.texture.Discard()
+}
+
+func (f *Frame) Present() error {
+	f.presented = true
+
+	return f.texture.Present()
+}

@@ -27,8 +27,6 @@ type Platform interface {
 type GPUConfig struct {
 }
 
-type Surface uint64
-
 type Graphics interface {
 	Init(cfg GPUConfig) error
 
@@ -39,4 +37,13 @@ type WindowHandle interface{}
 
 type MetalWindowHandle struct {
 	Layer unsafe.Pointer
+}
+
+type Surface interface {
+	AcquireTexture() (SurfaceTexture, error)
+}
+
+type SurfaceTexture interface {
+	Present() error
+	Discard()
 }
