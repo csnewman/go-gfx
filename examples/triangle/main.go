@@ -64,6 +64,25 @@ func (e *Example) render() {
 		panic(err)
 	}
 
+	defer frame.Close()
+
+	buf := frame.NewCommandBuffer()
+
+	rp := buf.BeginRenderPass(gfx.RenderPassDescriptor{
+		ColorAttachments: []gfx.ColorAttachment{
+			{
+				Target:     frame,
+				Load:       false,
+				ClearColor: gfx.NewColor(1, 0, 1, 1),
+				Discard:    false,
+			},
+		},
+	})
+
+	rp.End()
+
+	buf.Submit()
+
 	if err := frame.Present(); err != nil {
 		panic(err)
 	}

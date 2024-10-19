@@ -27,27 +27,85 @@ int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer) {
     }
 }
 
-void gfx_mtl_acquire_texture(CAMetalLayer *layer, id *res) {
+void gfx_mtl_acquire_texture(CAMetalLayer *layer, id *res_draw, id *res_tex) {
     @autoreleasepool {
         id <CAMetalDrawable> drawable = [layer nextDrawable];
 
         if (drawable != nil) {
-            *res = [drawable retain];
+            *res_draw = [drawable retain];
+            *res_tex = [drawable texture];
         }
     }
 }
 
-void gfx_mtl_present_texture(id <MTLCommandQueue> queue, id <CAMetalDrawable> texture) {
+void gfx_mtl_present_texture(id <MTLCommandQueue> queue, id <CAMetalDrawable> draw) {
     @autoreleasepool {
         id <MTLCommandBuffer> buffer = [queue commandBuffer];
-        [buffer presentDrawable:texture];
+        [buffer presentDrawable:draw];
         [buffer commit];
-        [texture release];
+        [draw release];
     }
 }
 
-void gfx_mtl_discard_surface_texture(id <CAMetalDrawable> texture) {
+void gfx_mtl_discard_surface_texture(id <CAMetalDrawable> draw) {
     @autoreleasepool {
-        [texture release];
+        [draw release];
+    }
+}
+
+void gfx_mtl_create_command_buf(id <MTLCommandQueue> queue, id *res) {
+    @autoreleasepool {
+        id <MTLCommandBuffer> buf = [queue commandBuffer];
+
+        *res = [buf retain];
+    }
+}
+
+void gfx_mtl_cbuf_submit(id <MTLCommandBuffer> buf) {
+    @autoreleasepool {
+        [buf commit];
+        [buf release];
+    }
+}
+
+void gfx_mtl_begin_rpass(
+        id <MTLCommandBuffer> buf,
+        const struct ColorAttachment *colors,
+        uint64_t colors_len,
+        id *res
+) {
+    @autoreleasepool {
+        MTLRenderPassDescriptor *des = [[MTLRenderPassDescriptor new] autorelease];
+
+        for (int i = 0; i < colors_len; ++i) {
+            const struct ColorAttachment attachment = colors[i];
+
+            des.colorAttachments[i].texture = attachment.view;
+
+            if (attachment.load) {
+                des.colorAttachments[i].loadAction = MTLLoadActionLoad;
+            } else {
+                des.colorAttachments[i].loadAction = MTLLoadActionClear;
+                des.colorAttachments[i].clearColor = MTLClearColorMake(
+                        attachment.r, attachment.g, attachment.b, attachment.a
+                );
+            }
+
+            if (attachment.store) {
+                des.colorAttachments[i].storeAction = MTLStoreActionStore;
+            } else {
+                des.colorAttachments[i].storeAction = MTLStoreActionDontCare;
+            }
+        }
+
+        id <MTLRenderCommandEncoder> enc = [buf renderCommandEncoderWithDescriptor:des];
+        *res = [enc retain];
+    }
+}
+
+void gfx_mtl_end_rpass(id <MTLRenderCommandEncoder> enc) {
+    @autoreleasepool {
+        [enc endEncoding];
+        [enc release];
     }
 }
