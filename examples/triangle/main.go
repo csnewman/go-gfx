@@ -25,6 +25,7 @@ func (e *Example) init(app *gfx.Application) error {
 		Height:   600,
 		OnClosed: e.closed,
 		OnRender: e.render,
+		OnResize: e.resize,
 	})
 	if err != nil {
 		return err
@@ -47,6 +48,10 @@ func (e *Example) closed() {
 	log.Println("Main window closed")
 
 	e.app.Exit()
+}
+
+func (e *Example) resize(width float64, height float64) {
+	log.Println("Main window resized", width, height)
 }
 
 func (e *Example) render(frame *gfx.Frame) {

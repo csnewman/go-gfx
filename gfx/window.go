@@ -3,7 +3,6 @@ package gfx
 import (
 	"fmt"
 	"github.com/csnewman/go-gfx/hal"
-	"log"
 )
 
 type WindowConfig struct {
@@ -13,6 +12,7 @@ type WindowConfig struct {
 	OnCloseRequested func()
 	OnClosed         func()
 	OnRender         func(f *Frame)
+	OnResize         func(width float64, height float64)
 }
 
 type Window struct {
@@ -101,8 +101,15 @@ func (a *Application) windowRender(id hal.Window, token hal.RenderToken) {
 	}
 }
 
-func (a *Application) windowResized(w hal.Window, width float64, height float64) {
-	log.Println("resize", width, height)
+func (a *Application) windowResized(id hal.Window, width float64, height float64) {
+	w, ok := a.windows.Get(id)
+	if !ok {
+		return
+	}
+
+	if w.cfg.OnResize != nil {
+		w.cfg.OnResize(width, height)
+	}
 }
 
 type Frame struct {
