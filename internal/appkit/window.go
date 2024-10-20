@@ -25,7 +25,15 @@ func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, hal.WindowHandle
 
 	id := hal.Window(windowCounter.Add(1))
 
-	r := C.gfx_ak_new_window(C.uint64_t(id), C.int(cfg.Width), C.int(cfg.Height), &res, &resWH)
+	r := C.gfx_ak_new_window(
+		C.uint64_t(id),
+		unsafe.Pointer(unsafe.StringData(cfg.Title)),
+		C.int(len(cfg.Title)),
+		C.int(cfg.Width),
+		C.int(cfg.Height),
+		&res,
+		&resWH,
+	)
 
 	switch r {
 	case C.GFX_SUCCESS:

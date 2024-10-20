@@ -17,7 +17,15 @@ void gfx_ak_stop();
 
 void gfx_ak_init_callback();
 
-int gfx_ak_new_window(uint64_t wid, int width, int height, id *res, id *res_wh);
+int gfx_ak_new_window(
+        uint64_t wid,
+        const void *title,
+        int title_len,
+        int width,
+        int height,
+        id *res,
+        id *res_wh
+);
 
 void gfx_ak_close_requested_callback(uint64_t wid);
 

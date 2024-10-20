@@ -265,7 +265,7 @@ void gfx_ak_stop() {
 
 @end
 
-int gfx_ak_new_window(uint64_t wid, int width, int height, id *res, id *res_wh) {
+int gfx_ak_new_window(uint64_t wid, const void *title, int title_len, int width, int height, id *res, id *res_wh) {
     @autoreleasepool {
         GfxWindowContext *ctx = [[GfxWindowContext alloc] initWithWID:wid];
         *res = ctx;
@@ -290,7 +290,7 @@ int gfx_ak_new_window(uint64_t wid, int width, int height, id *res, id *res_wh) 
         [ctx->window makeFirstResponder:ctx->view];
         [ctx->view setNeedsDisplay:YES];
 
-        [ctx->window setTitle:@"hello"];
+        [ctx->window setTitle:[[[NSString alloc] initWithBytes:title length:title_len encoding:NSUTF8StringEncoding] autorelease]];
         [ctx->window setRestorable:NO];
         [ctx->window setTabbingMode:NSWindowTabbingModeDisallowed];
         [ctx->window setCollectionBehavior:(NSWindowCollectionBehaviorFullScreenPrimary |

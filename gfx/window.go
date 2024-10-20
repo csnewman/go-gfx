@@ -29,6 +29,7 @@ func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
 	}
 
 	id, wh, err := a.platform.NewWindow(hal.WindowConfig{
+		Title:  cfg.Title,
 		Width:  cfg.Width,
 		Height: cfg.Height,
 	})
