@@ -66,6 +66,11 @@ func gfx_ak_window_closed_callback(id uint64) {
 }
 
 //export gfx_ak_draw_callback
-func gfx_ak_draw_callback(id uint64) {
-	halCfg.WindowRender(hal.Window(id))
+func gfx_ak_draw_callback(id uint64, drawable unsafe.Pointer) {
+	halCfg.WindowRender(hal.Window(id), hal.MetalRenderToken{Drawable: drawable})
+}
+
+//export gfx_ak_resize_callback
+func gfx_ak_resize_callback(id uint64, width float64, height float64) {
+	halCfg.WindowResized(hal.Window(id), width, height)
 }

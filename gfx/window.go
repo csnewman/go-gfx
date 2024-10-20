@@ -3,6 +3,7 @@ package gfx
 import (
 	"fmt"
 	"github.com/csnewman/go-gfx/hal"
+	"log"
 )
 
 type WindowConfig struct {
@@ -11,7 +12,7 @@ type WindowConfig struct {
 	Height           int
 	OnCloseRequested func()
 	OnClosed         func()
-	OnRender         func()
+	OnRender         func(f *Frame)
 }
 
 type Window struct {
@@ -79,33 +80,34 @@ func (w *Window) Close() {
 	w.app.platform.CloseWindow(w.id)
 }
 
-func (a *Application) windowRender(id hal.Window) {
+func (a *Application) windowRender(id hal.Window, token hal.RenderToken) {
 	w, ok := a.windows.Get(id)
 	if !ok {
 		return
 	}
 
 	if w.cfg.OnRender != nil {
-		w.cfg.OnRender()
+		texture, err := w.surface.AcquireTexture(token)
+		if err != nil {
+			// TODO: handle error
+			panic(err)
+		}
+
+		w.cfg.OnRender(&Frame{
+			app:     w.app,
+			texture: texture,
+		})
 	}
+}
+
+func (a *Application) windowResized(w hal.Window, width float64, height float64) {
+	log.Println("resize", width, height)
 }
 
 type Frame struct {
 	app       *Application
 	texture   hal.SurfaceTexture
 	presented bool
-}
-
-func (w *Window) BeginFrame() (*Frame, error) {
-	texture, err := w.surface.AcquireTexture()
-	if err != nil {
-		return nil, err
-	}
-
-	return &Frame{
-		app:     w.app,
-		texture: texture,
-	}, nil
 }
 
 func (f *Frame) Close() {

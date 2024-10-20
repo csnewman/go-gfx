@@ -49,7 +49,9 @@ func (e *Example) closed() {
 	e.app.Exit()
 }
 
-func (e *Example) render() {
+func (e *Example) render(frame *gfx.Frame) {
+	defer frame.Close()
+
 	count++
 
 	if time.Since(lastPrint) > time.Second {
@@ -58,13 +60,6 @@ func (e *Example) render() {
 		log.Println("FPS", count)
 		count = 0
 	}
-
-	frame, err := e.window.BeginFrame()
-	if err != nil {
-		panic(err)
-	}
-
-	defer frame.Close()
 
 	buf := frame.NewCommandBuffer()
 

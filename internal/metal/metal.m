@@ -27,14 +27,10 @@ int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer) {
     }
 }
 
-void gfx_mtl_acquire_texture(CAMetalLayer *layer, id *res_draw, id *res_tex) {
+id gfx_mtl_get_drawable_texture(id <CAMetalDrawable> drawable) {
     @autoreleasepool {
-        id <CAMetalDrawable> drawable = [layer nextDrawable];
-
-        if (drawable != nil) {
-            *res_draw = [drawable retain];
-            *res_tex = [drawable texture];
-        }
+        [drawable retain];
+        return [drawable texture];
     }
 }
 
@@ -49,7 +45,7 @@ void gfx_mtl_present_texture(id <MTLCommandQueue> queue, id <CAMetalDrawable> dr
 
 void gfx_mtl_discard_surface_texture(id <CAMetalDrawable> draw) {
     @autoreleasepool {
-        [draw release];
+         [draw release];
     }
 }
 
