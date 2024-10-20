@@ -33,7 +33,7 @@ type Graphics interface {
 	Init(cfg GPUConfig) error
 
 	CreateSurface(windowHandle WindowHandle) (Surface, error)
-
+	CreateShader(cfg ShaderConfig) (Shader, error)
 	CreateCommandBuffer() CommandBuffer
 }
 
@@ -58,6 +58,17 @@ type SurfaceTexture interface {
 
 	Present() error
 	Discard()
+}
+
+type ShaderConfig struct {
+	Source string
+}
+
+type Shader interface {
+	ResolveFunction(name string) (ShaderFunction, error)
+}
+
+type ShaderFunction interface {
 }
 
 type Color struct {

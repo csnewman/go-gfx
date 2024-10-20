@@ -3,15 +3,28 @@ package main
 import (
 	"github.com/csnewman/go-gfx/gfx"
 	"log"
+	"runtime"
 	"time"
+
+	_ "embed"
 )
+
+func init() {
+	runtime.LockOSThread()
+}
 
 var lastPrint time.Time
 var count int
 
+//go:embed shader.metal
+var metalShader string
+
 type Example struct {
-	app    *gfx.Application
-	window *gfx.Window
+	app              *gfx.Application
+	window           *gfx.Window
+	shader           *gfx.Shader
+	vertexFunction   *gfx.ShaderFunction
+	fragmentFunction *gfx.ShaderFunction
 }
 
 func (e *Example) init(app *gfx.Application) error {
@@ -34,6 +47,23 @@ func (e *Example) init(app *gfx.Application) error {
 	e.window = window
 
 	log.Println("init complete")
+
+	e.shader, err = e.app.LoadShader(gfx.ShaderConfig{
+		Source: metalShader,
+	})
+	if err != nil {
+		return err
+	}
+
+	e.vertexFunction, err = e.shader.Function("vertexShader")
+	if err != nil {
+		return err
+	}
+
+	e.fragmentFunction, err = e.shader.Function("fragmentShader")
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

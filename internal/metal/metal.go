@@ -3,11 +3,13 @@ package metal
 /*
 #cgo darwin LDFLAGS: -framework Metal
 
+#include <stdlib.h>
 #include "metal.h"
 */
 import "C"
 
 import (
+	"errors"
 	"github.com/csnewman/go-gfx/hal"
 	"unsafe"
 )
@@ -99,6 +101,62 @@ func (s *SurfaceTexture) View() hal.TextureView {
 
 type TextureView struct {
 	texture C.id
+}
+
+type Shader struct {
+	shader C.id
+}
+
+func (g *Graphics) CreateShader(cfg hal.ShaderConfig) (hal.Shader, error) {
+	var (
+		lib      C.id
+		errorStr *C.char
+	)
+
+	r := C.gfx_mtl_create_shader(
+		g.device,
+		unsafe.Pointer(unsafe.StringData(cfg.Source)),
+		C.int(len(cfg.Source)),
+		&lib,
+		&errorStr,
+	)
+
+	switch r {
+	case C.GFX_SUCCESS:
+		return &Shader{
+			shader: lib,
+		}, nil
+
+	case C.GFX_SEE_ERROR:
+		defer C.free(unsafe.Pointer(errorStr))
+
+		return nil, errors.New(C.GoString(errorStr))
+	default:
+		panic("unexpected response")
+	}
+}
+
+type ShaderFunction struct {
+	function C.id
+}
+
+func (s *Shader) ResolveFunction(name string) (hal.ShaderFunction, error) {
+	var fun C.id
+
+	C.gfx_mtl_get_shader_function(
+		s.shader,
+		unsafe.Pointer(unsafe.StringData(name)),
+		C.int(len(name)),
+		&fun,
+	)
+
+	if fun == nil {
+		return nil, hal.ErrFunctionNotFound
+	}
+
+	return &ShaderFunction{
+		function: fun,
+	}, nil
 }
 
 type CommandBuffer struct {

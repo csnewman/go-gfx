@@ -9,6 +9,7 @@
 typedef void *id;
 #endif
 
+#define GFX_SEE_ERROR (-10)
 #define GFX_SUCCESS 1
 
 int gfx_mtl_open(id *res, id *res_queue);
@@ -20,6 +21,10 @@ id gfx_mtl_get_drawable_texture(id drawable);
 void gfx_mtl_present_texture(id queue, id draw);
 
 void gfx_mtl_discard_surface_texture(id draw);
+
+int gfx_mtl_create_shader(id device, const void *src, int src_len, id *res_lib, char **res_err);
+
+void gfx_mtl_get_shader_function(id lib, const void *name, int name_len, id *res);
 
 void gfx_mtl_create_command_buf(id queue, id *res);
 
