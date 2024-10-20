@@ -26,6 +26,8 @@ int gfx_mtl_create_shader(id device, const void *src, int src_len, id *res_lib, 
 
 void gfx_mtl_get_shader_function(id lib, const void *name, int name_len, id *res);
 
+void gfx_mtl_buffer_from_bytes(id device, const void *data, int data_len, id *res);
+
 void gfx_mtl_create_command_buf(id queue, id *res);
 
 typedef struct ColorAttachment {

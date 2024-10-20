@@ -1,12 +1,12 @@
 package main
 
 import (
+	_ "embed"
 	"github.com/csnewman/go-gfx/gfx"
 	"log"
 	"runtime"
 	"time"
-
-	_ "embed"
+	"unsafe"
 )
 
 func init() {
@@ -25,6 +25,7 @@ type Example struct {
 	shader           *gfx.Shader
 	vertexFunction   *gfx.ShaderFunction
 	fragmentFunction *gfx.ShaderFunction
+	vertData         *gfx.Buffer
 }
 
 func (e *Example) init(app *gfx.Application) error {
@@ -64,6 +65,14 @@ func (e *Example) init(app *gfx.Application) error {
 	if err != nil {
 		return err
 	}
+
+	floatData := []float32{
+		-0.5, -0.5, 0.0, 0,
+		0.5, -0.5, 0.0, 0,
+		0.0, 0.5, 0.0, 0,
+	}
+	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
+	e.vertData = e.app.NewBuffer(byteData)
 
 	return nil
 }

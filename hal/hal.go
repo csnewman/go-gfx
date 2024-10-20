@@ -34,6 +34,7 @@ type Graphics interface {
 
 	CreateSurface(windowHandle WindowHandle) (Surface, error)
 	CreateShader(cfg ShaderConfig) (Shader, error)
+	CreateBuffer(data []byte) Buffer
 	CreateCommandBuffer() CommandBuffer
 }
 
@@ -69,6 +70,9 @@ type Shader interface {
 }
 
 type ShaderFunction interface {
+}
+
+type Buffer interface {
 }
 
 type Color struct {

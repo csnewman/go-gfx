@@ -159,6 +159,25 @@ func (s *Shader) ResolveFunction(name string) (hal.ShaderFunction, error) {
 	}, nil
 }
 
+type Buffer struct {
+	buffer C.id
+}
+
+func (g *Graphics) CreateBuffer(data []byte) hal.Buffer {
+	var buf C.id
+
+	C.gfx_mtl_buffer_from_bytes(
+		g.device,
+		unsafe.Pointer(unsafe.SliceData(data)),
+		C.int(len(data)),
+		&buf,
+	)
+
+	return &Buffer{
+		buffer: buf,
+	}
+}
+
 type CommandBuffer struct {
 	buffer        C.id
 	renderEncoder C.id
