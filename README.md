@@ -1,4 +1,5 @@
 # go-gfx
+
 <img align="right" width="25%" src="mascot.png">
 Cross-platform graphics framework for Go.
 
@@ -8,18 +9,20 @@ Cross-platform graphics framework for Go.
 ## Structure
 
 The repository contains the following packages:
+
 - `gfx` - User facing API. Will eventually be stable.
 - `hal` - Internal hardware abstraction layer. Expect breaking changes.
 - `internal/`
-  - `appkit` - macOS windowing backend.
-  - `metal` - Metal rendering backend.
+    - `appkit` - macOS windowing backend.
+    - `metal` - Metal rendering backend.
+    - `vulkan` - Vulkan rendering backend.
 
 ## Platforms
 
-|           | macOS                    | Linux                 | Windows                | iOS | Android | Web |
-|-----------|--------------------------|-----------------------|------------------------|-----|---------|-----|
-| Windowing | 🏗️ AppKit               | ⌛ Wayland </br> ⌛ X11 | ⌛                      | 💤  | 💤      | 💤  | 
-| Rendering | 🏗️ Metal </br> ⌛ Vulkan | ⌛ Vulkan              | ⌛ Vulkan <br/> 💤 DX12 | 💤  | 💤      | 💤  | 
+|           | macOS                     | Linux                 | Windows                | iOS | Android | Web |
+|-----------|---------------------------|-----------------------|------------------------|-----|---------|-----|
+| Windowing | 🏗️ AppKit                | ⌛ Wayland </br> ⌛ X11 | ⌛                      | 💤  | 💤      | 💤  | 
+| Rendering | 🏗️ Metal </br> 🏗 Vulkan | ⌛ Vulkan              | ⌛ Vulkan <br/> 💤 DX12 | 💤  | 💤      | 💤  | 
 
 ✅ = Supported.  
 🏗️ = Work in progress.  
