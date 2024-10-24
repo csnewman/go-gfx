@@ -37,7 +37,7 @@ var Black = Color{
 	A: 1,
 }
 
-type ColorAttachment struct {
+type RenderPassColorAttachment struct {
 	Target     TextureViewable
 	Load       bool
 	ClearColor Color
@@ -45,16 +45,16 @@ type ColorAttachment struct {
 }
 
 type RenderPassDescriptor struct {
-	ColorAttachments []ColorAttachment
+	ColorAttachments []RenderPassColorAttachment
 }
 
 func (b *CommandBuffer) BeginRenderPass(descriptor RenderPassDescriptor) *RenderPass {
 	halDes := hal.RenderPassDescriptor{
-		ColorAttachments: make([]hal.ColorAttachment, len(descriptor.ColorAttachments)),
+		ColorAttachments: make([]hal.RenderPassColorAttachment, len(descriptor.ColorAttachments)),
 	}
 
 	for i, attachment := range descriptor.ColorAttachments {
-		halDes.ColorAttachments[i] = hal.ColorAttachment{
+		halDes.ColorAttachments[i] = hal.RenderPassColorAttachment{
 			View:       attachment.Target.TextureView().view,
 			Load:       attachment.Load,
 			ClearColor: attachment.ClearColor,
@@ -71,4 +71,16 @@ func (b *CommandBuffer) BeginRenderPass(descriptor RenderPassDescriptor) *Render
 
 func (p *RenderPass) End() {
 	p.buf.buffer.EndRenderPass()
+}
+
+func (p *RenderPass) SetPipeline(pipeline *RenderPipeline) {
+	p.buf.buffer.SetRenderPipeline(pipeline.pipeline)
+}
+
+func (p *RenderPass) SetVertexBuffer(data *Buffer) {
+	p.buf.buffer.SetVertexBuffer(data.buffer)
+}
+
+func (p *RenderPass) Draw(start int, count int) {
+	p.buf.buffer.Draw(start, count)
 }

@@ -2,6 +2,8 @@ package gfx
 
 import "github.com/csnewman/go-gfx/hal"
 
+type TextureFormat = hal.TextureFormat
+
 type TextureViewable interface {
 	TextureView() *TextureView
 }

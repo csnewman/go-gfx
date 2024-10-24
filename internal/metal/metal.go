@@ -43,13 +43,16 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 	layer := C.id(wh.Layer)
 
-	r := C.gfx_mtl_configure_surface(g.device, layer)
+	format := hal.TextureFormatBGRA8UNorm
+
+	r := C.gfx_mtl_configure_surface(g.device, layer, ToPixelFormat(format))
 
 	switch r {
 	case C.GFX_SUCCESS:
 		return &Surface{
 			graphics: g,
 			layer:    layer,
+			format:   format,
 		}, nil
 
 	default:
@@ -57,9 +60,23 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 	}
 }
 
+func ToPixelFormat(tf hal.TextureFormat) C.int {
+	switch tf {
+	case hal.TextureFormatBGRA8UNorm:
+		return 80
+	default:
+		panic("unknown format")
+	}
+}
+
 type Surface struct {
 	graphics *Graphics
 	layer    C.id
+	format   hal.TextureFormat
+}
+
+func (s *Surface) TextureFormat() hal.TextureFormat {
+	return s.format
 }
 
 func (s *Surface) AcquireTexture(rawTK hal.RenderToken) (hal.SurfaceTexture, error) {
@@ -178,6 +195,74 @@ func (g *Graphics) CreateBuffer(data []byte) hal.Buffer {
 	}
 }
 
+type RenderPipeline struct {
+	pipeline C.id
+}
+
+func (g *Graphics) CreateRenderPipeline(des hal.RenderPipelineDescriptor) (hal.RenderPipeline, error) {
+	var (
+		vert C.id
+		frag C.id
+	)
+
+	if des.VertexFunction != nil {
+		vf, ok := des.VertexFunction.(*ShaderFunction)
+		if !ok {
+			panic("unexpected type")
+		}
+
+		vert = vf.function
+	}
+
+	if des.FragmentFunction != nil {
+		vf, ok := des.FragmentFunction.(*ShaderFunction)
+		if !ok {
+			panic("unexpected type")
+		}
+
+		frag = vf.function
+	}
+
+	cAttachs := make([]C.PipelineColorAttachment, len(des.ColorAttachments))
+
+	for i, c := range des.ColorAttachments {
+		cAttachs[i] = C.PipelineColorAttachment{
+			format: ToPixelFormat(c.Format),
+		}
+	}
+
+	cAttachsPtr := unsafe.SliceData(cAttachs)
+
+	var (
+		pipeline C.id
+		errorStr *C.char
+	)
+
+	r := C.gfx_mtl_create_render_pipeline(
+		g.device,
+		vert,
+		frag,
+		cAttachsPtr,
+		C.uint64_t(len(cAttachs)),
+		&pipeline,
+		&errorStr,
+	)
+
+	switch r {
+	case C.GFX_SUCCESS:
+		return &RenderPipeline{
+			pipeline: pipeline,
+		}, nil
+
+	case C.GFX_SEE_ERROR:
+		defer C.free(unsafe.Pointer(errorStr))
+
+		return nil, errors.New(C.GoString(errorStr))
+	default:
+		panic("unexpected response")
+	}
+}
+
 type CommandBuffer struct {
 	buffer        C.id
 	renderEncoder C.id
@@ -222,6 +307,28 @@ func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {
 		C.uint64_t(len(cAttachs)),
 		&c.renderEncoder,
 	)
+}
+
+func (c *CommandBuffer) SetRenderPipeline(pipeline hal.RenderPipeline) {
+	p, ok := pipeline.(*RenderPipeline)
+	if !ok {
+		panic("unexpected type")
+	}
+
+	C.gfx_mtl_set_render_pipeline(c.renderEncoder, p.pipeline)
+}
+
+func (c *CommandBuffer) SetVertexBuffer(data hal.Buffer) {
+	d, ok := data.(*Buffer)
+	if !ok {
+		panic("unexpected type")
+	}
+
+	C.gfx_mtl_set_vertex_buffer(c.renderEncoder, d.buffer)
+}
+
+func (c *CommandBuffer) Draw(start int, count int) {
+	C.gfx_mtl_draw(c.renderEncoder, C.int(start), C.int(count))
 }
 
 func (c *CommandBuffer) EndRenderPass() {

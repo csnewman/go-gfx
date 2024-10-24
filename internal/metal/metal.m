@@ -13,10 +13,10 @@ int gfx_mtl_open(id *res, id *res_queue) {
     }
 }
 
-int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer) {
+int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer, int pixelFormat) {
     @autoreleasepool {
         [layer setDevice:device];
-        // TODO: pixelFormat
+        [layer setPixelFormat:pixelFormat];
         [layer setFramebufferOnly:YES];
         // TODO: colorspace?
         // TODO: wantsExtendedDynamicRangeContent?
@@ -79,6 +79,44 @@ void gfx_mtl_buffer_from_bytes(id <MTLDevice> device, const void *data, int data
     *res = [device newBufferWithBytes:data length:data_len options:MTLResourceStorageModeShared];
 }
 
+int gfx_mtl_create_render_pipeline(
+        id <MTLDevice> device,
+        id <MTLFunction> vertFunc,
+        id <MTLFunction> fragFunc,
+        const struct PipelineColorAttachment *colors,
+        uint64_t colors_len,
+        id *res_lib,
+        char **res_err
+) {
+    @autoreleasepool {
+        MTLRenderPipelineDescriptor *des = [[MTLRenderPipelineDescriptor new] autorelease];
+        // TODO: label
+
+        [des setVertexFunction:vertFunc];
+        [des setFragmentFunction:fragFunc];
+
+
+        for (int i = 0; i < colors_len; ++i) {
+            const struct PipelineColorAttachment attachment = colors[i];
+
+            des.colorAttachments[i].pixelFormat = attachment.format;
+            // TODO: rest of options
+        }
+
+        NSError *error = nil;
+        id <MTLRenderPipelineState> state = [device newRenderPipelineStateWithDescriptor:des error:&error];
+
+        if (error != nil) {
+            *res_err = strdup([error.localizedDescription UTF8String]);
+            return GFX_SEE_ERROR;
+        }
+
+        *res_lib = state;
+
+        return GFX_SUCCESS;
+    }
+}
+
 void gfx_mtl_create_command_buf(id <MTLCommandQueue> queue, id *res) {
     @autoreleasepool {
         id <MTLCommandBuffer> buf = [queue commandBuffer];
@@ -126,6 +164,24 @@ void gfx_mtl_begin_rpass(
 
         id <MTLRenderCommandEncoder> enc = [buf renderCommandEncoderWithDescriptor:des];
         *res = [enc retain];
+    }
+}
+
+void gfx_mtl_set_render_pipeline(id <MTLRenderCommandEncoder> enc, id <MTLRenderPipelineState> pipeline) {
+    @autoreleasepool {
+        [enc setRenderPipelineState:pipeline];
+    }
+}
+
+void gfx_mtl_set_vertex_buffer(id <MTLRenderCommandEncoder> enc, id <MTLBuffer> buffer) {
+    @autoreleasepool {
+        [enc setVertexBuffer:buffer offset:0 atIndex:0];
+    }
+}
+
+void gfx_mtl_draw(id <MTLRenderCommandEncoder> enc, int start, int count) {
+    @autoreleasepool {
+        [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:start vertexCount:count];
     }
 }
 

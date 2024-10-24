@@ -1,6 +1,8 @@
 package hal
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 type PlatformConfig struct {
 	Init                 func() error
@@ -35,6 +37,7 @@ type Graphics interface {
 	CreateSurface(windowHandle WindowHandle) (Surface, error)
 	CreateShader(cfg ShaderConfig) (Shader, error)
 	CreateBuffer(data []byte) Buffer
+	CreateRenderPipeline(des RenderPipelineDescriptor) (RenderPipeline, error)
 	CreateCommandBuffer() CommandBuffer
 }
 
@@ -51,6 +54,8 @@ type MetalWindowHandle struct {
 }
 
 type Surface interface {
+	TextureFormat() TextureFormat
+
 	AcquireTexture(token RenderToken) (SurfaceTexture, error)
 }
 
@@ -82,7 +87,7 @@ type Color struct {
 	A float64
 }
 
-type ColorAttachment struct {
+type RenderPassColorAttachment struct {
 	View       TextureView
 	Load       bool
 	ClearColor Color
@@ -90,15 +95,37 @@ type ColorAttachment struct {
 }
 
 type RenderPassDescriptor struct {
-	ColorAttachments []ColorAttachment
+	ColorAttachments []RenderPassColorAttachment
 }
 
 type CommandBuffer interface {
 	BeginRenderPass(description RenderPassDescriptor)
+	SetRenderPipeline(pipeline RenderPipeline)
+	SetVertexBuffer(data Buffer)
+	Draw(start int, count int)
 	EndRenderPass()
 
 	Submit()
 }
 
 type TextureView interface {
+}
+
+type TextureFormat int
+
+const (
+	TextureFormatBGRA8UNorm TextureFormat = iota
+)
+
+type RenderPipelineColorAttachment struct {
+	Format TextureFormat
+}
+
+type RenderPipelineDescriptor struct {
+	VertexFunction   ShaderFunction
+	FragmentFunction ShaderFunction
+	ColorAttachments []RenderPipelineColorAttachment
+}
+
+type RenderPipeline interface {
 }

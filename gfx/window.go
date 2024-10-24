@@ -49,6 +49,10 @@ func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
 	return w, nil
 }
 
+func (w *Window) TextureFormat() TextureFormat {
+	return w.surface.TextureFormat()
+}
+
 func (a *Application) windowCloseRequested(id hal.Window) {
 	w, ok := a.windows.Get(id)
 	if !ok {
