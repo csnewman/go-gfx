@@ -2,5 +2,6 @@
 #include <vulkan/vulkan.h>
 
 uint32_t gfx_vk_version(int a, int b, int c) {
+//    vkCreateDebugUtilsMessengerEXT
     return VK_MAKE_VERSION(a, b, c);
 }
