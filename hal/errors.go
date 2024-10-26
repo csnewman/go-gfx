@@ -1,6 +1,8 @@
 package hal
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrUnexpectedStatus        = errors.New("unexpected status")
@@ -9,4 +11,6 @@ var (
 	ErrUnsupportedWindowHandle = errors.New("unsupported window handle")
 	ErrFunctionNotFound        = errors.New("function not found")
 	ErrIncompatibleDriver      = errors.New("incompatible driver")
+	ErrNoSuitableDevice        = errors.New("could not find a suitable device")
+	ErrMissingFeature          = errors.New("feature missing")
 )

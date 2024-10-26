@@ -15,6 +15,9 @@ func mapError(err C.VkResult) error {
 	}
 
 	switch err {
+	case C.VK_ERROR_EXTENSION_NOT_PRESENT:
+		return hal.ErrMissingFeature
+
 	case C.VK_ERROR_INCOMPATIBLE_DRIVER:
 		return hal.ErrIncompatibleDriver
 
