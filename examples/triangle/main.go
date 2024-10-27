@@ -88,6 +88,8 @@ func (e *Example) init(app *gfx.Application) error {
 	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
 	e.vertData = e.app.NewBuffer(byteData)
 
+	e.window.Start()
+
 	return nil
 }
 
@@ -112,7 +114,7 @@ func (e *Example) render(frame *gfx.Frame) {
 
 	count++
 
-	if time.Since(lastPrint) > time.Second {
+	if time.Since(lastPrint) >= time.Second {
 		lastPrint = time.Now()
 
 		log.Println("FPS", count)

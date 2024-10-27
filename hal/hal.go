@@ -8,7 +8,6 @@ type PlatformConfig struct {
 	Init                 func() error
 	WindowCloseRequested func(w Window)
 	WindowClosed         func(w Window)
-	WindowRender         func(w Window, token RenderToken)
 	WindowResized        func(w Window, width float64, height float64)
 }
 
@@ -41,12 +40,6 @@ type Graphics interface {
 	CreateCommandBuffer() CommandBuffer
 }
 
-type RenderToken any
-
-type MetalRenderToken struct {
-	Drawable unsafe.Pointer
-}
-
 type WindowHandle interface{}
 
 type MetalWindowHandle struct {
@@ -56,7 +49,7 @@ type MetalWindowHandle struct {
 type Surface interface {
 	TextureFormat() TextureFormat
 
-	AcquireTexture(token RenderToken) (SurfaceTexture, error)
+	AcquireTexture() (SurfaceTexture, error)
 }
 
 type SurfaceTexture interface {

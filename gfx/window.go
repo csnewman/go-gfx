@@ -85,14 +85,13 @@ func (w *Window) Close() {
 	w.app.platform.CloseWindow(w.id)
 }
 
-func (a *Application) windowRender(id hal.Window, token hal.RenderToken) {
-	w, ok := a.windows.Get(id)
-	if !ok {
-		return
-	}
+func (w *Window) Start() {
+	go w.thread()
+}
 
-	if w.cfg.OnRender != nil {
-		texture, err := w.surface.AcquireTexture(token)
+func (w *Window) thread() {
+	for {
+		texture, err := w.surface.AcquireTexture()
 		if err != nil {
 			// TODO: handle error
 			panic(err)

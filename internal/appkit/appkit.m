@@ -147,15 +147,15 @@ void gfx_ak_stop() {
 - (void)viewDidMoveToWindow {
     [displayLink invalidate];
 
-    displayLink = [[CAMetalDisplayLink alloc] initWithMetalLayer:context->layer];
+//     displayLink = [[CAMetalDisplayLink alloc] initWithMetalLayer:context->layer];
 //     displayLink.preferredFrameRateRange = CAFrameRateRangeMake(120.0, 120.0, 120.0);
-    displayLink.preferredFrameLatency = 2;
-    displayLink.paused = NO;
-    displayLink.delegate = self;
+//     displayLink.preferredFrameLatency = 2;
+//     displayLink.paused = NO;
+//     displayLink.delegate = self;
 
     _previousTargetPresentationTimestamp = CACurrentMediaTime();
-    [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSEventTrackingRunLoopMode];
+//     [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+//     [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSEventTrackingRunLoopMode];
 
     [self resizeDrawable];
 }
