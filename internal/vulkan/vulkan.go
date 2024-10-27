@@ -15,6 +15,7 @@ const char* GFX_VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
 const char* GFX_VK_KHR_portability_subset = "VK_KHR_portability_subset";
 const char* GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
 const char* GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME = VK_EXT_METAL_SURFACE_EXTENSION_NAME;
+const char* GFX_VK_KHR_SWAPCHAIN_EXTENSION_NAME = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
 VkBool32 gfx_vk_debug_callback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
@@ -44,6 +45,7 @@ import (
 type Graphics struct {
 	instance       C.VkInstance
 	debugMessenger C.VkDebugUtilsMessengerEXT
+	physicalDevice C.VkPhysicalDevice
 	device         C.VkDevice
 	graphicsQueue  C.VkQueue
 }
@@ -229,6 +231,8 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
+	g.physicalDevice = sel.device
+
 	priority := C.float(1.0)
 
 	var queueCreateInfo C.VkDeviceQueueCreateInfo
@@ -254,6 +258,7 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 
 	exts = append(exts, C.GFX_VK_KHR_portability_subset)
 	exts = append(exts, C.GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
+	exts = append(exts, C.GFX_VK_KHR_SWAPCHAIN_EXTENSION_NAME)
 
 	createInfo.enabledExtensionCount = C.uint32_t(len(exts))
 	createInfo.ppEnabledExtensionNames = unsafe.SliceData(exts)
@@ -268,9 +273,38 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	return nil
 }
 
+type Shader struct {
+	shader C.VkShaderModule
+}
+
 func (g *Graphics) CreateShader(cfg hal.ShaderConfig) (hal.Shader, error) {
-	//TODO implement me
-	panic("implement me")
+
+	var createInfo C.VkShaderModuleCreateInfo
+	createInfo.sType = C.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
+	createInfo.codeSize = C.size_t(len(cfg.Code))
+	createInfo.pCode = (*C.uint32_t)(unsafe.Pointer(unsafe.SliceData(cfg.Code)))
+
+	var shaderModule C.VkShaderModule
+
+	if err := mapError(C.vkCreateShaderModule(g.device, &createInfo, nil, &shaderModule)); err != nil {
+		return nil, err
+	}
+
+	return &Shader{
+		shader: shaderModule,
+	}, nil
+}
+
+type ShaderFunction struct {
+	shader   *Shader
+	function string
+}
+
+func (s *Shader) ResolveFunction(name string) (hal.ShaderFunction, error) {
+	return &ShaderFunction{
+		shader:   s,
+		function: name,
+	}, nil
 }
 
 func (g *Graphics) CreateBuffer(data []byte) hal.Buffer {

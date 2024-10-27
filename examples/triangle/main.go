@@ -19,6 +19,9 @@ var count int
 //go:embed shader.metal
 var metalShader string
 
+//go:embed shader.spv
+var mainShader []byte
+
 type Example struct {
 	app              *gfx.Application
 	window           *gfx.Window
@@ -52,6 +55,7 @@ func (e *Example) init(app *gfx.Application) error {
 
 	e.shader, err = e.app.LoadShader(gfx.ShaderConfig{
 		Source: metalShader,
+		Code:   mainShader,
 	})
 	if err != nil {
 		return err

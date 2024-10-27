@@ -61,6 +61,7 @@ type SurfaceTexture interface {
 
 type ShaderConfig struct {
 	Source string
+	Code   []byte
 }
 
 type Shader interface {
