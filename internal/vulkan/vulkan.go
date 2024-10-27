@@ -5,6 +5,7 @@ package vulkan
 
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_metal.h>
 #include "vulkan.h"
 
 const char* GFX_VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
@@ -13,6 +14,7 @@ const char* GFX_VK_EXT_DEBUG_UTILS_EXTENSION_NAME = VK_EXT_DEBUG_UTILS_EXTENSION
 const char* GFX_VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
 const char* GFX_VK_KHR_portability_subset = "VK_KHR_portability_subset";
 const char* GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
+const char* GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME = VK_EXT_METAL_SURFACE_EXTENSION_NAME;
 
 VkBool32 gfx_vk_debug_callback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
@@ -98,6 +100,8 @@ func (g *Graphics) createInstance() error {
 	instInfo.flags |= C.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
 
 	exts = append(exts, C.GFX_VK_KHR_SURFACE_EXTENSION_NAME)
+	exts = append(exts, C.GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME)
+
 	exts = append(exts, C.GFX_VK_EXT_DEBUG_UTILS_EXTENSION_NAME)
 
 	instInfo.enabledExtensionCount = C.uint32_t(len(exts))
@@ -262,11 +266,6 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	C.vkGetDeviceQueue(g.device, C.uint32_t(sel.graphicsFamily), 0, &g.graphicsQueue)
 
 	return nil
-}
-
-func (g *Graphics) CreateSurface(windowHandle hal.WindowHandle) (hal.Surface, error) {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (g *Graphics) CreateShader(cfg hal.ShaderConfig) (hal.Shader, error) {
