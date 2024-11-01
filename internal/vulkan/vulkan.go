@@ -2,11 +2,13 @@ package vulkan
 
 /*
 #cgo pkg-config: vulkan
+#cgo CXXFLAGS: -std=c++20
 
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_metal.h>
 #include "vulkan.h"
+#include "vk_mem_alloc.h"
 
 const char* GFX_VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME = VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
 const char* GFX_VK_KHR_SURFACE_EXTENSION_NAME = VK_KHR_SURFACE_EXTENSION_NAME;
@@ -46,11 +48,12 @@ import (
 )
 
 type Graphics struct {
-	instance       C.VkInstance
-	debugMessenger C.VkDebugUtilsMessengerEXT
-	physicalDevice C.VkPhysicalDevice
-	device         C.VkDevice
-	graphicsQueue  C.VkQueue
+	instance        C.VkInstance
+	debugMessenger  C.VkDebugUtilsMessengerEXT
+	physicalDevice  C.VkPhysicalDevice
+	device          C.VkDevice
+	graphicsQueue   C.VkQueue
+	memoryAllocator C.VmaAllocator
 }
 
 func NewGraphics() hal.Graphics {
@@ -290,6 +293,16 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 
 	C.vkGetDeviceQueue(g.device, C.uint32_t(sel.graphicsFamily), 0, &g.graphicsQueue)
 
+	var vmaInfo C.VmaAllocatorCreateInfo
+	vmaInfo.vulkanApiVersion = C.VK_API_VERSION_1_3
+	vmaInfo.physicalDevice = sel.device
+	vmaInfo.device = g.device
+	vmaInfo.instance = g.instance
+
+	if err := mapError(C.vmaCreateAllocator(&vmaInfo, &g.memoryAllocator)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -325,11 +338,6 @@ func (s *Shader) ResolveFunction(name string) (hal.ShaderFunction, error) {
 		shader:   s,
 		function: name,
 	}, nil
-}
-
-func (g *Graphics) CreateBuffer(data []byte) hal.Buffer {
-	//TODO implement me
-	panic("implement me")
 }
 
 type RenderPipeline struct {
@@ -416,6 +424,7 @@ func (g *Graphics) CreateRenderPipeline(des hal.RenderPipelineDescriptor) (hal.R
 	rasterizer.cullMode = C.VK_CULL_MODE_BACK_BIT
 	rasterizer.frontFace = C.VK_FRONT_FACE_CLOCKWISE
 	rasterizer.depthBiasEnable = C.VkBool32(0)
+	rasterizer.lineWidth = 1.0
 
 	var multisampling C.VkPipelineMultisampleStateCreateInfo
 	multisampling.sType = C.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO
