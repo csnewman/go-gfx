@@ -51,6 +51,7 @@ type Graphics struct {
 	instance        C.VkInstance
 	debugMessenger  C.VkDebugUtilsMessengerEXT
 	physicalDevice  C.VkPhysicalDevice
+	graphicsFamily  int
 	device          C.VkDevice
 	graphicsQueue   C.VkQueue
 	memoryAllocator C.VmaAllocator
@@ -238,6 +239,7 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	defer pinner.Unpin()
 
 	g.physicalDevice = sel.device
+	g.graphicsFamily = sel.graphicsFamily
 
 	priority := C.float(1.0)
 
@@ -507,9 +509,4 @@ func ToFormat(format hal.TextureFormat) C.VkFormat {
 	default:
 		panic("unknown format")
 	}
-}
-
-func (g *Graphics) CreateCommandBuffer() hal.CommandBuffer {
-	//TODO implement me
-	panic("implement me")
 }

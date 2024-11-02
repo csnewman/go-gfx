@@ -2,6 +2,7 @@ package vulkan
 
 import (
 	"log/slog"
+	"math"
 	"unsafe"
 
 	"github.com/csnewman/go-gfx/hal"
@@ -23,6 +24,21 @@ type Surface struct {
 	minImageCount int
 	transform     C.VkSurfaceTransformFlagBitsKHR
 	swapchain     C.VkSwapchainKHR
+	images        []*SurfaceImage
+	entries       []*SurfaceEntry
+	currentEntry  int
+}
+
+type SurfaceImage struct {
+	image C.VkImage
+	view  C.VkImageView
+}
+
+type SurfaceEntry struct {
+	commandPool C.VkCommandPool
+	imgSem      C.VkSemaphore
+	completeSem C.VkSemaphore
+	fence       C.VkFence
 }
 
 func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
@@ -95,6 +111,52 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 		return nil, err
 	}
 
+	for i := 0; i < 3; i++ {
+		var commandInfo C.VkCommandPoolCreateInfo
+
+		commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
+		commandInfo.queueFamilyIndex = C.uint32_t(g.graphicsFamily)
+		commandInfo.flags = C.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+
+		var commandPool C.VkCommandPool
+
+		if err := mapError(C.vkCreateCommandPool(g.device, &commandInfo, nil, &commandPool)); err != nil {
+			return nil, err
+		}
+
+		var semInfo C.VkSemaphoreCreateInfo
+		semInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+
+		var imgSem C.VkSemaphore
+
+		if err := mapError(C.vkCreateSemaphore(g.device, &semInfo, nil, &imgSem)); err != nil {
+			return nil, err
+		}
+
+		var completeSem C.VkSemaphore
+
+		if err := mapError(C.vkCreateSemaphore(g.device, &semInfo, nil, &completeSem)); err != nil {
+			return nil, err
+		}
+
+		var fenceInfo C.VkFenceCreateInfo
+		fenceInfo.sType = C.VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
+		fenceInfo.flags = C.VK_FENCE_CREATE_SIGNALED_BIT
+
+		var fence C.VkFence
+
+		if err := mapError(C.vkCreateFence(g.device, &fenceInfo, nil, &fence)); err != nil {
+			return nil, err
+		}
+
+		s.entries = append(s.entries, &SurfaceEntry{
+			commandPool: commandPool,
+			imgSem:      imgSem,
+			completeSem: completeSem,
+			fence:       fence,
+		})
+	}
+
 	return s, nil
 }
 
@@ -121,6 +183,48 @@ func (s *Surface) Resize(width int, height int) error {
 		return err
 	}
 
+	var imageCount C.uint32_t
+
+	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, nil)); err != nil {
+		return err
+	}
+
+	images := make([]C.VkImage, imageCount)
+
+	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, unsafe.SliceData(images))); err != nil {
+		return err
+	}
+
+	images = images[:imageCount]
+
+	for _, image := range images {
+		var createInfo C.VkImageViewCreateInfo
+		createInfo.sType = C.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO
+		createInfo.viewType = C.VK_IMAGE_VIEW_TYPE_2D
+		createInfo.components.r = C.VK_COMPONENT_SWIZZLE_IDENTITY
+		createInfo.components.g = C.VK_COMPONENT_SWIZZLE_IDENTITY
+		createInfo.components.b = C.VK_COMPONENT_SWIZZLE_IDENTITY
+		createInfo.components.a = C.VK_COMPONENT_SWIZZLE_IDENTITY
+		createInfo.subresourceRange.baseMipLevel = 0
+		createInfo.subresourceRange.levelCount = C.VK_REMAINING_MIP_LEVELS
+		createInfo.subresourceRange.baseArrayLayer = 0
+		createInfo.subresourceRange.layerCount = C.VK_REMAINING_ARRAY_LAYERS
+		createInfo.image = image
+		createInfo.format = s.format
+		createInfo.subresourceRange.aspectMask = C.VK_IMAGE_ASPECT_COLOR_BIT
+
+		var view C.VkImageView
+
+		if err := mapError(C.vkCreateImageView(s.graphics.device, &createInfo, nil, &view)); err != nil {
+			return err
+		}
+
+		s.images = append(s.images, &SurfaceImage{
+			image: image,
+			view:  view,
+		})
+	}
+
 	return nil
 }
 
@@ -130,7 +234,63 @@ func (s *Surface) TextureFormat() hal.TextureFormat {
 	return hal.TextureFormatBGRA8UNorm
 }
 
-func (s *Surface) AcquireTexture() (hal.SurfaceTexture, error) {
+type SurfaceFrame struct {
+	graphics *Graphics
+	entry    *SurfaceEntry
+	img      *SurfaceImage
+}
+
+func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
+	entry := s.entries[s.currentEntry]
+
+	if err := mapError(C.vkWaitForFences(
+		s.graphics.device,
+		1,
+		&entry.fence,
+		C.VkBool32(1),
+		C.uint64_t(math.MaxUint64),
+	)); err != nil {
+		return nil, err
+	}
+
+	if err := mapError(C.vkResetFences(s.graphics.device, 1, &entry.fence)); err != nil {
+		return nil, err
+	}
+
+	var imgIndex C.uint32_t
+
+	// TODO: handle outdated & suboptimal
+	if err := mapError(C.vkAcquireNextImageKHR(
+		s.graphics.device,
+		s.swapchain,
+		C.uint64_t(math.MaxUint64),
+		entry.imgSem,
+		nil,
+		&imgIndex,
+	)); err != nil {
+		return nil, err
+	}
+
+	s.currentEntry = (s.currentEntry + 1) % len(s.entries)
+
+	return &SurfaceFrame{
+		graphics: s.graphics,
+		entry:    entry,
+		img:      s.images[imgIndex],
+	}, nil
+}
+
+func (f *SurfaceFrame) View() hal.TextureView {
+
+	return &TextureView{}
+}
+
+func (f *SurfaceFrame) Present() error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *SurfaceFrame) Discard() {
 	//TODO implement me
 	panic("implement me")
 }

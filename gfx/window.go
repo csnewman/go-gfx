@@ -91,15 +91,15 @@ func (w *Window) Start() {
 
 func (w *Window) thread() {
 	for {
-		texture, err := w.surface.AcquireTexture()
+		frame, err := w.surface.Acquire()
 		if err != nil {
 			// TODO: handle error
 			panic(err)
 		}
 
 		w.cfg.OnRender(&Frame{
-			app:     w.app,
-			texture: texture,
+			app:   w.app,
+			frame: frame,
 		})
 	}
 }
@@ -117,7 +117,7 @@ func (a *Application) windowResized(id hal.Window, width float64, height float64
 
 type Frame struct {
 	app       *Application
-	texture   hal.SurfaceTexture
+	frame     hal.SurfaceFrame
 	presented bool
 }
 
@@ -126,15 +126,15 @@ func (f *Frame) Close() {
 		return
 	}
 
-	f.texture.Discard()
+	f.frame.Discard()
 }
 
 func (f *Frame) Present() error {
 	f.presented = true
 
-	return f.texture.Present()
+	return f.frame.Present()
 }
 
 func (f *Frame) TextureView() *TextureView {
-	return viewFromHal(f.texture.View())
+	return viewFromHal(f.frame.View())
 }

@@ -37,7 +37,6 @@ type Graphics interface {
 	CreateShader(cfg ShaderConfig) (Shader, error)
 	CreateBuffer(data []byte) Buffer
 	CreateRenderPipeline(des RenderPipelineDescriptor) (RenderPipeline, error)
-	CreateCommandBuffer() CommandBuffer
 }
 
 type WindowHandle interface{}
@@ -49,14 +48,16 @@ type MetalWindowHandle struct {
 type Surface interface {
 	TextureFormat() TextureFormat
 
-	AcquireTexture() (SurfaceTexture, error)
+	Acquire() (SurfaceFrame, error)
 }
 
-type SurfaceTexture interface {
+type SurfaceFrame interface {
 	View() TextureView
 
 	Present() error
 	Discard()
+
+	CreateCommandBuffer() CommandBuffer
 }
 
 type ShaderConfig struct {
