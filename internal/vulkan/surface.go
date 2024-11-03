@@ -3,6 +3,7 @@ package vulkan
 import (
 	"log/slog"
 	"math"
+	"runtime"
 	"unsafe"
 
 	"github.com/csnewman/go-gfx/hal"
@@ -27,11 +28,15 @@ type Surface struct {
 	images        []*SurfaceImage
 	entries       []*SurfaceEntry
 	currentEntry  int
+	width         int
+	height        int
 }
 
 type SurfaceImage struct {
-	image C.VkImage
-	view  C.VkImageView
+	image  C.VkImage
+	view   C.VkImageView
+	width  int
+	height int
 }
 
 type SurfaceEntry struct {
@@ -163,6 +168,9 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 func (s *Surface) Resize(width int, height int) error {
 	slog.Info("resize", "width", width, "height", height)
 
+	s.width = width
+	s.height = height
+
 	var createInfo C.VkSwapchainCreateInfoKHR
 	createInfo.sType = C.VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR
 	createInfo.surface = s.surface
@@ -220,8 +228,10 @@ func (s *Surface) Resize(width int, height int) error {
 		}
 
 		s.images = append(s.images, &SurfaceImage{
-			image: image,
-			view:  view,
+			image:  image,
+			view:   view,
+			width:  width,
+			height: height,
 		})
 	}
 
@@ -236,8 +246,10 @@ func (s *Surface) TextureFormat() hal.TextureFormat {
 
 type SurfaceFrame struct {
 	graphics *Graphics
+	surface  *Surface
 	entry    *SurfaceEntry
 	img      *SurfaceImage
+	index    int
 }
 
 func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
@@ -275,19 +287,47 @@ func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
 
 	return &SurfaceFrame{
 		graphics: s.graphics,
+		surface:  s,
 		entry:    entry,
 		img:      s.images[imgIndex],
+		index:    int(imgIndex),
 	}, nil
 }
 
 func (f *SurfaceFrame) View() hal.TextureView {
-
-	return &TextureView{}
+	return &TextureView{
+		view: f.img.view,
+	}
 }
 
 func (f *SurfaceFrame) Present() error {
-	//TODO implement me
-	panic("implement me")
+	pinner := new(runtime.Pinner)
+	defer pinner.Unpin()
+
+	var presentInfo C.VkPresentInfoKHR
+	presentInfo.sType = C.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR
+	presentInfo.pNext = nil
+	presentInfo.swapchainCount = 1
+
+	swapchain := f.surface.swapchain
+	presentInfo.pSwapchains = &swapchain
+	pinner.Pin(presentInfo.pSwapchains)
+
+	ind := C.uint32_t(f.index)
+	presentInfo.pImageIndices = &ind
+	pinner.Pin(presentInfo.pImageIndices)
+
+	complete := f.entry.completeSem
+	presentInfo.pWaitSemaphores = &complete
+	pinner.Pin(presentInfo.pWaitSemaphores)
+
+	presentInfo.waitSemaphoreCount = 1
+
+	if err := mapError(C.vkQueuePresentKHR(f.graphics.graphicsQueue, &presentInfo)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (f *SurfaceFrame) Discard() {
