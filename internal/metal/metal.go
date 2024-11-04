@@ -100,6 +100,11 @@ type SurfaceFrame struct {
 	texture  C.id
 }
 
+func (f *SurfaceFrame) Texture() hal.Texture {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (f *SurfaceFrame) Present() error {
 	C.gfx_mtl_present_texture(f.graphics.queue, f.drawable)
 
@@ -279,6 +284,10 @@ func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
 	return &CommandBuffer{
 		buffer: buf,
 	}
+}
+
+func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
+	// Unneeded on Metal
 }
 
 func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {

@@ -294,6 +294,12 @@ func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
 	}, nil
 }
 
+func (f *SurfaceFrame) Texture() hal.Texture {
+	return &Texture{
+		img: f.img.image,
+	}
+}
+
 func (f *SurfaceFrame) View() hal.TextureView {
 	return &TextureView{
 		view: f.img.view,

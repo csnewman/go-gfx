@@ -62,6 +62,14 @@ void gfx_vkCmdSetScissorWithCountEXT(
 ) {
 	GFX_VK_EXT_FUNC(vkCmdSetScissorWithCountEXT, commandBuffer, scissorCount, pScissors);
 }
+
+void gfx_vkCmdPipelineBarrier2KHR(
+    VkInstance                                  instance,
+	VkCommandBuffer                             commandBuffer,
+    const VkDependencyInfo*                     pDependencyInfo
+) {
+	GFX_VK_EXT_FUNC(vkCmdPipelineBarrier2KHR, commandBuffer, pDependencyInfo);
+}
 */
 import "C"
 
@@ -69,6 +77,84 @@ type CommandBuffer struct {
 	graphics      *Graphics
 	frame         *SurfaceFrame
 	commandBuffer C.VkCommandBuffer
+}
+
+func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
+	pinner := new(runtime.Pinner)
+	defer pinner.Unpin()
+
+	var depInfo C.VkDependencyInfo
+	depInfo.sType = C.VK_STRUCTURE_TYPE_DEPENDENCY_INFO
+
+	var imgBarriers []C.VkImageMemoryBarrier2
+
+	for _, halB := range barrier.Textures {
+		var imgBarrier C.VkImageMemoryBarrier2
+		imgBarrier.sType = C.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2
+
+		// TODO: reduce stageMask scope
+		imgBarrier.srcStageMask = C.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
+		imgBarrier.dstStageMask = C.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
+
+		// TODO: access masks (srcAccessMask, dstAccessMask. for now, layout guesses)
+		// TODO: transfers (srcQueueFamilyIndex, dstQueueFamilyIndex)
+
+		switch halB.SrcLayout {
+		case hal.TextureLayoutUndefined:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_UNDEFINED
+			imgBarrier.srcAccessMask = C.VK_ACCESS_2_NONE
+		case hal.TextureLayoutAttachment:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
+			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT | C.VK_ACCESS_2_MEMORY_WRITE_BIT
+		case hal.TextureLayoutRead:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
+			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+		case hal.TextureLayoutPresent:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+		default:
+			panic("unknown layout")
+		}
+
+		switch halB.DstLayout {
+		case hal.TextureLayoutUndefined:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_UNDEFINED
+			panic("todo check")
+		case hal.TextureLayoutAttachment:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
+			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT | C.VK_ACCESS_2_MEMORY_WRITE_BIT
+		case hal.TextureLayoutRead:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
+			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+		case hal.TextureLayoutPresent:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+		default:
+			panic("unknown layout")
+		}
+
+		t, ok := halB.Texture.(*Texture)
+		if !ok {
+			panic("unexpected type")
+		}
+
+		imgBarrier.image = t.img
+
+		// TODO: subresourceRange (e.g. depth)
+		imgBarrier.subresourceRange.aspectMask = C.VK_IMAGE_ASPECT_COLOR_BIT
+		imgBarrier.subresourceRange.baseMipLevel = 0
+		imgBarrier.subresourceRange.levelCount = C.VK_REMAINING_MIP_LEVELS
+		imgBarrier.subresourceRange.baseArrayLayer = 0
+		imgBarrier.subresourceRange.layerCount = C.VK_REMAINING_ARRAY_LAYERS
+
+		imgBarriers = append(imgBarriers, imgBarrier)
+	}
+
+	depInfo.imageMemoryBarrierCount = C.uint32_t(len(imgBarriers))
+	depInfo.pImageMemoryBarriers = unsafe.SliceData(imgBarriers)
+	pinner.Pin(depInfo.pImageMemoryBarriers)
+
+	C.gfx_vkCmdPipelineBarrier2KHR(c.graphics.instance, c.commandBuffer, &depInfo)
 }
 
 func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
