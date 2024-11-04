@@ -251,9 +251,15 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	queueCreateInfo.pQueuePriorities = &priority
 	pinner.Pin(queueCreateInfo.pQueuePriorities)
 
+	var synchronization2Features C.VkPhysicalDeviceSynchronization2FeaturesKHR
+	synchronization2Features.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR
+	synchronization2Features.synchronization2 = C.VkBool32(1)
+
 	var extendedDynamicState C.VkPhysicalDeviceExtendedDynamicStateFeaturesEXT
 	extendedDynamicState.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT
 	extendedDynamicState.extendedDynamicState = C.VkBool32(1)
+	extendedDynamicState.pNext = unsafe.Pointer(&synchronization2Features)
+	pinner.Pin(extendedDynamicState.pNext)
 
 	var extendedDynamicState3 C.VkPhysicalDeviceExtendedDynamicState3FeaturesEXT
 	extendedDynamicState3.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT
