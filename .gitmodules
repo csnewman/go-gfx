@@ -1,0 +1,3 @@
+[submodule "internal/vulkan/volk"]
+	path = internal/vulkan/volk
+	url = git@github.com:zeux/volk.git
