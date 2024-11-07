@@ -1,8 +1,7 @@
 package vulkan
 
 /*
-#include <stdlib.h>
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 */
 import "C"
 

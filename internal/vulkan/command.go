@@ -7,8 +7,6 @@ import (
 )
 
 /*
-#include <stdlib.h>
-#include <vulkan/vulkan.h>
 #include "vulkan.h"
 
 VkClearValue gfx_vk_clear_color(float r, float g, float b, float a) {
@@ -18,57 +16,6 @@ VkClearValue gfx_vk_clear_color(float r, float g, float b, float a) {
 	col.color.float32[2] = b;
 	col.color.float32[3] = a;
 	return col;
-}
-
-void gfx_vkCmdBeginRenderingKHR(
-    VkInstance                                  instance,
-	VkCommandBuffer                             commandBuffer,
-    const VkRenderingInfo*                      pRenderingInfo
-) {
-	GFX_VK_EXT_FUNC(vkCmdBeginRenderingKHR, commandBuffer, pRenderingInfo);
-}
-
-void gfx_vkCmdEndRenderingKHR(
-    VkInstance                                  instance,
-	VkCommandBuffer                             commandBuffer
-) {
-	GFX_VK_EXT_FUNC(vkCmdEndRenderingKHR, commandBuffer);
-}
-
-VkResult gfx_vkQueueSubmit2KHR(
-    VkInstance                                  instance,
-	VkQueue                                     queue,
-    uint32_t                                    submitCount,
-    const VkSubmitInfo2*                        pSubmits,
-    VkFence                                     fence
-) {
-	return GFX_VK_EXT_FUNC(vkQueueSubmit2KHR, queue, submitCount, pSubmits, fence);
-}
-
-void gfx_vkCmdSetViewportWithCountEXT(
-    VkInstance                                  instance,
-	VkCommandBuffer                             commandBuffer,
-    uint32_t                                    viewportCount,
-    const VkViewport*                           pViewports
-) {
-	GFX_VK_EXT_FUNC(vkCmdSetViewportWithCountEXT, commandBuffer, viewportCount, pViewports);
-}
-
-void gfx_vkCmdSetScissorWithCountEXT(
-    VkInstance                                  instance,
-	VkCommandBuffer                             commandBuffer,
-    uint32_t                                    scissorCount,
-    const VkRect2D*                             pScissors
-) {
-	GFX_VK_EXT_FUNC(vkCmdSetScissorWithCountEXT, commandBuffer, scissorCount, pScissors);
-}
-
-void gfx_vkCmdPipelineBarrier2KHR(
-    VkInstance                                  instance,
-	VkCommandBuffer                             commandBuffer,
-    const VkDependencyInfo*                     pDependencyInfo
-) {
-	GFX_VK_EXT_FUNC(vkCmdPipelineBarrier2KHR, commandBuffer, pDependencyInfo);
 }
 */
 import "C"
@@ -154,7 +101,7 @@ func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
 	depInfo.pImageMemoryBarriers = unsafe.SliceData(imgBarriers)
 	pinner.Pin(depInfo.pImageMemoryBarriers)
 
-	C.gfx_vkCmdPipelineBarrier2KHR(c.graphics.instance, c.commandBuffer, &depInfo)
+	C.gfx_vkCmdPipelineBarrier2KHR(c.commandBuffer, &depInfo)
 }
 
 func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
@@ -166,7 +113,7 @@ func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
 
 	var commandBuffer C.VkCommandBuffer
 
-	if err := mapError(C.vkAllocateCommandBuffers(f.graphics.device, &allocInfo, &commandBuffer)); err != nil {
+	if err := mapError(C.gfx_vkAllocateCommandBuffers(f.graphics.device, &allocInfo, &commandBuffer)); err != nil {
 		panic(err)
 	}
 
@@ -174,7 +121,7 @@ func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
 	beginInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
 	beginInfo.flags = C.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
 
-	if err := mapError(C.vkBeginCommandBuffer(commandBuffer, &beginInfo)); err != nil {
+	if err := mapError(C.gfx_vkBeginCommandBuffer(commandBuffer, &beginInfo)); err != nil {
 		panic(err)
 	}
 
@@ -236,7 +183,7 @@ func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {
 	renderingInfo.pColorAttachments = unsafe.SliceData(cAttachs)
 	pinner.Pin(renderingInfo.pColorAttachments)
 
-	C.gfx_vkCmdBeginRenderingKHR(c.graphics.instance, c.commandBuffer, &renderingInfo)
+	C.gfx_vkCmdBeginRenderingKHR(c.commandBuffer, &renderingInfo)
 
 	var viewport C.VkViewport
 	viewport.x = C.float(0)
@@ -246,7 +193,7 @@ func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {
 	viewport.minDepth = C.float(0)
 	viewport.maxDepth = C.float(1)
 
-	C.gfx_vkCmdSetViewportWithCountEXT(c.graphics.instance, c.commandBuffer, 1, &viewport)
+	C.gfx_vkCmdSetViewportWithCountEXT(c.commandBuffer, 1, &viewport)
 
 	var scissor C.VkRect2D
 	scissor.offset.x = 0
@@ -254,7 +201,7 @@ func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {
 	scissor.extent.width = C.uint32_t(c.frame.img.width)
 	scissor.extent.height = C.uint32_t(c.frame.img.height)
 
-	C.gfx_vkCmdSetScissorWithCountEXT(c.graphics.instance, c.commandBuffer, 1, &scissor)
+	C.gfx_vkCmdSetScissorWithCountEXT(c.commandBuffer, 1, &scissor)
 }
 
 func (c *CommandBuffer) SetRenderPipeline(pipeline hal.RenderPipeline) {
@@ -263,7 +210,7 @@ func (c *CommandBuffer) SetRenderPipeline(pipeline hal.RenderPipeline) {
 		panic("unexpected type")
 	}
 
-	C.vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, p.pipeline)
+	C.gfx_vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, p.pipeline)
 }
 
 func (c *CommandBuffer) SetVertexBuffer(data hal.Buffer) {
@@ -272,18 +219,18 @@ func (c *CommandBuffer) SetVertexBuffer(data hal.Buffer) {
 }
 
 func (c *CommandBuffer) Draw(start int, count int) {
-	C.vkCmdDraw(c.commandBuffer, C.uint32_t(count), 1, C.uint32_t(start), 0)
+	C.gfx_vkCmdDraw(c.commandBuffer, C.uint32_t(count), 1, C.uint32_t(start), 0)
 }
 
 func (c *CommandBuffer) EndRenderPass() {
-	C.gfx_vkCmdEndRenderingKHR(c.graphics.instance, c.commandBuffer)
+	C.gfx_vkCmdEndRenderingKHR(c.commandBuffer)
 }
 
 func (c *CommandBuffer) Submit() {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
-	C.vkEndCommandBuffer(c.commandBuffer)
+	C.gfx_vkEndCommandBuffer(c.commandBuffer)
 
 	var cmdinfo C.VkCommandBufferSubmitInfo
 	cmdinfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO
@@ -323,7 +270,7 @@ func (c *CommandBuffer) Submit() {
 	submitInfo.pCommandBufferInfos = &cmdinfo
 	pinner.Pin(submitInfo.pCommandBufferInfos)
 
-	if err := mapError(C.gfx_vkQueueSubmit2KHR(c.graphics.instance, c.graphics.graphicsQueue, 1, &submitInfo, c.frame.entry.fence)); err != nil {
+	if err := mapError(C.gfx_vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, c.frame.entry.fence)); err != nil {
 		panic(err)
 	}
 

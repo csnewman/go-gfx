@@ -10,9 +10,6 @@ import (
 )
 
 /*
-#include <stdlib.h>
-#include <vulkan/vulkan.h>
-#include <vulkan/vulkan_metal.h>
 #include "vulkan.h"
 */
 import "C"
@@ -59,13 +56,13 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 	createInfo.sType = C.VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT
 	createInfo.pLayer = wh.Layer
 
-	if err := mapError(C.vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
+	if err := mapError(C.gfx_vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
 		return nil, err
 	}
 
 	var capabilities C.VkSurfaceCapabilitiesKHR
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(g.physicalDevice, surface, &capabilities)); err != nil {
+	if err := mapError(C.gfx_vkGetPhysicalDeviceSurfaceCapabilitiesKHR(g.physicalDevice, surface, &capabilities)); err != nil {
 		return nil, err
 	}
 
@@ -75,13 +72,13 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 	var formatCount C.uint32_t
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, nil)); err != nil {
+	if err := mapError(C.gfx_vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, nil)); err != nil {
 		return nil, err
 	}
 
 	formats := make([]C.VkSurfaceFormatKHR, formatCount)
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, unsafe.SliceData(formats))); err != nil {
+	if err := mapError(C.gfx_vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, unsafe.SliceData(formats))); err != nil {
 		return nil, err
 	}
 
@@ -125,7 +122,7 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 		var commandPool C.VkCommandPool
 
-		if err := mapError(C.vkCreateCommandPool(g.device, &commandInfo, nil, &commandPool)); err != nil {
+		if err := mapError(C.gfx_vkCreateCommandPool(g.device, &commandInfo, nil, &commandPool)); err != nil {
 			return nil, err
 		}
 
@@ -134,13 +131,13 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 		var imgSem C.VkSemaphore
 
-		if err := mapError(C.vkCreateSemaphore(g.device, &semInfo, nil, &imgSem)); err != nil {
+		if err := mapError(C.gfx_vkCreateSemaphore(g.device, &semInfo, nil, &imgSem)); err != nil {
 			return nil, err
 		}
 
 		var completeSem C.VkSemaphore
 
-		if err := mapError(C.vkCreateSemaphore(g.device, &semInfo, nil, &completeSem)); err != nil {
+		if err := mapError(C.gfx_vkCreateSemaphore(g.device, &semInfo, nil, &completeSem)); err != nil {
 			return nil, err
 		}
 
@@ -150,7 +147,7 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 		var fence C.VkFence
 
-		if err := mapError(C.vkCreateFence(g.device, &fenceInfo, nil, &fence)); err != nil {
+		if err := mapError(C.gfx_vkCreateFence(g.device, &fenceInfo, nil, &fence)); err != nil {
 			return nil, err
 		}
 
@@ -187,19 +184,19 @@ func (s *Surface) Resize(width int, height int) error {
 	createInfo.presentMode = C.VK_PRESENT_MODE_FIFO_KHR
 	createInfo.clipped = C.VkBool32(1)
 
-	if err := mapError(C.vkCreateSwapchainKHR(s.graphics.device, &createInfo, nil, &s.swapchain)); err != nil {
+	if err := mapError(C.gfx_vkCreateSwapchainKHR(s.graphics.device, &createInfo, nil, &s.swapchain)); err != nil {
 		return err
 	}
 
 	var imageCount C.uint32_t
 
-	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, nil)); err != nil {
+	if err := mapError(C.gfx_vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, nil)); err != nil {
 		return err
 	}
 
 	images := make([]C.VkImage, imageCount)
 
-	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, unsafe.SliceData(images))); err != nil {
+	if err := mapError(C.gfx_vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, unsafe.SliceData(images))); err != nil {
 		return err
 	}
 
@@ -223,7 +220,7 @@ func (s *Surface) Resize(width int, height int) error {
 
 		var view C.VkImageView
 
-		if err := mapError(C.vkCreateImageView(s.graphics.device, &createInfo, nil, &view)); err != nil {
+		if err := mapError(C.gfx_vkCreateImageView(s.graphics.device, &createInfo, nil, &view)); err != nil {
 			return err
 		}
 
@@ -255,7 +252,7 @@ type SurfaceFrame struct {
 func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
 	entry := s.entries[s.currentEntry]
 
-	if err := mapError(C.vkWaitForFences(
+	if err := mapError(C.gfx_vkWaitForFences(
 		s.graphics.device,
 		1,
 		&entry.fence,
@@ -265,14 +262,14 @@ func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
 		return nil, err
 	}
 
-	if err := mapError(C.vkResetFences(s.graphics.device, 1, &entry.fence)); err != nil {
+	if err := mapError(C.gfx_vkResetFences(s.graphics.device, 1, &entry.fence)); err != nil {
 		return nil, err
 	}
 
 	var imgIndex C.uint32_t
 
 	// TODO: handle outdated & suboptimal
-	if err := mapError(C.vkAcquireNextImageKHR(
+	if err := mapError(C.gfx_vkAcquireNextImageKHR(
 		s.graphics.device,
 		s.swapchain,
 		C.uint64_t(math.MaxUint64),
@@ -329,7 +326,7 @@ func (f *SurfaceFrame) Present() error {
 
 	presentInfo.waitSemaphoreCount = 1
 
-	if err := mapError(C.vkQueuePresentKHR(f.graphics.graphicsQueue, &presentInfo)); err != nil {
+	if err := mapError(C.gfx_vkQueuePresentKHR(f.graphics.graphicsQueue, &presentInfo)); err != nil {
 		return err
 	}
 

@@ -6,7 +6,7 @@ import (
 )
 
 /*
-#include "vk_mem_alloc.h"
+#include "vulkan.h"
 */
 import "C"
 
