@@ -1,6 +1,7 @@
 package windows
 
 import (
+	"fmt"
 	"github.com/csnewman/go-gfx/hal"
 	"sync/atomic"
 )
@@ -35,7 +36,11 @@ func (p *Platform) Run(cfg hal.PlatformConfig) error {
 	case C.GFX_SUCCESS:
 		return nil
 	case C.GFX_MODULE_ERROR:
-		return hal.ErrUnexpectedSystemResponse
+		return fmt.Errorf("%w: failed to get module", hal.ErrUnexpectedSystemResponse)
+	case C.GFX_CLASS_ERROR:
+		return fmt.Errorf("%w: failed to create window class", hal.ErrUnexpectedSystemResponse)
+	default:
+		panic("unexpected result")
 	}
 
 	return nil
@@ -49,16 +54,6 @@ func gfx_windows_init_callback() {
 }
 
 func (p *Platform) Exit() {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, hal.WindowHandle, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (p *Platform) CloseWindow(id hal.Window) {
 	//TODO implement me
 	panic("implement me")
 }
