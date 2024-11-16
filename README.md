@@ -16,13 +16,14 @@ The repository contains the following packages:
     - `appkit` - macOS windowing backend.
     - `metal` - Metal rendering backend.
     - `vulkan` - Vulkan rendering backend.
+    - `windows` - Windows windowing backend.
 
 ## Platforms
 
-|           | macOS                     | Linux                 | Windows                | iOS | Android | Web |
-|-----------|---------------------------|-----------------------|------------------------|-----|---------|-----|
-| Windowing | 🏗️ AppKit                | ⌛ Wayland </br> ⌛ X11 | ⌛                      | 💤  | 💤      | 💤  | 
-| Rendering | 🏗️ Metal </br> 🏗 Vulkan | ⌛ Vulkan              | ⌛ Vulkan <br/> 💤 DX12 | 💤  | 💤      | 💤  | 
+|           | macOS                     | Linux                 | Windows                  | iOS | Android | Web |
+|-----------|---------------------------|-----------------------|--------------------------|-----|---------|-----|
+| Windowing | 🏗️ AppKit                | ⌛ Wayland </br> ⌛ X11 | 🏗️                      | 💤  | 💤      | 💤  | 
+| Rendering | 🏗️ Metal </br> 🏗 Vulkan | ⌛ Vulkan              | 🏗️ Vulkan <br/> 💤 DX12 | 💤  | 💤      | 💤  | 
 
 ✅ = Supported.  
 🏗️ = Work in progress.  

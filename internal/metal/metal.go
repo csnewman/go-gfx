@@ -102,7 +102,8 @@ type SurfaceFrame struct {
 
 func (f *SurfaceFrame) Texture() hal.Texture {
 	//TODO implement me
-	panic("implement me")
+	//panic("implement me")
+	return nil
 }
 
 func (f *SurfaceFrame) Present() error {
