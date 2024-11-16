@@ -17,7 +17,7 @@
 #define GFX_SEE_ERROR (-10)
 #define GFX_SUCCESS 1
 
-int gfx_windows_init();
+int gfx_windows_init(HMODULE* inst);
 
 void gfx_windows_init_callback();
 
@@ -25,7 +25,8 @@ int gfx_windows_new_window(
         uint64_t wid,
         LPCWSTR title,
         int width,
-        int height
+        int height,
+        HWND* res
 );
 
 #endif //GFX_WINDOWS_H

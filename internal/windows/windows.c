@@ -19,11 +19,13 @@ HMODULE GetCurrentModuleHandle() {
     return 0;
 }
 
-int gfx_windows_init() {
+int gfx_windows_init(HMODULE *inst) {
     gfx_win_module = GetCurrentModuleHandle();
     if (!gfx_win_module) {
         return GFX_MODULE_ERROR;
     }
+
+    *inst = gfx_win_module;
 
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
@@ -61,7 +63,8 @@ int gfx_windows_new_window(
         uint64_t wid,
         LPCWSTR title,
         int width,
-        int height
+        int height,
+        HWND* res
 ) {
     HWND hwnd = CreateWindowExW(
             WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW,
@@ -76,6 +79,8 @@ int gfx_windows_new_window(
     if (hwnd == NULL) {
         return GFX_CALL_ERROR;
     }
+
+    *res = hwnd;
 
     ShowWindow(hwnd, SW_NORMAL);
 

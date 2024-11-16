@@ -44,20 +44,30 @@ type SurfaceEntry struct {
 }
 
 func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
-	// TODO: support other handles
-	wh, ok := rawWH.(hal.MetalWindowHandle)
-	if !ok {
-		return nil, hal.ErrUnsupportedWindowHandle
-	}
-
 	var surface C.VkSurfaceKHR
 
-	var createInfo C.VkMetalSurfaceCreateInfoEXT
-	createInfo.sType = C.VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT
-	createInfo.pLayer = wh.Layer
+	switch wh := rawWH.(type) {
+	case hal.MetalWindowHandle:
+		var createInfo C.VkMetalSurfaceCreateInfoEXT
+		createInfo.sType = C.VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT
+		createInfo.pLayer = wh.Layer
 
-	if err := mapError(C.gfx_vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
-		return nil, err
+		if err := mapError(C.gfx_vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
+			return nil, err
+		}
+
+	case hal.Win32WindowHandle:
+		var createInfo C.VkWin32SurfaceCreateInfoKHR
+		createInfo.sType = C.VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR
+		createInfo.hinstance = C.HINSTANCE(wh.Instance)
+		createInfo.hwnd = C.HWND(wh.Handle)
+
+		if err := mapError(C.gfx_vkCreateWin32SurfaceKHR(g.instance, &createInfo, nil, &surface)); err != nil {
+			return nil, err
+		}
+
+	default:
+		return nil, hal.ErrUnsupportedWindowHandle
 	}
 
 	var capabilities C.VkSurfaceCapabilitiesKHR

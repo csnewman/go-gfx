@@ -53,6 +53,13 @@ GFX_FUNC(VkResult, vkCreateMetalSurfaceEXT,
     (VkSurfaceKHR*, pSurface)
 );
 
+GFX_FUNC(VkResult, vkCreateWin32SurfaceKHR,
+    (VkInstance, instance),
+    (const VkWin32SurfaceCreateInfoKHR*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkSurfaceKHR*, pSurface)
+);
+
 GFX_FUNC(VkResult, vkGetPhysicalDeviceSurfaceCapabilitiesKHR,
     (VkPhysicalDevice, physicalDevice),
     (VkSurfaceKHR, surface),

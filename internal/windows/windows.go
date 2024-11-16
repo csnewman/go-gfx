@@ -17,6 +17,7 @@ var (
 )
 
 type Platform struct {
+	instance C.HMODULE
 }
 
 func NewPlatform() hal.Platform {
@@ -30,7 +31,7 @@ func (p *Platform) Run(cfg hal.PlatformConfig) error {
 
 	halCfg = cfg
 
-	res := C.gfx_windows_init()
+	res := C.gfx_windows_init(&p.instance)
 
 	switch res {
 	case C.GFX_SUCCESS:

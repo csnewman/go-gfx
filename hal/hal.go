@@ -45,6 +45,11 @@ type MetalWindowHandle struct {
 	Layer unsafe.Pointer
 }
 
+type Win32WindowHandle struct {
+	Instance unsafe.Pointer
+	Handle   unsafe.Pointer
+}
+
 type Surface interface {
 	TextureFormat() TextureFormat
 

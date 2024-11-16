@@ -13,6 +13,7 @@ const char* GFX_VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
 const char* GFX_VK_KHR_portability_subset = "VK_KHR_portability_subset";
 const char* GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME = VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME;
 const char* GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME = VK_EXT_METAL_SURFACE_EXTENSION_NAME;
+const char* GFX_VK_KHR_WIN32_SURFACE_EXTENSION_NAME = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 const char* GFX_VK_KHR_SWAPCHAIN_EXTENSION_NAME = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 const char* GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME = VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME;
 const char* GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME = VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME;
@@ -101,7 +102,9 @@ func (g *Graphics) createInstance() error {
 	instInfo.flags |= C.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
 
 	exts = append(exts, C.GFX_VK_KHR_SURFACE_EXTENSION_NAME)
-	exts = append(exts, C.GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME)
+
+	exts = append(exts, C.GFX_VK_KHR_WIN32_SURFACE_EXTENSION_NAME)
+	//exts = append(exts, C.GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME)
 
 	exts = append(exts, C.GFX_VK_EXT_DEBUG_UTILS_EXTENSION_NAME)
 
@@ -254,14 +257,9 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	extendedDynamicState.pNext = unsafe.Pointer(&synchronization2Features)
 	pinner.Pin(extendedDynamicState.pNext)
 
-	var extendedDynamicState3 C.VkPhysicalDeviceExtendedDynamicState3FeaturesEXT
-	extendedDynamicState3.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT
-	extendedDynamicState3.pNext = unsafe.Pointer(&extendedDynamicState)
-	pinner.Pin(extendedDynamicState3.pNext)
-
 	var dynamicRenderingFeatures C.VkPhysicalDeviceDynamicRenderingFeatures
 	dynamicRenderingFeatures.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES
-	dynamicRenderingFeatures.pNext = unsafe.Pointer(&extendedDynamicState3)
+	dynamicRenderingFeatures.pNext = unsafe.Pointer(&extendedDynamicState)
 	pinner.Pin(dynamicRenderingFeatures.pNext)
 	dynamicRenderingFeatures.dynamicRendering = C.VkBool32(1)
 
@@ -275,13 +273,13 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 
 	var exts []*C.char
 
-	exts = append(exts, C.GFX_VK_KHR_portability_subset)
+	//exts = append(exts, C.GFX_VK_KHR_portability_subset)
 
 	// TODO: switch to vk1.3
 	exts = append(exts, C.GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)
-	exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)
-	exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME)
+	//exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)
+	//exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_KHR_SWAPCHAIN_EXTENSION_NAME)
 

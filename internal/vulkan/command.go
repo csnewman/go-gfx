@@ -9,6 +9,14 @@ import (
 /*
 #include "vulkan.h"
 
+const VkPipelineStageFlagBits2 GFX_VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+const VkPipelineStageFlagBits2 GFX_VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT = VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT;
+const VkPipelineStageFlagBits2 GFX_VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+const VkAccessFlagBits2 GFX_VK_ACCESS_2_NONE = VK_ACCESS_2_NONE;
+const VkAccessFlagBits2 GFX_VK_ACCESS_2_MEMORY_READ_BIT = VK_ACCESS_2_MEMORY_READ_BIT;
+const VkAccessFlagBits2 GFX_VK_ACCESS_2_MEMORY_WRITE_BIT = VK_ACCESS_2_MEMORY_WRITE_BIT;
+
 VkClearValue gfx_vk_clear_color(float r, float g, float b, float a) {
 	VkClearValue col;
 	col.color.float32[0] = r;
@@ -40,8 +48,8 @@ func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
 		imgBarrier.sType = C.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2
 
 		// TODO: reduce stageMask scope
-		imgBarrier.srcStageMask = C.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
-		imgBarrier.dstStageMask = C.VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
+		imgBarrier.srcStageMask = C.GFX_VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
+		imgBarrier.dstStageMask = C.GFX_VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT
 
 		// TODO: access masks (srcAccessMask, dstAccessMask. for now, layout guesses)
 		// TODO: transfers (srcQueueFamilyIndex, dstQueueFamilyIndex)
@@ -49,16 +57,16 @@ func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
 		switch halB.SrcLayout {
 		case hal.TextureLayoutUndefined:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_UNDEFINED
-			imgBarrier.srcAccessMask = C.VK_ACCESS_2_NONE
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_NONE
 		case hal.TextureLayoutAttachment:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
-			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT | C.VK_ACCESS_2_MEMORY_WRITE_BIT
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		case hal.TextureLayoutRead:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
-			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		case hal.TextureLayoutPresent:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-			imgBarrier.srcAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -69,13 +77,13 @@ func (c *CommandBuffer) Barrier(barrier hal.Barrier) {
 			panic("todo check")
 		case hal.TextureLayoutAttachment:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
-			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT | C.VK_ACCESS_2_MEMORY_WRITE_BIT
+			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		case hal.TextureLayoutRead:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
-			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		case hal.TextureLayoutPresent:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-			imgBarrier.dstAccessMask = C.VK_ACCESS_2_MEMORY_READ_BIT
+			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -242,7 +250,7 @@ func (c *CommandBuffer) Submit() {
 	waitInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO
 	waitInfo.pNext = nil
 	waitInfo.semaphore = c.frame.entry.imgSem
-	waitInfo.stageMask = C.VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR
+	waitInfo.stageMask = C.GFX_VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT
 	waitInfo.deviceIndex = 0
 	waitInfo.value = 1
 
@@ -250,7 +258,7 @@ func (c *CommandBuffer) Submit() {
 	signalInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO
 	signalInfo.pNext = nil
 	signalInfo.semaphore = c.frame.entry.completeSem
-	signalInfo.stageMask = C.VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT
+	signalInfo.stageMask = C.GFX_VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT
 	signalInfo.deviceIndex = 0
 	signalInfo.value = 1
 
