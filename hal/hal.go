@@ -23,11 +23,13 @@ type Platform interface {
 	Run(cfg PlatformConfig) error
 	Exit()
 
+	WindowType() WindowHandleType
 	NewWindow(cfg WindowConfig) (Window, WindowHandle, error)
 	CloseWindow(id Window)
 }
 
 type GPUConfig struct {
+	WindowType WindowHandleType
 }
 
 type Graphics interface {
@@ -41,14 +43,20 @@ type Graphics interface {
 
 type WindowHandle interface{}
 
+type WindowHandleType string
+
 type MetalWindowHandle struct {
 	Layer unsafe.Pointer
 }
+
+const MetalWindowHandleType WindowHandleType = "MetalWindowHandle"
 
 type Win32WindowHandle struct {
 	Instance unsafe.Pointer
 	Handle   unsafe.Pointer
 }
+
+const Win32WindowHandleType WindowHandleType = "Win32WindowHandle"
 
 type Surface interface {
 	TextureFormat() TextureFormat

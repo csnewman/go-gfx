@@ -36,7 +36,10 @@ import (
 	"unsafe"
 )
 
+const portabilityExtension = "VK_KHR_portability_subset"
+
 type Graphics struct {
+	windowType      hal.WindowHandleType
 	instance        C.VkInstance
 	debugMessenger  C.VkDebugUtilsMessengerEXT
 	physicalDevice  C.VkPhysicalDevice
@@ -51,6 +54,8 @@ func NewGraphics() hal.Graphics {
 }
 
 func (g *Graphics) Init(cfg hal.GPUConfig) error {
+	g.windowType = cfg.WindowType
+
 	if err := g.createInstance(); err != nil {
 		return err
 	}
@@ -103,8 +108,14 @@ func (g *Graphics) createInstance() error {
 
 	exts = append(exts, C.GFX_VK_KHR_SURFACE_EXTENSION_NAME)
 
-	exts = append(exts, C.GFX_VK_KHR_WIN32_SURFACE_EXTENSION_NAME)
-	//exts = append(exts, C.GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME)
+	switch g.windowType {
+	case hal.MetalWindowHandleType:
+		exts = append(exts, C.GFX_VK_EXT_METAL_SURFACE_EXTENSION_NAME)
+	case hal.Win32WindowHandleType:
+		exts = append(exts, C.GFX_VK_KHR_WIN32_SURFACE_EXTENSION_NAME)
+	default:
+		return hal.ErrUnsupportedWindowHandle
+	}
 
 	exts = append(exts, C.GFX_VK_EXT_DEBUG_UTILS_EXTENSION_NAME)
 
@@ -142,6 +153,7 @@ func (g *Graphics) createInstance() error {
 type selectedDevice struct {
 	device         C.VkPhysicalDevice
 	graphicsFamily int
+	portability    bool
 }
 
 func (g *Graphics) selectDevice() (*selectedDevice, error) {
@@ -213,6 +225,34 @@ func (g *Graphics) selectDevice() (*selectedDevice, error) {
 			continue
 		}
 
+		var extensionCount C.uint32_t
+		if err := mapError(C.gfx_vkEnumerateDeviceExtensionProperties(device, nil, &extensionCount, nil)); err != nil {
+			return nil, err
+		}
+
+		extensions := make([]C.VkExtensionProperties, extensionCount)
+
+		if err := mapError(C.gfx_vkEnumerateDeviceExtensionProperties(
+			device,
+			nil,
+			&extensionCount,
+			unsafe.SliceData(extensions),
+		)); err != nil {
+			return nil, err
+		}
+
+		extensions = extensions[:extensionCount]
+
+		portability := false
+
+		for _, ext := range extensions {
+			name := C.GoString(&ext.extensionName[0])
+
+			if name == portabilityExtension {
+				portability = true
+			}
+		}
+
 		// TODO: other scoring tie breakers
 
 		if score > currentScore {
@@ -220,6 +260,7 @@ func (g *Graphics) selectDevice() (*selectedDevice, error) {
 			bestDevice = &selectedDevice{
 				device:         device,
 				graphicsFamily: graphicsQueue,
+				portability:    portability,
 			}
 		}
 	}
@@ -273,7 +314,9 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 
 	var exts []*C.char
 
-	//exts = append(exts, C.GFX_VK_KHR_portability_subset)
+	if sel.portability {
+		exts = append(exts, C.GFX_VK_KHR_portability_subset)
+	}
 
 	// TODO: switch to vk1.3
 	exts = append(exts, C.GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)

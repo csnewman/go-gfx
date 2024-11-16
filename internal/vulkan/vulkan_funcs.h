@@ -23,6 +23,13 @@ GFX_FUNC(void, vkGetPhysicalDeviceQueueFamilyProperties,
     (VkQueueFamilyProperties*, pQueueFamilyProperties)
 );
 
+GFX_FUNC(VkResult, vkEnumerateDeviceExtensionProperties,
+    (VkPhysicalDevice, physicalDevice),
+    (const char*, pLayerName),
+    (uint32_t*, pPropertyCount),
+    (VkExtensionProperties*, pProperties)
+);
+
 GFX_FUNC(VkResult, vkCreateDevice,
     (VkPhysicalDevice, physicalDevice),
     (const VkDeviceCreateInfo*, pCreateInfo),

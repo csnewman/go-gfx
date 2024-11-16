@@ -50,7 +50,9 @@ func RunWith(cfg ApplicationConfig, platform hal.Platform, graphics hal.Graphics
 		cfg:      cfg,
 	}
 
-	if err := app.graphics.Init(hal.GPUConfig{}); err != nil {
+	if err := app.graphics.Init(hal.GPUConfig{
+		WindowType: platform.WindowType(),
+	}); err != nil {
 		return fmt.Errorf("failed to init graphics: %w", err)
 	}
 
