@@ -1,3 +1,3 @@
 module github.com/csnewman/go-gfx
 
-go 1.22
+go 1.23
