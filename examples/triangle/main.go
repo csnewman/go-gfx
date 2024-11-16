@@ -125,26 +125,21 @@ func (e *Example) render(frame *gfx.Frame) {
 		count = 0
 	}
 
-	buf := frame.NewCommandBuffer()
-
-	rp := buf.BeginRenderPass(gfx.RenderPassDescriptor{
+	frame.QueueRenderPass(gfx.RenderPassDescriptor{
 		ColorAttachments: []gfx.RenderPassColorAttachment{
 			{
 				Target:     frame,
 				Load:       false,
-				ClearColor: gfx.NewColor(0, 0, 0, 1),
+				ClearColor: gfx.NewColor(1, 0, 0, 1),
 				Discard:    false,
 			},
 		},
+		Body: func(enc *gfx.RenderPassEncoder) {
+			enc.SetPipeline(e.trianglePipeline)
+			//enc.SetVertexBuffer(e.vertData)
+			enc.Draw(0, 3)
+		},
 	})
-
-	rp.SetPipeline(e.trianglePipeline)
-	rp.SetVertexBuffer(e.vertData)
-	rp.Draw(0, 3)
-
-	rp.End()
-
-	buf.Submit()
 
 	if err := frame.Present(); err != nil {
 		panic(err)

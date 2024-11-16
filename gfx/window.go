@@ -114,27 +114,3 @@ func (a *Application) windowResized(id hal.Window, width float64, height float64
 		w.cfg.OnResize(width, height)
 	}
 }
-
-type Frame struct {
-	app       *Application
-	frame     hal.SurfaceFrame
-	presented bool
-}
-
-func (f *Frame) Close() {
-	if f.presented {
-		return
-	}
-
-	f.frame.Discard()
-}
-
-func (f *Frame) Present() error {
-	f.presented = true
-
-	return f.frame.Present()
-}
-
-func (f *Frame) TextureView() *TextureView {
-	return viewFromHal(f.frame.View())
-}
