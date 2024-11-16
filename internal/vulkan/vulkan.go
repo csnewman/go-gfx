@@ -322,7 +322,6 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	exts = append(exts, C.GFX_VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME)
 	//exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME)
-	//exts = append(exts, C.GFX_VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME)
 	exts = append(exts, C.GFX_VK_KHR_SWAPCHAIN_EXTENSION_NAME)
 
@@ -501,6 +500,9 @@ func (g *Graphics) CreateRenderPipeline(des hal.RenderPipelineDescriptor) (hal.R
 	dynamicState.pDynamicStates = unsafe.SliceData(dynamicStates)
 	pinner.Pin(dynamicState.pDynamicStates)
 
+	var viewportState C.VkPipelineViewportStateCreateInfo
+	viewportState.sType = C.VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO
+
 	var pipelineInfo C.VkGraphicsPipelineCreateInfo
 
 	pipelineInfo.sType = C.VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO
@@ -517,6 +519,9 @@ func (g *Graphics) CreateRenderPipeline(des hal.RenderPipelineDescriptor) (hal.R
 
 	pipelineInfo.pInputAssemblyState = &inputAssembly
 	pinner.Pin(pipelineInfo.pInputAssemblyState)
+
+	pipelineInfo.pViewportState = &viewportState
+	pinner.Pin(pipelineInfo.pViewportState)
 
 	pipelineInfo.pRasterizationState = &rasterizer
 	pinner.Pin(pipelineInfo.pRasterizationState)
