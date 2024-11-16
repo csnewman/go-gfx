@@ -3,6 +3,7 @@ package gfx
 import (
 	"fmt"
 	"github.com/csnewman/go-gfx/hal"
+	"runtime"
 )
 
 type ApplicationConfig struct {
@@ -14,6 +15,28 @@ type Application struct {
 	graphics hal.Graphics
 	cfg      ApplicationConfig
 	windows  tmap[hal.Window, *Window]
+}
+
+func DefaultPlatform() hal.Platform {
+	switch runtime.GOOS {
+	case "darwin":
+		return AppKitPlatform()
+	case "windows":
+		return WindowsPlatform()
+	default:
+		panic("unsupported platform")
+	}
+}
+
+func DefaultGraphics() hal.Graphics {
+	switch runtime.GOOS {
+	case "darwin":
+		return MetalGraphics()
+	case "windows":
+		return VulkanGraphics()
+	default:
+		panic("unsupported platform")
+	}
 }
 
 func Run(cfg ApplicationConfig) error {

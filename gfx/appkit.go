@@ -7,6 +7,10 @@ import (
 	"github.com/csnewman/go-gfx/internal/appkit"
 )
 
-func DefaultPlatform() hal.Platform {
+func AppKitPlatformEnabled() bool {
+	return true
+}
+
+func AppKitPlatform() hal.Platform {
 	return appkit.NewPlatform()
 }

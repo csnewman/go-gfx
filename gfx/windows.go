@@ -7,6 +7,10 @@ import (
 	"github.com/csnewman/go-gfx/internal/windows"
 )
 
-func DefaultPlatform() hal.Platform {
+func WindowsPlatformEnabled() bool {
+	return true
+}
+
+func WindowsPlatform() hal.Platform {
 	return windows.NewPlatform()
 }

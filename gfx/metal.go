@@ -7,6 +7,10 @@ import (
 	"github.com/csnewman/go-gfx/internal/metal"
 )
 
-func DefaultGraphics() hal.Graphics {
+func MetalGraphicsEnabled() bool {
+	return true
+}
+
+func MetalGraphics() hal.Graphics {
 	return metal.NewGraphics()
 }
