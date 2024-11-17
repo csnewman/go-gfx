@@ -1,9 +1,11 @@
 #include "helper.h"
 
 #define GFX_WEVENT_INIT (WM_APP+1)
+#define GFX_WEVENT_CLOSE (WM_APP+2)
 
 HMODULE gfx_win_module;
 ATOM gfx_win_class;
+DWORD gfx_main_id;
 
 LRESULT gfx_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -41,8 +43,8 @@ int gfx_windows_init(HMODULE *inst) {
         return GFX_CLASS_ERROR;
     }
 
-    DWORD main = GetCurrentThreadId();
-    PostThreadMessage(main, GFX_WEVENT_INIT, 0, 0);
+    gfx_main_id = GetCurrentThreadId();
+    PostThreadMessage(gfx_main_id, GFX_WEVENT_INIT, 0, 0);
 
     MSG msg;
 
@@ -59,12 +61,16 @@ int gfx_windows_init(HMODULE *inst) {
     return GFX_SUCCESS;
 }
 
+void gfx_windows_exit() {
+    PostThreadMessage(gfx_main_id, WM_QUIT, 0, 0);
+}
+
 int gfx_windows_new_window(
         uint64_t wid,
         LPCWSTR title,
         int width,
         int height,
-        HWND* res
+        HWND *res
 ) {
     HWND hwnd = CreateWindowExW(
             WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW,
@@ -89,6 +95,10 @@ int gfx_windows_new_window(
     return GFX_SUCCESS;
 }
 
+void gfx_windows_close_window(HWND w) {
+    PostMessageW(w, GFX_WEVENT_CLOSE, 0, 0);
+}
+
 LRESULT gfx_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     uint64_t wid = (uint64_t) GetPropW(hwnd, L"GFX_WID");
     if (wid == 0) {
@@ -108,7 +118,18 @@ LRESULT gfx_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             ValidateRect(hwnd, NULL);
             return 0;
 
-        default:
-            return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+        case WM_CLOSE:
+            gfx_windows_close_requested_callback(wid);
+            return 0;
+
+        case WM_DESTROY:
+            gfx_windows_window_closed_callback(wid);
+            break;
+
+        case GFX_WEVENT_CLOSE:
+            DestroyWindow(hwnd);
+            return 0;
     }
+
+    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 }

@@ -55,6 +55,7 @@ func gfx_windows_init_callback() {
 }
 
 func (p *Platform) Exit() {
-	//TODO implement me
-	panic("implement me")
+	C.gfx_windows_exit()
+
+	windows.Clear()
 }

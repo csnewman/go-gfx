@@ -21,8 +21,6 @@ int gfx_windows_init(HMODULE* inst);
 
 void gfx_windows_init_callback();
 
-void gfx_windows_resize_callback(uint64_t id, int64_t width, int64_t height);
-
 int gfx_windows_new_window(
         uint64_t wid,
         LPCWSTR title,
@@ -30,5 +28,15 @@ int gfx_windows_new_window(
         int height,
         HWND* res
 );
+
+void gfx_windows_resize_callback(uint64_t id, int64_t width, int64_t height);
+
+void gfx_windows_close_requested_callback(uint64_t wid);
+
+void gfx_windows_window_closed_callback(uint64_t wid);
+
+void gfx_windows_close_window(HWND w);
+
+void gfx_windows_exit();
 
 #endif //GFX_WINDOWS_H
