@@ -76,8 +76,9 @@ type Surface struct {
 }
 
 func (s *Surface) Resize(width int, height int) error {
-	//TODO implement me
-	panic("implement me")
+	C.gfx_mtl_resize_surface(s.layer, C.int(width), C.int(height))
+
+	return nil
 }
 
 func (s *Surface) TextureFormat() hal.TextureFormat {

@@ -209,8 +209,6 @@ void gfx_ak_stop() {
         return;
     }
 
-    context->layer.drawableSize = newSize;
-
     gfx_ak_resize_callback(context->wid, newSize.width, newSize.height);
 }
 

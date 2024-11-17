@@ -1,5 +1,6 @@
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
+#import <CoreGraphics/CGGeometry.h>
 #include "metal.h"
 
 int gfx_mtl_open(id *res, id *res_queue) {
@@ -24,6 +25,13 @@ int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer, int pi
         [layer setDisplaySyncEnabled:YES];
 
         return GFX_SUCCESS;
+    }
+}
+
+void gfx_mtl_resize_surface(id layer, int width, int height) {
+    @autoreleasepool {
+        CGSize newSize = CGSizeMake(width, height);
+        [layer setDrawableSize:newSize];
     }
 }
 

@@ -16,6 +16,8 @@ int gfx_mtl_open(id *res, id *res_queue);
 
 int gfx_mtl_configure_surface(id device, id layer, int pixelFormat);
 
+void gfx_mtl_resize_surface(id layer, int width, int height);
+
 void gfx_mtl_acquire_surface(id layer, id* res_draw, id* res_text);
 
 void gfx_mtl_present_texture(id queue, id draw);
