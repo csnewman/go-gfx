@@ -75,6 +75,11 @@ type Surface struct {
 	format   hal.TextureFormat
 }
 
+func (s *Surface) Resize(width int, height int) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *Surface) TextureFormat() hal.TextureFormat {
 	return s.format
 }

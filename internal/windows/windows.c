@@ -82,11 +82,33 @@ int gfx_windows_new_window(
 
     *res = hwnd;
 
+    SetPropW(hwnd, L"GFX_WID", (HANDLE) wid);
+
     ShowWindow(hwnd, SW_NORMAL);
 
     return GFX_SUCCESS;
 }
 
 LRESULT gfx_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    uint64_t wid = (uint64_t) GetPropW(hwnd, L"GFX_WID");
+    if (wid == 0) {
+        return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    }
+
+    switch (uMsg) {
+        case WM_SIZE: {
+            int width = LOWORD(lParam);
+            int height = HIWORD(lParam);
+
+            gfx_windows_resize_callback(wid, width, height);
+            return 0;
+        }
+
+        case WM_PAINT:
+            ValidateRect(hwnd, NULL);
+            return 0;
+
+        default:
+            return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    }
 }

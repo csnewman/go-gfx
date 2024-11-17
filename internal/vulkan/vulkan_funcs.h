@@ -51,6 +51,10 @@ GFX_FUNC(VkResult, vkCreateDebugUtilsMessengerEXT,
     (VkDebugUtilsMessengerEXT*, pMessenger)
 );
 
+GFX_FUNC(VkResult, vkDeviceWaitIdle,
+    (VkDevice,device)
+);
+
 /* --- surface --- */
 
 GFX_FUNC(VkResult, vkCreateMetalSurfaceEXT,
@@ -87,6 +91,12 @@ GFX_FUNC(VkResult, vkCreateSwapchainKHR,
     (VkSwapchainKHR*, pSwapchain)
 );
 
+GFX_FUNC(void, vkDestroySwapchainKHR,
+    (VkDevice, device),
+    (VkSwapchainKHR, swapchain),
+    (const VkAllocationCallbacks*, pAllocator)
+);
+
 GFX_FUNC(VkResult, vkGetSwapchainImagesKHR,
     (VkDevice, device),
     (VkSwapchainKHR, swapchain),
@@ -117,11 +127,23 @@ GFX_FUNC(VkResult, vkCreateSemaphore,
     (VkSemaphore*, pSemaphore)
 );
 
+GFX_FUNC(void, vkDestroySemaphore,
+    (VkDevice, device),
+    (VkSemaphore, semaphore),
+    (const VkAllocationCallbacks*, pAllocator)
+);
+
 GFX_FUNC(VkResult, vkCreateFence,
     (VkDevice, device),
     (const VkFenceCreateInfo*, pCreateInfo),
     (const VkAllocationCallbacks*, pAllocator),
     (VkFence*, pFence)
+);
+
+GFX_FUNC(void, vkDestroyFence,
+    (VkDevice, device),
+    (VkFence, fence),
+    (const VkAllocationCallbacks*, pAllocator)
 );
 
 GFX_FUNC(VkResult, vkWaitForFences,
@@ -145,6 +167,12 @@ GFX_FUNC(VkResult, vkCreateCommandPool,
     (const VkCommandPoolCreateInfo*, pCreateInfo),
     (const VkAllocationCallbacks*, pAllocator),
     (VkCommandPool*, pCommandPool)
+);
+
+GFX_FUNC(void, vkDestroyCommandPool,
+    (VkDevice, device),
+    (VkCommandPool, commandPool),
+    (const VkAllocationCallbacks*, pAllocator)
 );
 
 GFX_FUNC(VkResult, vkAllocateCommandBuffers,
@@ -241,4 +269,10 @@ GFX_FUNC(VkResult, vkCreateImageView,
     (const VkImageViewCreateInfo*, pCreateInfo),
     (const VkAllocationCallbacks*, pAllocator),
     (VkImageView*, pView)
+);
+
+GFX_FUNC(void, vkDestroyImageView,
+    (VkDevice, device),
+    (VkImageView, imageView),
+    (const VkAllocationCallbacks*, pAllocator)
 );

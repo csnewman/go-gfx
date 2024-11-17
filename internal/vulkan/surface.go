@@ -127,12 +127,12 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 		var commandInfo C.VkCommandPoolCreateInfo
 
 		commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
-		commandInfo.queueFamilyIndex = C.uint32_t(g.graphicsFamily)
+		commandInfo.queueFamilyIndex = C.uint32_t(s.graphics.graphicsFamily)
 		commandInfo.flags = C.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
 
 		var commandPool C.VkCommandPool
 
-		if err := mapError(C.gfx_vkCreateCommandPool(g.device, &commandInfo, nil, &commandPool)); err != nil {
+		if err := mapError(C.gfx_vkCreateCommandPool(s.graphics.device, &commandInfo, nil, &commandPool)); err != nil {
 			return nil, err
 		}
 
@@ -141,13 +141,13 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 		var imgSem C.VkSemaphore
 
-		if err := mapError(C.gfx_vkCreateSemaphore(g.device, &semInfo, nil, &imgSem)); err != nil {
+		if err := mapError(C.gfx_vkCreateSemaphore(s.graphics.device, &semInfo, nil, &imgSem)); err != nil {
 			return nil, err
 		}
 
 		var completeSem C.VkSemaphore
 
-		if err := mapError(C.gfx_vkCreateSemaphore(g.device, &semInfo, nil, &completeSem)); err != nil {
+		if err := mapError(C.gfx_vkCreateSemaphore(s.graphics.device, &semInfo, nil, &completeSem)); err != nil {
 			return nil, err
 		}
 
@@ -157,7 +157,7 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 		var fence C.VkFence
 
-		if err := mapError(C.gfx_vkCreateFence(g.device, &fenceInfo, nil, &fence)); err != nil {
+		if err := mapError(C.gfx_vkCreateFence(s.graphics.device, &fenceInfo, nil, &fence)); err != nil {
 			return nil, err
 		}
 
@@ -172,20 +172,28 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 	return s, nil
 }
 
-func (s *Surface) Resize(width int, height int) error {
-	slog.Info("resize", "width", width, "height", height)
+func (s *Surface) destroy() {
+	for _, entry := range s.entries {
+		C.gfx_vkDestroyFence(s.graphics.device, entry.fence, nil)
+		C.gfx_vkDestroySemaphore(s.graphics.device, entry.imgSem, nil)
+		C.gfx_vkDestroySemaphore(s.graphics.device, entry.completeSem, nil)
+		C.gfx_vkDestroyCommandPool(s.graphics.device, entry.commandPool, nil)
+	}
 
-	s.width = width
-	s.height = height
+	s.entries = nil
 
+	s.destroySwapchain()
+}
+
+func (s *Surface) createSwapchain() error {
 	var createInfo C.VkSwapchainCreateInfoKHR
 	createInfo.sType = C.VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR
 	createInfo.surface = s.surface
 	createInfo.minImageCount = C.uint32_t(s.minImageCount)
 	createInfo.imageFormat = s.format
 	createInfo.imageColorSpace = s.colorSpace
-	createInfo.imageExtent.width = C.uint32_t(width)
-	createInfo.imageExtent.height = C.uint32_t(height)
+	createInfo.imageExtent.width = C.uint32_t(s.width)
+	createInfo.imageExtent.height = C.uint32_t(s.height)
 	createInfo.imageArrayLayers = 1
 	createInfo.imageUsage = C.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
 	createInfo.imageSharingMode = C.VK_SHARING_MODE_EXCLUSIVE
@@ -237,12 +245,47 @@ func (s *Surface) Resize(width int, height int) error {
 		s.images = append(s.images, &SurfaceImage{
 			image:  image,
 			view:   view,
-			width:  width,
-			height: height,
+			width:  s.width,
+			height: s.height,
 		})
 	}
 
 	return nil
+}
+
+func (s *Surface) destroySwapchain() {
+	for _, image := range s.images {
+		C.gfx_vkDestroyImageView(s.graphics.device, image.view, nil)
+	}
+
+	s.images = nil
+
+	C.gfx_vkDestroySwapchainKHR(s.graphics.device, s.swapchain, nil)
+}
+
+func (s *Surface) Resize(width int, height int) error {
+	slog.Info("resize", "width", width, "height", height)
+
+	s.width = width
+	s.height = height
+
+	var capabilities C.VkSurfaceCapabilitiesKHR
+
+	if err := mapError(C.gfx_vkGetPhysicalDeviceSurfaceCapabilitiesKHR(s.graphics.physicalDevice, s.surface, &capabilities)); err != nil {
+		return err
+	}
+
+	// TODO: min & max width height
+
+	slog.Info("cap", "cap", capabilities)
+
+	if err := mapError(C.gfx_vkDeviceWaitIdle(s.graphics.device)); err != nil {
+		return err
+	}
+
+	s.destroySwapchain()
+
+	return s.createSwapchain()
 }
 
 func (s *Surface) TextureFormat() hal.TextureFormat {

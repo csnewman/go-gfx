@@ -53,6 +53,11 @@ func (p *Platform) NewWindow(cfg hal.WindowConfig) (hal.Window, hal.WindowHandle
 	}
 }
 
+//export gfx_windows_resize_callback
+func gfx_windows_resize_callback(id uint64, width int64, height int64) {
+	halCfg.WindowResized(hal.Window(id), float64(width), float64(height))
+}
+
 func (p *Platform) CloseWindow(id hal.Window) {
 	//TODO implement me
 	panic("implement me")

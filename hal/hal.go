@@ -61,6 +61,8 @@ const Win32WindowHandleType WindowHandleType = "Win32WindowHandle"
 type Surface interface {
 	TextureFormat() TextureFormat
 
+	Resize(width int, height int) error
+
 	Acquire() (SurfaceFrame, error)
 }
 

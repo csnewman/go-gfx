@@ -20,6 +20,11 @@ type Window struct {
 	id      hal.Window
 	cfg     WindowConfig
 	surface hal.Surface
+
+	surfaceWidth  float64
+	width         float64
+	surfaceHeight float64
+	height        float64
 }
 
 func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
@@ -45,6 +50,11 @@ func (a *Application) NewWindow(cfg WindowConfig) (*Window, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create surface: %w", err)
 	}
+
+	w.width = float64(cfg.Width)
+	w.surfaceWidth = float64(cfg.Width)
+	w.height = float64(cfg.Height)
+	w.surfaceHeight = float64(cfg.Height)
 
 	return w, nil
 }
@@ -91,6 +101,19 @@ func (w *Window) Start() {
 
 func (w *Window) thread() {
 	for {
+		if w.width != w.surfaceWidth || w.height != w.surfaceHeight {
+			if err := w.surface.Resize(int(w.width), int(w.height)); err != nil {
+				panic(err)
+			}
+
+			w.surfaceWidth = w.width
+			w.surfaceHeight = w.height
+
+			if w.cfg.OnResize != nil {
+				w.cfg.OnResize(w.width, w.height)
+			}
+		}
+
 		frame, err := w.surface.Acquire()
 		if err != nil {
 			// TODO: handle error
@@ -110,7 +133,7 @@ func (a *Application) windowResized(id hal.Window, width float64, height float64
 		return
 	}
 
-	if w.cfg.OnResize != nil {
-		w.cfg.OnResize(width, height)
-	}
+	// TODO: fix race
+	w.width = width
+	w.height = height
 }
