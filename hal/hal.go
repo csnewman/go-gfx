@@ -80,8 +80,7 @@ type SurfaceFrame interface {
 }
 
 type ShaderConfig struct {
-	Source string
-	Code   []byte
+	SPIRV []byte
 }
 
 type Shader interface {

@@ -11,6 +11,7 @@ import "C"
 import (
 	"errors"
 	"github.com/csnewman/go-gfx/hal"
+	"github.com/csnewman/go-gfx/internal/spvc"
 	"unsafe"
 )
 
@@ -45,7 +46,12 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 
 	format := hal.TextureFormatBGRA8UNorm
 
-	r := C.gfx_mtl_configure_surface(g.device, layer, ToPixelFormat(format))
+	var (
+		width  C.double
+		height C.double
+	)
+
+	r := C.gfx_mtl_configure_surface(g.device, layer, ToPixelFormat(format), &width, &height)
 
 	switch r {
 	case C.GFX_SUCCESS:
@@ -53,6 +59,8 @@ func (g *Graphics) CreateSurface(rawWH hal.WindowHandle) (hal.Surface, error) {
 			graphics: g,
 			layer:    layer,
 			format:   format,
+			width:    int(width),
+			height:   int(height),
 		}, nil
 
 	default:
@@ -73,9 +81,14 @@ type Surface struct {
 	graphics *Graphics
 	layer    C.id
 	format   hal.TextureFormat
+	width    int
+	height   int
 }
 
 func (s *Surface) Resize(width int, height int) error {
+	s.width = width
+	s.height = height
+
 	C.gfx_mtl_resize_surface(s.layer, C.int(width), C.int(height))
 
 	return nil
@@ -97,6 +110,8 @@ func (s *Surface) Acquire() (hal.SurfaceFrame, error) {
 		graphics: s.graphics,
 		drawable: draw,
 		texture:  text,
+		width:    s.width,
+		height:   s.height,
 	}, nil
 }
 
@@ -104,6 +119,8 @@ type SurfaceFrame struct {
 	graphics *Graphics
 	drawable C.id
 	texture  C.id
+	width    int
+	height   int
 }
 
 func (f *SurfaceFrame) Texture() hal.Texture {
@@ -135,59 +152,115 @@ type TextureView struct {
 }
 
 type Shader struct {
-	shader C.id
+	funcs map[string]*ShaderFunction
 }
 
 func (g *Graphics) CreateShader(cfg hal.ShaderConfig) (hal.Shader, error) {
-	var (
-		lib      C.id
-		errorStr *C.char
-	)
-
-	r := C.gfx_mtl_create_shader(
-		g.device,
-		unsafe.Pointer(unsafe.StringData(cfg.Source)),
-		C.int(len(cfg.Source)),
-		&lib,
-		&errorStr,
-	)
-
-	switch r {
-	case C.GFX_SUCCESS:
-		return &Shader{
-			shader: lib,
-		}, nil
-
-	case C.GFX_SEE_ERROR:
-		defer C.free(unsafe.Pointer(errorStr))
-
-		return nil, errors.New(C.GoString(errorStr))
-	default:
-		panic("unexpected response")
+	ctx, err := spvc.NewContext()
+	if err != nil {
+		return nil, err
 	}
+
+	defer ctx.Close()
+
+	ir, err := ctx.ParseSPIRV(cfg.SPIRV)
+	if err != nil {
+		return nil, err
+	}
+
+	cc, err := ir.CreateCompiler(spvc.BackendMSL)
+	if err != nil {
+		return nil, err
+	}
+
+	eps, err := cc.EntryPoints()
+	if err != nil {
+		return nil, err
+	}
+
+	funcs := make(map[string]*ShaderFunction)
+
+	// TODO: cleanup on error
+	for _, e := range eps {
+		com, err := ir.CreateCompiler(spvc.BackendMSL)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := com.SetEntryPoint(e); err != nil {
+			return nil, err
+		}
+
+		com.SetMSLPlatform(spvc.MSLPlatformMacOS)
+
+		src, err := com.Compile()
+		if err != nil {
+			return nil, err
+		}
+
+		cleanedName := com.GetCleanedEntryPoint(e)
+
+		var (
+			lib      C.id
+			errorStr *C.char
+		)
+
+		r := C.gfx_mtl_create_shader(
+			g.device,
+			unsafe.Pointer(unsafe.StringData(src)),
+			C.int(len(src)),
+			&lib,
+			&errorStr,
+		)
+
+		switch r {
+		case C.GFX_SUCCESS:
+			var fun C.id
+
+			C.gfx_mtl_get_shader_function(
+				lib,
+				unsafe.Pointer(unsafe.StringData(cleanedName)),
+				C.int(len(cleanedName)),
+				&fun,
+			)
+
+			if fun == nil {
+				// TODO: handle better
+				return nil, hal.ErrFunctionNotFound
+			}
+
+			funcs[e.Name] = &ShaderFunction{
+				lib:      lib,
+				function: fun,
+			}
+		case C.GFX_SEE_ERROR:
+			defer C.free(unsafe.Pointer(errorStr))
+
+			return nil, errors.New(C.GoString(errorStr))
+		default:
+			panic("unexpected response")
+		}
+
+	}
+
+	return &Shader{
+		funcs: funcs,
+	}, nil
 }
 
 type ShaderFunction struct {
+	lib      C.id
 	function C.id
 }
 
 func (s *Shader) ResolveFunction(name string) (hal.ShaderFunction, error) {
-	var fun C.id
+	fun, ok := s.funcs[name]
+	if !ok {
 
-	C.gfx_mtl_get_shader_function(
-		s.shader,
-		unsafe.Pointer(unsafe.StringData(name)),
-		C.int(len(name)),
-		&fun,
-	)
-
-	if fun == nil {
 		return nil, hal.ErrFunctionNotFound
 	}
 
-	return &ShaderFunction{
-		function: fun,
-	}, nil
+	return fun, nil
 }
 
 type Buffer struct {
@@ -278,6 +351,7 @@ func (g *Graphics) CreateRenderPipeline(des hal.RenderPipelineDescriptor) (hal.R
 }
 
 type CommandBuffer struct {
+	frame         *SurfaceFrame
 	buffer        C.id
 	renderEncoder C.id
 }
@@ -289,6 +363,7 @@ func (f *SurfaceFrame) CreateCommandBuffer() hal.CommandBuffer {
 	C.gfx_mtl_create_command_buf(f.graphics.queue, &buf)
 
 	return &CommandBuffer{
+		frame:  f,
 		buffer: buf,
 	}
 }
@@ -324,6 +399,17 @@ func (c *CommandBuffer) BeginRenderPass(description hal.RenderPassDescriptor) {
 		cAttachsPtr,
 		C.uint64_t(len(cAttachs)),
 		&c.renderEncoder,
+	)
+
+	// Flipped-y viewport to match Vulkan
+	C.gfx_mtl_set_viewport(
+		c.renderEncoder,
+		C.double(0.0),
+		C.double(float64(c.frame.height)),
+		C.double(float64(c.frame.width)),
+		C.double(float64(-c.frame.height)),
+		C.double(0.0),
+		C.double(1.0),
 	)
 }
 

@@ -353,11 +353,10 @@ type Shader struct {
 }
 
 func (g *Graphics) CreateShader(cfg hal.ShaderConfig) (hal.Shader, error) {
-
 	var createInfo C.VkShaderModuleCreateInfo
 	createInfo.sType = C.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
-	createInfo.codeSize = C.size_t(len(cfg.Code))
-	createInfo.pCode = (*C.uint32_t)(unsafe.Pointer(unsafe.SliceData(cfg.Code)))
+	createInfo.codeSize = C.size_t(len(cfg.SPIRV))
+	createInfo.pCode = (*C.uint32_t)(unsafe.Pointer(unsafe.SliceData(cfg.SPIRV)))
 
 	var shaderModule C.VkShaderModule
 

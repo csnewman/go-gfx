@@ -16,9 +16,6 @@ func init() {
 var lastPrint time.Time
 var count int
 
-//go:embed shader.metal
-var metalShader string
-
 //go:embed shader.spv
 var mainShader []byte
 
@@ -54,8 +51,7 @@ func (e *Example) init(app *gfx.Application) error {
 	log.Println("init complete")
 
 	e.shader, err = e.app.LoadShader(gfx.ShaderConfig{
-		Source: metalShader,
-		Code:   mainShader,
+		SPIRV: mainShader,
 	})
 	if err != nil {
 		return err

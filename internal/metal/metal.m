@@ -14,7 +14,7 @@ int gfx_mtl_open(id *res, id *res_queue) {
     }
 }
 
-int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer, int pixelFormat) {
+int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer, int pixelFormat, double *width, double *height) {
     @autoreleasepool {
         [layer setDevice:device];
         [layer setPixelFormat:pixelFormat];
@@ -23,6 +23,10 @@ int gfx_mtl_configure_surface(id <MTLDevice> device, CAMetalLayer *layer, int pi
         // TODO: wantsExtendedDynamicRangeContent?
         // TODO: expose
         [layer setDisplaySyncEnabled:YES];
+
+        CGSize size = [layer drawableSize];
+        *width = size.width;
+        *height = size.height;
 
         return GFX_SUCCESS;
     }
@@ -35,9 +39,9 @@ void gfx_mtl_resize_surface(id layer, int width, int height) {
     }
 }
 
-void gfx_mtl_acquire_surface(CAMetalLayer *layer, id* res_draw, id* res_text) {
+void gfx_mtl_acquire_surface(CAMetalLayer *layer, id *res_draw, id *res_text) {
     @autoreleasepool {
-        id<CAMetalDrawable> drawable = [[layer nextDrawable] retain];
+        id <CAMetalDrawable> drawable = [[layer nextDrawable] retain];
         *res_draw = drawable;
         *res_text = [drawable texture];
     }
@@ -173,6 +177,13 @@ void gfx_mtl_begin_rpass(
 
         id <MTLRenderCommandEncoder> enc = [buf renderCommandEncoderWithDescriptor:des];
         *res = [enc retain];
+    }
+}
+
+void gfx_mtl_set_viewport(id <MTLRenderCommandEncoder> enc, double originX, double originY, double width, double height,
+                          double zNear, double zFar) {
+    @autoreleasepool {
+        [enc setViewport:(MTLViewport) {originX, originY, width, height, zNear, zFar}];
     }
 }
 

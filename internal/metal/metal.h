@@ -14,7 +14,7 @@ typedef void *id;
 
 int gfx_mtl_open(id *res, id *res_queue);
 
-int gfx_mtl_configure_surface(id device, id layer, int pixelFormat);
+int gfx_mtl_configure_surface(id device, id layer, int pixelFormat, double *width, double *height);
 
 void gfx_mtl_resize_surface(id layer, int width, int height);
 
@@ -57,6 +57,8 @@ typedef struct ColorAttachment {
 } ColorAttachment;
 
 void gfx_mtl_begin_rpass(id buf, const struct ColorAttachment *colors, uint64_t colors_len, id *res);
+
+void gfx_mtl_set_viewport(id enc, double originX, double originY, double width, double height, double zNear, double zFar);
 
 void gfx_mtl_set_render_pipeline(id enc, id pipeline);
 

@@ -209,6 +209,10 @@ void gfx_ak_stop() {
         return;
     }
 
+    if (context->layer.drawableSize.width <= 0 || context->layer.drawableSize.width <= 0) {
+        [context->layer setDrawableSize:newSize];
+    }
+
     gfx_ak_resize_callback(context->wid, newSize.width, newSize.height);
 }
 

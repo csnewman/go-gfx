@@ -7,14 +7,12 @@ type Shader struct {
 }
 
 type ShaderConfig struct {
-	Source string
-	Code   []byte
+	SPIRV []byte
 }
 
 func (a *Application) LoadShader(cfg ShaderConfig) (*Shader, error) {
 	shader, err := a.graphics.CreateShader(hal.ShaderConfig{
-		Source: cfg.Source,
-		Code:   cfg.Code,
+		SPIRV: cfg.SPIRV,
 	})
 	if err != nil {
 		return nil, err
