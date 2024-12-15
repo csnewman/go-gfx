@@ -1,0 +1,12 @@
+#include "sdl_wrapper.h"
+
+#include "../thirdparty/SDL/src/core/windows/SDL_windows.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsclipboard.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsevents.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsframebuffer.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsmessagebox.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsmodes.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsmouse.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsshape.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsvideo.c"
+#include "../thirdparty/SDL/src/video/windows/SDL_windowsvulkan.c"
