@@ -209,6 +209,20 @@ GFX_FUNC(VkResult, vkDeviceWaitIdle,
 
 /* --- surface --- */
 
+GFX_FUNC(VkResult, vkCreateMetalSurfaceEXT,
+    (VkInstance, instance),
+    (const VkMetalSurfaceCreateInfoEXT*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkSurfaceKHR*, pSurface)
+);
+
+GFX_FUNC(VkResult, vkCreateWin32SurfaceKHR,
+    (VkInstance, instance),
+    (const VkWin32SurfaceCreateInfoKHR*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkSurfaceKHR*, pSurface)
+);
+
 GFX_FUNC(VkResult, vkGetPhysicalDeviceSurfaceCapabilitiesKHR,
     (VkPhysicalDevice, physicalDevice),
     (VkSurfaceKHR, surface),

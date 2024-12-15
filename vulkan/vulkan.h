@@ -11,24 +11,24 @@
 #define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
 #define VMA_EXTERNAL_MEMORY_WIN32 0
 
-//#if defined(_WIN32)
-//#include <windows.h>
-//#else
-//typedef void *HANDLE;
-//#define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
-//typedef unsigned short WCHAR;
-//typedef WCHAR *LPCWSTR;
-//DECLARE_HANDLE(HWND);
-//DECLARE_HANDLE(HINSTANCE);
-//DECLARE_HANDLE(HMONITOR);
-//typedef void SECURITY_ATTRIBUTES;
-//typedef uint32_t DWORD;
-//#endif
+#if defined(_WIN32)
+#include <windows.h>
+#else
+typedef void *HANDLE;
+#define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
+typedef unsigned short WCHAR;
+typedef WCHAR *LPCWSTR;
+DECLARE_HANDLE(HWND);
+DECLARE_HANDLE(HINSTANCE);
+DECLARE_HANDLE(HMONITOR);
+typedef void SECURITY_ATTRIBUTES;
+typedef uint32_t DWORD;
+#endif
 
 #include "vulkan/vk_platform.h"
 #include "vulkan/vulkan_core.h"
-//#include "vulkan/vulkan_metal.h"
-//#include "vulkan/vulkan_win32.h"
+#include "vulkan/vulkan_metal.h"
+#include "vulkan/vulkan_win32.h"
 
 #include "macromap.h"
 

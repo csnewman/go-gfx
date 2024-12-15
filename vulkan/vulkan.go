@@ -54,25 +54,25 @@ type Config struct {
 	Platform gfx.VulkanPlatform
 }
 
-func Init(cfg Config) error {
+func Init(cfg Config) (*Graphics, error) {
 	g := &Graphics{
 		logger: cfg.Logger,
 	}
 
 	if err := g.createInstance(cfg.Platform); err != nil {
-		return err
+		return nil, err
 	}
 
 	device, err := g.selectDevice()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := g.createDevice(device); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return g, nil
 }
 
 func (g *Graphics) createInstance(p gfx.VulkanPlatform) error {
