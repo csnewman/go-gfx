@@ -10,6 +10,7 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"unsafe"
 )
 
 func init() {
@@ -32,7 +33,7 @@ type Example struct {
 	vertexFunction   *gfx.ShaderFunction
 	fragmentFunction *gfx.ShaderFunction
 	trianglePipeline *gfx.RenderPipeline
-	//vertData         *gfx.Buffer
+	vertData         *gfx.Buffer
 }
 
 func (e *Example) init() error {
@@ -56,7 +57,20 @@ func (e *Example) init() error {
 	}
 
 	e.trianglePipeline, err = e.graphics.CreateRenderPipeline(gfx.RenderPipelineDescriptor{
-		VertexFunction:   e.vertexFunction,
+		VertexFunction: e.vertexFunction,
+		VertexBindings: []gfx.VertexBinding{
+			{
+				Binding: 0,
+				Stride:  16,
+				Rate:    gfx.VertexRateVertex,
+				Attributes: []gfx.VertexAttribute{
+					{
+						Location: 0,
+						Offset:   0,
+					},
+				},
+			},
+		},
 		FragmentFunction: e.fragmentFunction,
 		ColorAttachments: []gfx.RenderPipelineColorAttachment{
 			{
@@ -67,16 +81,14 @@ func (e *Example) init() error {
 	if err != nil {
 		return fmt.Errorf("error creating rendering pipeline: %w", err)
 	}
-	//
-	//floatData := []float32{
-	//	-0.5, -0.5, 0.0, 0,
-	//	0.5, -0.5, 0.0, 0,
-	//	0.0, 0.5, 0.0, 0,
-	//}
-	//byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
-	//e.vertData = e.app.NewBuffer(byteData)
-	//
-	//e.window.Start()
+
+	floatData := []float32{
+		-0.5, -0.5, 0.0, 0,
+		0.5, -0.5, 0.0, 0,
+		0.0, 0.5, 0.0, 0,
+	}
+	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
+	e.vertData = e.graphics.CreateBuffer(byteData)
 
 	return nil
 }
@@ -139,11 +151,24 @@ func (e *Example) render() {
 	if time.Since(lastPrint) >= time.Second {
 		lastPrint = time.Now()
 
-		log.Println("FPS", count)
+		e.logger.Info("FPS", "fps", count)
+
 		count = 0
 	}
 
-	frame.QueueRenderPass(gfx.RenderPassDescriptor{
+	buffer := frame.CreateCommandBuffer()
+
+	buffer.Barrier(gfx.Barrier{
+		Textures: []gfx.TextureBarrier{
+			{
+				Texture:   frame.Texture(),
+				SrcLayout: gfx.TextureLayoutUndefined,
+				DstLayout: gfx.TextureLayoutAttachment,
+			},
+		},
+	})
+
+	buffer.BeginRenderPass(gfx.RenderPassDescriptor{
 		ColorAttachments: []gfx.RenderPassColorAttachment{
 			{
 				Target:     frame,
@@ -152,12 +177,25 @@ func (e *Example) render() {
 				Discard:    false,
 			},
 		},
-		Body: func(enc *gfx.RenderPassEncoder) {
-			enc.SetPipeline(e.trianglePipeline)
-			//enc.SetVertexBuffer(e.vertData)
-			enc.Draw(0, 3)
+	})
+
+	buffer.SetRenderPipeline(e.trianglePipeline)
+	buffer.SetVertexBuffer(0, e.vertData, 0)
+	buffer.Draw(0, 3)
+
+	buffer.EndRenderPass()
+
+	buffer.Barrier(gfx.Barrier{
+		Textures: []gfx.TextureBarrier{
+			{
+				Texture:   frame.Texture(),
+				SrcLayout: gfx.TextureLayoutAttachment,
+				DstLayout: gfx.TextureLayoutPresent,
+			},
 		},
 	})
+
+	buffer.Submit()
 
 	if err := frame.Present(); err != nil {
 		panic(err)

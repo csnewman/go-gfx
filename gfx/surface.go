@@ -377,68 +377,7 @@ type RenderPassColorAttachment struct {
 	Discard    bool
 }
 
-type RenderPassEncoder struct {
-	buffer *CommandBuffer
-}
-
-func (e *RenderPassEncoder) SetPipeline(pipeline *RenderPipeline) {
-	e.buffer.SetRenderPipeline(pipeline)
-}
-
-func (e *RenderPassEncoder) Draw(start int, count int) {
-	e.buffer.Draw(start, count)
-}
-
-type RenderPassDescriptor struct {
-	ColorAttachments []RenderPassColorAttachment
-
-	Body func(enc *RenderPassEncoder)
-}
-
-func (f *SurfaceFrame) QueueRenderPass(descriptor RenderPassDescriptor) {
-	f.passes = append(f.passes, descriptor)
-}
-
 func (f *SurfaceFrame) Present() error {
-
-	buffer := f.CreateCommandBuffer()
-
-	buffer.Barrier(Barrier{
-		Textures: []TextureBarrier{
-			{
-				Texture:   f.Texture(),
-				SrcLayout: TextureLayoutUndefined,
-				DstLayout: TextureLayoutAttachment,
-			},
-		},
-	})
-
-	for _, pass := range f.passes {
-		buffer.BeginRenderPass(pass)
-
-		pass.Body(&RenderPassEncoder{
-			buffer: buffer,
-		})
-
-		buffer.EndRenderPass()
-	}
-
-	buffer.Barrier(Barrier{
-		Textures: []TextureBarrier{
-			{
-				Texture:   f.Texture(),
-				SrcLayout: TextureLayoutAttachment,
-				DstLayout: TextureLayoutPresent,
-			},
-		},
-	})
-
-	buffer.Submit()
-
-	return f.presentSurface()
-}
-
-func (f *SurfaceFrame) presentSurface() error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 

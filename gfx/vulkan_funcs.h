@@ -386,6 +386,14 @@ GFX_FUNC(void, vkCmdBeginRenderingKHR,
     (const VkRenderingInfo*, pRenderingInfo)
 );
 
+GFX_FUNC(void, vkCmdBindVertexBuffers,
+    (VkCommandBuffer, commandBuffer),
+    (uint32_t, firstBinding),
+    (uint32_t, bindingCount),
+    (const VkBuffer*, pBuffers),
+    (const VkDeviceSize*, pOffsets)
+);
+
 GFX_FUNC(void, vkCmdEndRenderingKHR,
 	(VkCommandBuffer, commandBuffer)
 );

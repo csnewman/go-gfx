@@ -153,6 +153,10 @@ func (f *SurfaceFrame) CreateCommandBuffer() *CommandBuffer {
 	}
 }
 
+type RenderPassDescriptor struct {
+	ColorAttachments []RenderPassColorAttachment
+}
+
 func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
@@ -226,9 +230,11 @@ func (c *CommandBuffer) SetRenderPipeline(pipeline *RenderPipeline) {
 	C.vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline)
 }
 
-func (c *CommandBuffer) SetVertexBuffer(data *Buffer) {
-	//TODO implement me
-	panic("implement me")
+func (c *CommandBuffer) SetVertexBuffer(binding int, buffer *Buffer, offset int) {
+	buf := buffer.buffer
+	off := C.VkDeviceSize(offset)
+
+	C.vkCmdBindVertexBuffers(c.commandBuffer, C.uint32_t(binding), C.uint32_t(1), &buf, &off)
 }
 
 func (c *CommandBuffer) Draw(start int, count int) {
@@ -283,6 +289,7 @@ func (c *CommandBuffer) Submit() {
 	submitInfo.pCommandBufferInfos = &cmdinfo
 	pinner.Pin(submitInfo.pCommandBufferInfos)
 
+	// TODO: split from frame
 	if err := mapError(C.vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, c.frame.entry.fence)); err != nil {
 		panic(err)
 	}

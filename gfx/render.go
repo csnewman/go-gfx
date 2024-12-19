@@ -14,8 +14,27 @@ type RenderPipelineColorAttachment struct {
 	Format TextureFormat
 }
 
+type VertexRate int
+
+const VertexRateVertex VertexRate = 0
+const VertexRateInstance VertexRate = 1
+
+type VertexBinding struct {
+	Binding    int
+	Stride     int
+	Rate       VertexRate
+	Attributes []VertexAttribute
+}
+
+type VertexAttribute struct {
+	Location int
+	// TODO: format
+	Offset int
+}
+
 type RenderPipelineDescriptor struct {
 	VertexFunction   *ShaderFunction
+	VertexBindings   []VertexBinding
 	FragmentFunction *ShaderFunction
 	ColorAttachments []RenderPipelineColorAttachment
 }
@@ -80,6 +99,43 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	vertexInputInfo.sType = C.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
 	vertexInputInfo.vertexBindingDescriptionCount = 0
 	vertexInputInfo.vertexAttributeDescriptionCount = 0
+
+	if len(des.VertexBindings) > 0 {
+		var bindingDes []C.VkVertexInputBindingDescription
+		var attrDes []C.VkVertexInputAttributeDescription
+
+		for _, binding := range des.VertexBindings {
+			var des C.VkVertexInputBindingDescription
+			des.binding = C.uint32_t(binding.Binding)
+			des.stride = C.uint32_t(binding.Stride)
+
+			// des.inputRate TODO
+
+			bindingDes = append(bindingDes, des)
+
+			for _, attribute := range binding.Attributes {
+				var attr C.VkVertexInputAttributeDescription
+
+				attr.binding = C.uint32_t(binding.Binding)
+				attr.location = C.uint32_t(attribute.Location)
+
+				//attr.format = // TODO
+				attr.format = C.VK_FORMAT_R32G32B32_SFLOAT
+
+				attr.offset = C.uint32_t(attribute.Offset)
+
+				attrDes = append(attrDes, attr)
+			}
+		}
+
+		vertexInputInfo.vertexBindingDescriptionCount = C.uint32_t(len(bindingDes))
+		vertexInputInfo.pVertexBindingDescriptions = unsafe.SliceData(bindingDes)
+		pinner.Pin(vertexInputInfo.pVertexBindingDescriptions)
+
+		vertexInputInfo.vertexAttributeDescriptionCount = C.uint32_t(len(attrDes))
+		vertexInputInfo.pVertexAttributeDescriptions = unsafe.SliceData(attrDes)
+		pinner.Pin(vertexInputInfo.pVertexAttributeDescriptions)
+	}
 
 	var inputAssembly C.VkPipelineInputAssemblyStateCreateInfo
 	inputAssembly.sType = C.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO

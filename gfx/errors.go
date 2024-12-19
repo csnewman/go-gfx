@@ -21,6 +21,7 @@ var (
 	ErrIncompatibleDriver       = errors.New("incompatible driver")
 	ErrNoSuitableDevice         = errors.New("could not find a suitable device")
 	ErrMissingFeature           = errors.New("feature missing")
+	ErrInitializationFailed     = errors.New("initialization failed")
 )
 
 func mapError(err C.VkResult) error {
@@ -29,6 +30,9 @@ func mapError(err C.VkResult) error {
 	}
 
 	switch err {
+	case C.VK_ERROR_INITIALIZATION_FAILED:
+		return ErrInitializationFailed
+
 	case C.VK_ERROR_LAYER_NOT_PRESENT:
 		return fmt.Errorf("%w: layer", ErrMissingFeature)
 
