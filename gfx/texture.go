@@ -1,23 +1,24 @@
 package gfx
 
-import "github.com/csnewman/go-gfx/hal"
+/*
+#include "vulkan.h"
+*/
+import "C"
 
-type TextureFormat = hal.TextureFormat
+type Texture struct {
+	img C.VkImage
+}
+
+type TextureView struct {
+	view C.VkImageView
+}
 
 type TextureViewable interface {
 	TextureView() *TextureView
 }
 
-type TextureView struct {
-	view hal.TextureView
-}
+type TextureFormat int
 
-func viewFromHal(view hal.TextureView) *TextureView {
-	return &TextureView{
-		view: view,
-	}
-}
-
-func (t *TextureView) TextureView() *TextureView {
-	return t
-}
+const (
+	TextureFormatBGRA8UNorm TextureFormat = iota
+)

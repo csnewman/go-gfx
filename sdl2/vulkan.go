@@ -63,3 +63,13 @@ func (p *Platform) VKGetInstanceProcAddr() unsafe.Pointer {
 func (p *Platform) RequiredVKExtensions() []string {
 	return p.vkExts
 }
+
+func (w *Window) CreateVkSurface(instance unsafe.Pointer) (unsafe.Pointer, error) {
+	var res C.VkSurfaceKHR
+
+	if r := C.SDL_Vulkan_CreateSurface(w.window, C.VkInstance(instance), &res); r != 1 {
+		return nil, getError()
+	}
+
+	return unsafe.Pointer(res), nil
+}

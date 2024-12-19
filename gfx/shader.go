@@ -1,39 +1,45 @@
 package gfx
 
-import "github.com/csnewman/go-gfx/hal"
+import "unsafe"
+
+/*
+#include "vulkan.h"
+*/
+import "C"
 
 type Shader struct {
-	shader hal.Shader
+	shader C.VkShaderModule
 }
 
 type ShaderConfig struct {
 	SPIRV []byte
 }
 
-func (a *Application) LoadShader(cfg ShaderConfig) (*Shader, error) {
-	shader, err := a.graphics.CreateShader(hal.ShaderConfig{
-		SPIRV: cfg.SPIRV,
-	})
-	if err != nil {
+func (g *Graphics) CreateShader(cfg ShaderConfig) (*Shader, error) {
+	var createInfo C.VkShaderModuleCreateInfo
+	createInfo.sType = C.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
+	createInfo.codeSize = C.size_t(len(cfg.SPIRV))
+	createInfo.pCode = (*C.uint32_t)(unsafe.Pointer(unsafe.SliceData(cfg.SPIRV)))
+
+	var shaderModule C.VkShaderModule
+
+	if err := mapError(C.vkCreateShaderModule(g.device, &createInfo, nil, &shaderModule)); err != nil {
 		return nil, err
 	}
 
 	return &Shader{
-		shader: shader,
+		shader: shaderModule,
 	}, nil
 }
 
 type ShaderFunction struct {
-	function hal.ShaderFunction
+	shader   *Shader
+	function string
 }
 
 func (s *Shader) Function(name string) (*ShaderFunction, error) {
-	sf, err := s.shader.ResolveFunction(name)
-	if err != nil {
-		return nil, err
-	}
-
 	return &ShaderFunction{
-		function: sf,
+		shader:   s,
+		function: name,
 	}, nil
 }

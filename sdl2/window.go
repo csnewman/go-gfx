@@ -2,6 +2,8 @@ package sdl2
 
 import (
 	"unsafe"
+
+	"github.com/csnewman/go-gfx/gfx"
 )
 
 /*
@@ -10,13 +12,17 @@ import (
 import "C"
 
 type Window struct {
+	id     uint
 	window *C.SDL_Window
+	render func()
 }
 
 type WindowConfig struct {
-	Title  string
-	Width  int
-	Height int
+	Title    string
+	Width    int
+	Height   int
+	OnResize func(w float64, h float64)
+	OnRender func()
 }
 
 func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
@@ -35,5 +41,19 @@ func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
 		return nil, getError()
 	}
 
-	return nil, nil
+	id := uint(C.SDL_GetWindowID(window))
+
+	w := &Window{
+		id:     id,
+		window: window,
+		render: cfg.OnRender,
+	}
+
+	p.windows[id] = w
+
+	return w, nil
+}
+
+func (w *Window) SurfaceHandleType() gfx.SurfaceHandleType {
+	return gfx.VulkanSurfaceHandleType
 }

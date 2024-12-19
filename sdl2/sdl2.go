@@ -34,8 +34,9 @@ func Init(c Config) (*Platform, error) {
 	C.SDL_Init(C.SDL_INIT_VIDEO)
 
 	p := &Platform{
-		logger: c.Logger,
-		init:   c.Init,
+		logger:  c.Logger,
+		init:    c.Init,
+		windows: make(map[uint]*Window),
 	}
 
 	// TODO: expose alternatives
@@ -47,10 +48,11 @@ func Init(c Config) (*Platform, error) {
 }
 
 type Platform struct {
-	logger *slog.Logger
-	init   func() error
-	vkAddr unsafe.Pointer
-	vkExts []string
+	logger  *slog.Logger
+	init    func() error
+	windows map[uint]*Window
+	vkAddr  unsafe.Pointer
+	vkExts  []string
 }
 
 func (p *Platform) Run() error {
@@ -61,7 +63,7 @@ func (p *Platform) Run() error {
 	for {
 		var event C.SDL_Event
 
-		for C.SDL_WaitEvent(&event) != 0 {
+		for C.SDL_PollEvent(&event) != 0 {
 			ptr := &event
 			ty := *(*C.Uint32)(unsafe.Pointer(ptr))
 
@@ -70,12 +72,46 @@ func (p *Platform) Run() error {
 				p.logger.Info("Quiting")
 				return nil
 
+			case C.SDL_WINDOWEVENT:
+
+				evt := (*C.SDL_WindowEvent)(unsafe.Pointer(ptr))
+				wid := uint(evt.windowID)
+
+				w, ok := p.windows[wid]
+				if !ok {
+					p.logger.Debug("Ignored window event", "wid", wid, "evt", evt.event)
+
+					continue
+				}
+
+				//Uint32 type;        /**< ::SDL_WINDOWEVENT */
+				//Uint32 timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+				//Uint32 windowID;    /**< The associated window */
+				//Uint8 event;        /**< ::SDL_WindowEventID */
+
+				_ = w
+
+				switch evt.event {
+				case C.SDL_WINDOWEVENT_RESIZED:
+
+					p.logger.Info("Window resized", "wid", evt.windowID, "w", evt.data1, "h", evt.data2)
+				case C.SDL_WINDOWEVENT_SIZE_CHANGED:
+					p.logger.Info("Window size changed", "wid", evt.windowID, "w", evt.data1, "h", evt.data2)
+				default:
+					p.logger.Info("Window event received", "time", evt.timestamp, "wid", evt.windowID, "evt", evt.event)
+
+				}
+
 			case C.SDL_MOUSEMOTION:
 				// Ignore
 
 			default:
 				p.logger.Debug("Unhandled event", "ty", ty)
 			}
+		}
+
+		for _, window := range p.windows {
+			window.render()
 		}
 	}
 }
@@ -84,23 +120,3 @@ func (p *Platform) Exit() {
 	//TODO implement me
 	panic("implement me")
 }
-
-//func (p *Platform) GetInstanceExtensions() ([]unsafe.Pointer, error) {
-//	var count C.uint32_t
-//
-//	if C.SDL_Vulkan_GetInstanceExtensions(p.window, &count, nil) == 0 {
-//		return nil, getError()
-//	}
-//
-//	res := make([]unsafe.Pointer, count)
-//
-//	if C.SDL_Vulkan_GetInstanceExtensions(p.window, &count, (**C.char)(unsafe.Pointer(unsafe.SliceData(res)))) == 0 {
-//		return nil, getError()
-//	}
-//
-//	return res[:count], nil
-//}
-//
-//func (p *Platform) GetLoader() unsafe.Pointer {
-//	return C.SDL_Vulkan_GetVkGetInstanceProcAddr()
-//}

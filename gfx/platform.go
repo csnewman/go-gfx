@@ -1,8 +1,6 @@
 package gfx
 
-import (
-	"unsafe"
-)
+import "unsafe"
 
 type VulkanPlatform interface {
 	VKGetInstanceProcAddr() unsafe.Pointer

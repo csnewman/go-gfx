@@ -2,11 +2,14 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/sdl2"
 	"log"
+	"log/slog"
+	"os"
 	"runtime"
 	"time"
-	"unsafe"
 )
 
 func init() {
@@ -20,97 +23,116 @@ var count int
 var mainShader []byte
 
 type Example struct {
-	app              *gfx.Application
-	window           *gfx.Window
+	logger           *slog.Logger
+	platform         *sdl2.Platform
+	window           *sdl2.Window
+	graphics         *gfx.Graphics
+	surface          *gfx.Surface
 	shader           *gfx.Shader
 	vertexFunction   *gfx.ShaderFunction
 	fragmentFunction *gfx.ShaderFunction
-	vertData         *gfx.Buffer
 	trianglePipeline *gfx.RenderPipeline
+	//vertData         *gfx.Buffer
 }
 
-func (e *Example) init(app *gfx.Application) error {
-	e.app = app
+func (e *Example) init() error {
+	var err error
 
-	log.Println("Creating main window")
-
-	window, err := e.app.NewWindow(gfx.WindowConfig{
-		Title:    "Triangle",
-		Width:    800,
-		Height:   600,
-		OnClosed: e.closed,
-		OnRender: e.render,
-		OnResize: e.resize,
-	})
-	if err != nil {
-		return err
-	}
-
-	e.window = window
-
-	log.Println("init complete")
-
-	e.shader, err = e.app.LoadShader(gfx.ShaderConfig{
+	e.shader, err = e.graphics.CreateShader(gfx.ShaderConfig{
 		SPIRV: mainShader,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("error loading shader: %w", err)
 	}
 
 	e.vertexFunction, err = e.shader.Function("vertexShader")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating vertex function: %w", err)
 	}
 
 	e.fragmentFunction, err = e.shader.Function("fragmentShader")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating fragment function: %w", err)
 	}
 
-	e.trianglePipeline, err = e.app.NewRenderPipeline(gfx.RenderPipelineDescriptor{
+	e.trianglePipeline, err = e.graphics.CreateRenderPipeline(gfx.RenderPipelineDescriptor{
 		VertexFunction:   e.vertexFunction,
 		FragmentFunction: e.fragmentFunction,
 		ColorAttachments: []gfx.RenderPipelineColorAttachment{
 			{
-				Format: e.window.TextureFormat(),
+				Format: e.surface.TextureFormat(),
 			},
 		},
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating rendering pipeline: %w", err)
 	}
-
-	floatData := []float32{
-		-0.5, -0.5, 0.0, 0,
-		0.5, -0.5, 0.0, 0,
-		0.0, 0.5, 0.0, 0,
-	}
-	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
-	e.vertData = e.app.NewBuffer(byteData)
-
-	e.window.Start()
+	//
+	//floatData := []float32{
+	//	-0.5, -0.5, 0.0, 0,
+	//	0.5, -0.5, 0.0, 0,
+	//	0.0, 0.5, 0.0, 0,
+	//}
+	//byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
+	//e.vertData = e.app.NewBuffer(byteData)
+	//
+	//e.window.Start()
 
 	return nil
 }
 
 func (e *Example) Run() error {
-	return gfx.Run(gfx.ApplicationConfig{
-		Init: e.init,
-	})
+	var err error
+
+	if e.platform, err = sdl2.Init(sdl2.Config{
+		Logger: e.logger,
+		Init:   e.init,
+	}); err != nil {
+		return fmt.Errorf("failed to initialise platform: %w", err)
+	}
+
+	if e.graphics, err = gfx.Init(gfx.Config{
+		Logger:   e.logger,
+		Platform: e.platform,
+	}); err != nil {
+		return err
+	}
+
+	e.logger.Info("Creating main window")
+
+	if e.window, err = e.platform.NewWindow(sdl2.WindowConfig{
+		Title:  "Triangle | go-gfx",
+		Width:  800,
+		Height: 600,
+		//OnClosed: e.closed,
+		OnRender: e.render,
+		OnResize: e.resize,
+	}); err != nil {
+		return fmt.Errorf("failed to create main window: %w", err)
+	}
+
+	if e.surface, err = e.graphics.CreateSurface(e.window); err != nil {
+		return fmt.Errorf("failed to create surface: %w", err)
+	}
+
+	return e.platform.Run()
 }
 
 func (e *Example) closed() {
 	log.Println("Main window closed")
 
-	e.app.Exit()
+	e.platform.Exit()
 }
 
 func (e *Example) resize(width float64, height float64) {
 	log.Println("Main window resized", width, height)
 }
 
-func (e *Example) render(frame *gfx.Frame) {
-	defer frame.Close()
+func (e *Example) render() {
+	frame, err := e.surface.Acquire()
+	if err != nil {
+		panic(err)
+	}
 
 	count++
 
@@ -126,7 +148,7 @@ func (e *Example) render(frame *gfx.Frame) {
 			{
 				Target:     frame,
 				Load:       false,
-				ClearColor: gfx.NewColor(1, 0, 0, 1),
+				ClearColor: gfx.NewColor(0, 1, 0, 1),
 				Discard:    false,
 			},
 		},
@@ -143,13 +165,21 @@ func (e *Example) render(frame *gfx.Frame) {
 }
 
 func main() {
-	log.Println("Triangle Example")
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource:   true,
+		Level:       slog.LevelDebug,
+		ReplaceAttr: nil,
+	}))
 
-	ex := &Example{}
+	logger.Info("Triangle example")
+
+	ex := &Example{
+		logger: logger,
+	}
 
 	if err := ex.Run(); err != nil {
 		panic(err)
 	}
 
-	log.Println("App exited")
+	logger.Info("App exited")
 }
