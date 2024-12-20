@@ -22,18 +22,11 @@ type Surface struct {
 	minImageCount int
 	transform     C.VkSurfaceTransformFlagBitsKHR
 	swapchain     C.VkSwapchainKHR
-	images        []*SurfaceImage
+	images        []*Image
 	entries       []*SurfaceEntry
 	currentEntry  int
 	width         int
 	height        int
-}
-
-type SurfaceImage struct {
-	image  C.VkImage
-	view   C.VkImageView
-	width  int
-	height int
 }
 
 type SurfaceEntry struct {
@@ -254,7 +247,7 @@ func (s *Surface) createSwapchain() error {
 			return err
 		}
 
-		s.images = append(s.images, &SurfaceImage{
+		s.images = append(s.images, &Image{
 			image:  image,
 			view:   view,
 			width:  s.width,
@@ -300,17 +293,17 @@ func (s *Surface) Resize(width int, height int) error {
 	return s.createSwapchain()
 }
 
-func (s *Surface) TextureFormat() TextureFormat {
+func (s *Surface) Format() Format {
 	// TODO: fix
 
-	return TextureFormatBGRA8UNorm
+	return FormatBGRA8UNorm
 }
 
 type SurfaceFrame struct {
 	graphics *Graphics
 	surface  *Surface
 	entry    *SurfaceEntry
-	img      *SurfaceImage
+	img      *Image
 	index    int
 
 	passes []RenderPassDescriptor
@@ -358,20 +351,16 @@ func (s *Surface) Acquire() (*SurfaceFrame, error) {
 	}, nil
 }
 
-func (f *SurfaceFrame) TextureView() *TextureView {
-	return &TextureView{
-		view: f.img.view,
-	}
+func (f *SurfaceFrame) ImageView() *ImageView {
+	return f.img.ImageView()
 }
 
-func (f *SurfaceFrame) Texture() *Texture {
-	return &Texture{
-		img: f.img.image,
-	}
+func (f *SurfaceFrame) Image() *Image {
+	return f.img
 }
 
 type RenderPassColorAttachment struct {
-	Target     TextureViewable
+	Target     ImageViewer
 	Load       bool
 	ClearColor Color
 	Discard    bool

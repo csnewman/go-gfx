@@ -33,23 +33,23 @@ type CommandBuffer struct {
 	commandBuffer C.VkCommandBuffer
 }
 
-type TextureLayout int
+type ImageLayout int
 
 const (
-	TextureLayoutUndefined TextureLayout = iota
-	TextureLayoutAttachment
-	TextureLayoutRead
-	TextureLayoutPresent
+	ImageLayoutUndefined ImageLayout = iota
+	ImageLayoutAttachment
+	ImageLayoutRead
+	ImageLayoutPresent
 )
 
-type TextureBarrier struct {
-	Texture   *Texture
-	SrcLayout TextureLayout
-	DstLayout TextureLayout
+type ImageBarrier struct {
+	Image     *Image
+	SrcLayout ImageLayout
+	DstLayout ImageLayout
 }
 
 type Barrier struct {
-	Textures []TextureBarrier
+	Images []ImageBarrier
 }
 
 func (c *CommandBuffer) Barrier(barrier Barrier) {
@@ -61,7 +61,7 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 
 	var imgBarriers []C.VkImageMemoryBarrier2
 
-	for _, bar := range barrier.Textures {
+	for _, bar := range barrier.Images {
 		var imgBarrier C.VkImageMemoryBarrier2
 		imgBarrier.sType = C.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2
 
@@ -73,16 +73,16 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		// TODO: transfers (srcQueueFamilyIndex, dstQueueFamilyIndex)
 
 		switch bar.SrcLayout {
-		case TextureLayoutUndefined:
+		case ImageLayoutUndefined:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_UNDEFINED
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_NONE
-		case TextureLayoutAttachment:
+		case ImageLayoutAttachment:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
-		case TextureLayoutRead:
+		case ImageLayoutRead:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
-		case TextureLayoutPresent:
+		case ImageLayoutPresent:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		default:
@@ -90,23 +90,23 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		}
 
 		switch bar.DstLayout {
-		case TextureLayoutUndefined:
+		case ImageLayoutUndefined:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_UNDEFINED
 			panic("todo check")
-		case TextureLayoutAttachment:
+		case ImageLayoutAttachment:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
-		case TextureLayoutRead:
+		case ImageLayoutRead:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
-		case TextureLayoutPresent:
+		case ImageLayoutPresent:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		default:
 			panic("unknown layout")
 		}
 
-		imgBarrier.image = bar.Texture.img
+		imgBarrier.image = bar.Image.image
 
 		// TODO: subresourceRange (e.g. depth)
 		imgBarrier.subresourceRange.aspectMask = C.VK_IMAGE_ASPECT_COLOR_BIT
@@ -164,7 +164,7 @@ func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 	var cAttachs []C.VkRenderingAttachmentInfo
 
 	for _, c := range description.ColorAttachments {
-		tv := c.Target.TextureView()
+		tv := c.Target.ImageView()
 
 		var colorAttachment C.VkRenderingAttachmentInfo
 		colorAttachment.sType = C.VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO

@@ -5,20 +5,29 @@ package gfx
 */
 import "C"
 
-type Texture struct {
-	img C.VkImage
+type Image struct {
+	image  C.VkImage
+	view   C.VkImageView
+	width  int
+	height int
 }
 
-type TextureView struct {
+func (i *Image) ImageView() *ImageView {
+	return &ImageView{
+		view: i.view,
+	}
+}
+
+type ImageView struct {
 	view C.VkImageView
 }
 
-type TextureViewable interface {
-	TextureView() *TextureView
+type ImageViewer interface {
+	ImageView() *ImageView
 }
 
-type TextureFormat int
+type Format int
 
 const (
-	TextureFormatBGRA8UNorm TextureFormat = iota
+	FormatBGRA8UNorm Format = iota
 )

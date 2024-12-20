@@ -74,7 +74,7 @@ func (e *Example) init() error {
 		FragmentFunction: e.fragmentFunction,
 		ColorAttachments: []gfx.RenderPipelineColorAttachment{
 			{
-				Format: e.surface.TextureFormat(),
+				Format: e.surface.Format(),
 			},
 		},
 	})
@@ -83,9 +83,9 @@ func (e *Example) init() error {
 	}
 
 	floatData := []float32{
-		-0.5, -0.5, 0.0, 0,
-		0.5, -0.5, 0.0, 0,
-		0.0, 0.5, 0.0, 0,
+		0.0, -0.5, 0.0, 0,
+		0.5, 0.5, 0.0, 0,
+		-0.5, 0.5, 0.0, 0,
 	}
 	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
 	e.vertData = e.graphics.CreateBuffer(byteData)
@@ -159,11 +159,11 @@ func (e *Example) render() {
 	buffer := frame.CreateCommandBuffer()
 
 	buffer.Barrier(gfx.Barrier{
-		Textures: []gfx.TextureBarrier{
+		Images: []gfx.ImageBarrier{
 			{
-				Texture:   frame.Texture(),
-				SrcLayout: gfx.TextureLayoutUndefined,
-				DstLayout: gfx.TextureLayoutAttachment,
+				Image:     frame.Image(),
+				SrcLayout: gfx.ImageLayoutUndefined,
+				DstLayout: gfx.ImageLayoutAttachment,
 			},
 		},
 	})
@@ -186,11 +186,11 @@ func (e *Example) render() {
 	buffer.EndRenderPass()
 
 	buffer.Barrier(gfx.Barrier{
-		Textures: []gfx.TextureBarrier{
+		Images: []gfx.ImageBarrier{
 			{
-				Texture:   frame.Texture(),
-				SrcLayout: gfx.TextureLayoutAttachment,
-				DstLayout: gfx.TextureLayoutPresent,
+				Image:     frame.Image(),
+				SrcLayout: gfx.ImageLayoutAttachment,
+				DstLayout: gfx.ImageLayoutPresent,
 			},
 		},
 	})

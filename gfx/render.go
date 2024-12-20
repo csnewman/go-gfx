@@ -11,7 +11,7 @@ import (
 )
 
 type RenderPipelineColorAttachment struct {
-	Format TextureFormat
+	Format Format
 }
 
 type VertexRate int
@@ -232,9 +232,9 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	}, nil
 }
 
-func ToFormat(format TextureFormat) C.VkFormat {
+func ToFormat(format Format) C.VkFormat {
 	switch format {
-	case TextureFormatBGRA8UNorm:
+	case FormatBGRA8UNorm:
 		return C.VK_FORMAT_B8G8R8A8_UNORM
 	default:
 		panic("unknown format")
