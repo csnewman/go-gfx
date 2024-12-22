@@ -84,22 +84,12 @@ func (p *Platform) Run() error {
 					continue
 				}
 
-				//Uint32 type;        /**< ::SDL_WINDOWEVENT */
-				//Uint32 timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
-				//Uint32 windowID;    /**< The associated window */
-				//Uint8 event;        /**< ::SDL_WindowEventID */
-
-				_ = w
-
 				switch evt.event {
-				case C.SDL_WINDOWEVENT_RESIZED:
-
-					p.logger.Info("Window resized", "wid", evt.windowID, "w", evt.data1, "h", evt.data2)
-				case C.SDL_WINDOWEVENT_SIZE_CHANGED:
-					p.logger.Info("Window size changed", "wid", evt.windowID, "w", evt.data1, "h", evt.data2)
+				case C.SDL_WINDOWEVENT_RESIZED, C.SDL_WINDOWEVENT_SIZE_CHANGED:
+					w.nextWidth = int(int32(evt.data1))
+					w.nextHeight = int(int32(evt.data2))
 				default:
 					p.logger.Info("Window event received", "time", evt.timestamp, "wid", evt.windowID, "evt", evt.event)
-
 				}
 
 			case C.SDL_MOUSEMOTION:
@@ -111,7 +101,9 @@ func (p *Platform) Run() error {
 		}
 
 		for _, window := range p.windows {
-			window.render()
+			if err := window.doRender(); err != nil {
+				return err
+			}
 		}
 	}
 }

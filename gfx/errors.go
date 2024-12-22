@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	ErrInvalidDescriptor        = errors.New("invalid descriptor")
 	ErrUnexpectedSystemResponse = errors.New("unexpected system response")
 	ErrUnexpectedStatus         = errors.New("unexpected status")
 	ErrAlreadyRunning           = errors.New("already running")

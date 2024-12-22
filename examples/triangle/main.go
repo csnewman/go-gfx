@@ -136,14 +136,20 @@ func (e *Example) closed() {
 	e.platform.Exit()
 }
 
-func (e *Example) resize(width float64, height float64) {
-	log.Println("Main window resized", width, height)
+func (e *Example) resize(width int, height int) error {
+	e.logger.Info("Main window resized", "width", width, "height", height)
+
+	if err := e.surface.Resize(width, height); err != nil {
+		return fmt.Errorf("ffailed to resize surface: %w", err)
+	}
+
+	return nil
 }
 
-func (e *Example) render() {
+func (e *Example) render() error {
 	frame, err := e.surface.Acquire()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	count++
@@ -198,8 +204,10 @@ func (e *Example) render() {
 	buffer.Submit()
 
 	if err := frame.Present(); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func main() {

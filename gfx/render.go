@@ -236,6 +236,8 @@ func ToFormat(format Format) C.VkFormat {
 	switch format {
 	case FormatBGRA8UNorm:
 		return C.VK_FORMAT_B8G8R8A8_UNORM
+	case FormatRGBA16SFloat:
+		return C.VK_FORMAT_R16G16B16A16_SFLOAT
 	default:
 		panic("unknown format")
 	}

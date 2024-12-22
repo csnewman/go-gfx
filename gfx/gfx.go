@@ -183,6 +183,11 @@ func (g *Graphics) selectDevice() (*selectedDevice, error) {
 
 		// TODO: check if device can present
 
+		// Ensure 1.2 support
+		if props.apiVersion < C.VK_API_VERSION_1_2 {
+			continue
+		}
+
 		score := 0
 
 		switch props.deviceType {
@@ -305,8 +310,15 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	pinner.Pin(dynamicRenderingFeatures.pNext)
 	dynamicRenderingFeatures.dynamicRendering = C.VkBool32(1)
 
+	var features12 C.VkPhysicalDeviceVulkan12Features
+	features12.pNext = unsafe.Pointer(&dynamicRenderingFeatures)
+	pinner.Pin(features12.pNext)
+	features12.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES
+	features12.bufferDeviceAddress = C.VkBool32(1)
+	features12.descriptorIndexing = C.VkBool32(1)
+
 	var createInfo C.VkDeviceCreateInfo
-	createInfo.pNext = unsafe.Pointer(&dynamicRenderingFeatures)
+	createInfo.pNext = unsafe.Pointer(&features12)
 	pinner.Pin(createInfo.pNext)
 	createInfo.sType = C.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO
 	createInfo.queueCreateInfoCount = 1
@@ -337,10 +349,11 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	C.vkGetDeviceQueue(g.device, C.uint32_t(sel.graphicsFamily), 0, &g.graphicsQueue)
 
 	var vmaInfo C.VmaAllocatorCreateInfo
-	vmaInfo.vulkanApiVersion = C.VK_API_VERSION_1_3
+	vmaInfo.vulkanApiVersion = C.VK_API_VERSION_1_2
 	vmaInfo.physicalDevice = sel.device
 	vmaInfo.device = g.device
 	vmaInfo.instance = g.instance
+	vmaInfo.flags = C.VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT
 
 	if err := mapError(C.vmaCreateAllocator(&vmaInfo, &g.memoryAllocator)); err != nil {
 		return err

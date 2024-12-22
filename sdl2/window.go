@@ -12,17 +12,22 @@ import (
 import "C"
 
 type Window struct {
-	id     uint
-	window *C.SDL_Window
-	render func()
+	id         uint
+	window     *C.SDL_Window
+	render     func() error
+	resize     func(w int, h int) error
+	width      int
+	height     int
+	nextWidth  int
+	nextHeight int
 }
 
 type WindowConfig struct {
 	Title    string
 	Width    int
 	Height   int
-	OnResize func(w float64, h float64)
-	OnRender func()
+	OnResize func(w int, h int) error
+	OnRender func() error
 }
 
 func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
@@ -47,6 +52,7 @@ func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
 		id:     id,
 		window: window,
 		render: cfg.OnRender,
+		resize: cfg.OnResize,
 	}
 
 	p.windows[id] = w
@@ -56,4 +62,18 @@ func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
 
 func (w *Window) SurfaceHandleType() gfx.SurfaceHandleType {
 	return gfx.VulkanSurfaceHandleType
+}
+
+func (w *Window) doRender() error {
+	if w.width != w.nextWidth || w.height != w.nextHeight {
+		w.width, w.height = w.nextWidth, w.nextHeight
+
+		if w.resize != nil {
+			if err := w.resize(w.width, w.height); err != nil {
+				return err
+			}
+		}
+	}
+
+	return w.render()
 }
