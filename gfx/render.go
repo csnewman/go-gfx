@@ -118,10 +118,7 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 
 				attr.binding = C.uint32_t(binding.Binding)
 				attr.location = C.uint32_t(attribute.Location)
-
-				//attr.format = // TODO
-				attr.format = C.VK_FORMAT_R32G32B32_SFLOAT
-
+				attr.format = ToFormat(attribute.Format)
 				attr.offset = C.uint32_t(attribute.Offset)
 
 				attrDes = append(attrDes, attr)
@@ -230,15 +227,4 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	return &RenderPipeline{
 		pipeline: pipeline,
 	}, nil
-}
-
-func ToFormat(format Format) C.VkFormat {
-	switch format {
-	case FormatBGRA8UNorm:
-		return C.VK_FORMAT_B8G8R8A8_UNORM
-	case FormatRGBA16SFloat:
-		return C.VK_FORMAT_R16G16B16A16_SFLOAT
-	default:
-		panic("unknown format")
-	}
 }

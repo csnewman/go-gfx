@@ -164,5 +164,25 @@ func (f Format) Depth() bool {
 
 const (
 	FormatBGRA8UNorm Format = iota
+	FormatRGBA8UNorm
 	FormatRGBA16SFloat
+	FormatRGB32SFloat
+	FormatRG32SFloat
 )
+
+func ToFormat(format Format) C.VkFormat {
+	switch format {
+	case FormatBGRA8UNorm:
+		return C.VK_FORMAT_B8G8R8A8_UNORM
+	case FormatRGBA8UNorm:
+		return C.VK_FORMAT_R8G8B8A8_UNORM
+	case FormatRGBA16SFloat:
+		return C.VK_FORMAT_R16G16B16A16_SFLOAT
+	case FormatRGB32SFloat:
+		return C.VK_FORMAT_R32G32B32_SFLOAT
+	case FormatRG32SFloat:
+		return C.VK_FORMAT_R32G32_SFLOAT
+	default:
+		panic("unknown format")
+	}
+}
