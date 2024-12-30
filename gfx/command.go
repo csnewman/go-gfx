@@ -31,6 +31,39 @@ type CommandBuffer struct {
 	graphics      *Graphics
 	frame         *SurfaceFrame
 	commandBuffer C.VkCommandBuffer
+	pool          C.VkCommandPool
+}
+
+func (g *Graphics) CreateCommandBuffer() (*CommandBuffer, error) {
+	var allocInfo C.VkCommandBufferAllocateInfo
+	allocInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO
+	allocInfo.level = C.VK_COMMAND_BUFFER_LEVEL_PRIMARY
+	allocInfo.commandPool = g.mainCommandPool
+	allocInfo.commandBufferCount = 1
+
+	var commandBuffer C.VkCommandBuffer
+
+	if err := mapError(C.vkAllocateCommandBuffers(g.device, &allocInfo, &commandBuffer)); err != nil {
+		return nil, err
+	}
+
+	var beginInfo C.VkCommandBufferBeginInfo
+	beginInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
+	beginInfo.flags = C.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
+
+	if err := mapError(C.vkBeginCommandBuffer(commandBuffer, &beginInfo)); err != nil {
+		return nil, err
+	}
+
+	return &CommandBuffer{
+		graphics:      g,
+		commandBuffer: commandBuffer,
+		pool:          g.mainCommandPool,
+	}, nil
+}
+
+func (c *CommandBuffer) Close() {
+	C.vkFreeCommandBuffers(c.graphics.device, c.pool, 1, &c.commandBuffer)
 }
 
 type ImageLayout int
@@ -40,6 +73,7 @@ const (
 	ImageLayoutAttachment
 	ImageLayoutRead
 	ImageLayoutPresent
+	ImageLayoutTransferDst
 )
 
 type ImageBarrier struct {
@@ -85,6 +119,9 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		case ImageLayoutPresent:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
+		case ImageLayoutTransferDst:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -102,6 +139,9 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		case ImageLayoutPresent:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
+		case ImageLayoutTransferDst:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -241,8 +281,59 @@ func (c *CommandBuffer) Draw(start int, count int) {
 	C.vkCmdDraw(c.commandBuffer, C.uint32_t(count), 1, C.uint32_t(start), 0)
 }
 
+func (c *CommandBuffer) CopyBufferToImage(buffer *Buffer, image *Image) {
+	var region C.VkBufferImageCopy
+	region.imageSubresource.aspectMask = C.VK_IMAGE_ASPECT_COLOR_BIT
+	region.imageSubresource.layerCount = 1
+	region.imageExtent.width = C.uint32_t(image.width)
+	region.imageExtent.height = C.uint32_t(image.height)
+	region.imageExtent.depth = 1
+
+	C.vkCmdCopyBufferToImage(
+		c.commandBuffer,
+		buffer.buffer,
+		image.image,
+		C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		1,
+		&region,
+	)
+}
+
 func (c *CommandBuffer) EndRenderPass() {
 	C.vkCmdEndRenderingKHR(c.commandBuffer)
+}
+
+// TODO: merge with submit and expose signaling
+func (c *CommandBuffer) SubmitAndWait() error {
+	pinner := new(runtime.Pinner)
+	defer pinner.Unpin()
+
+	C.vkEndCommandBuffer(c.commandBuffer)
+
+	var cmdinfo C.VkCommandBufferSubmitInfo
+	cmdinfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO
+	cmdinfo.pNext = nil
+	cmdinfo.commandBuffer = c.commandBuffer
+	cmdinfo.deviceMask = 0
+
+	var submitInfo C.VkSubmitInfo2
+	submitInfo.sType = C.VK_STRUCTURE_TYPE_SUBMIT_INFO_2
+	submitInfo.pNext = nil
+	submitInfo.waitSemaphoreInfoCount = 0
+	submitInfo.signalSemaphoreInfoCount = 0
+	submitInfo.commandBufferInfoCount = 1
+	submitInfo.pCommandBufferInfos = &cmdinfo
+	pinner.Pin(submitInfo.pCommandBufferInfos)
+
+	if err := mapError(C.vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, nil)); err != nil {
+		return err
+	}
+
+	if err := mapError(C.vkDeviceWaitIdle(c.graphics.device)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *CommandBuffer) Submit() {

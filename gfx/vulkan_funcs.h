@@ -333,6 +333,13 @@ GFX_FUNC(VkResult, vkAllocateCommandBuffers,
     (VkCommandBuffer*, pCommandBuffers)
 );
 
+GFX_FUNC(void, vkFreeCommandBuffers,
+    (VkDevice, device),
+    (VkCommandPool, commandPool),
+    (uint32_t, commandBufferCount),
+    (const VkCommandBuffer*, pCommandBuffers)
+);
+
 GFX_FUNC(VkResult, vkBeginCommandBuffer,
     (VkCommandBuffer, commandBuffer),
     (const VkCommandBufferBeginInfo*, pBeginInfo)
@@ -435,4 +442,13 @@ GFX_FUNC(void, vkDestroyImageView,
     (VkDevice, device),
     (VkImageView, imageView),
     (const VkAllocationCallbacks*, pAllocator)
+);
+
+GFX_FUNC(void, vkCmdCopyBufferToImage,
+    (VkCommandBuffer, commandBuffer),
+    (VkBuffer, srcBuffer),
+    (VkImage, dstImage),
+    (VkImageLayout, dstImageLayout),
+    (uint32_t, regionCount),
+    (const VkBufferImageCopy*, pRegions)
 );

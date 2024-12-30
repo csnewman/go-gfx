@@ -43,6 +43,7 @@ type Graphics struct {
 	device          C.VkDevice
 	graphicsQueue   C.VkQueue
 	memoryAllocator C.VmaAllocator
+	mainCommandPool C.VkCommandPool
 }
 
 type Config struct {
@@ -356,6 +357,16 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	vmaInfo.flags = C.VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT
 
 	if err := mapError(C.vmaCreateAllocator(&vmaInfo, &g.memoryAllocator)); err != nil {
+		return err
+	}
+
+	var commandInfo C.VkCommandPoolCreateInfo
+
+	commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
+	commandInfo.queueFamilyIndex = C.uint32_t(g.graphicsFamily)
+	commandInfo.flags = C.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+
+	if err := mapError(C.vkCreateCommandPool(g.device, &commandInfo, nil, &g.mainCommandPool)); err != nil {
 		return err
 	}
 
