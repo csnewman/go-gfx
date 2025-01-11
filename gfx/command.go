@@ -32,6 +32,7 @@ type CommandBuffer struct {
 	frame         *SurfaceFrame
 	commandBuffer C.VkCommandBuffer
 	pool          C.VkCommandPool
+	setsBound     bool
 }
 
 func (g *Graphics) CreateCommandBuffer() (*CommandBuffer, error) {
@@ -267,7 +268,33 @@ func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 }
 
 func (c *CommandBuffer) SetRenderPipeline(pipeline *RenderPipeline) {
+	if !c.setsBound {
+		C.vkCmdBindDescriptorSets(
+			c.commandBuffer,
+			C.VK_PIPELINE_BIND_POINT_GRAPHICS,
+			c.graphics.pipelineLayout,
+			0,
+			1,
+			&c.graphics.textureSet,
+			0,
+			nil,
+		)
+
+		c.setsBound = true
+	}
+
 	C.vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline)
+}
+
+func (c *CommandBuffer) SetPushConstants(offset int, size int, data unsafe.Pointer) {
+	C.vkCmdPushConstants(
+		c.commandBuffer,
+		c.graphics.pipelineLayout,
+		C.VK_SHADER_STAGE_VERTEX_BIT|C.VK_SHADER_STAGE_FRAGMENT_BIT,
+		C.uint32_t(offset),
+		C.uint32_t(size),
+		data,
+	)
 }
 
 func (c *CommandBuffer) SetVertexBuffer(binding int, buffer *Buffer, offset int) {
@@ -277,8 +304,16 @@ func (c *CommandBuffer) SetVertexBuffer(binding int, buffer *Buffer, offset int)
 	C.vkCmdBindVertexBuffers(c.commandBuffer, C.uint32_t(binding), C.uint32_t(1), &buf, &off)
 }
 
+func (c *CommandBuffer) SetIndexBuffer(buffer *Buffer, offset int) {
+	C.vkCmdBindIndexBuffer(c.commandBuffer, buffer.buffer, C.VkDeviceSize(offset), C.VK_INDEX_TYPE_UINT32)
+}
+
 func (c *CommandBuffer) Draw(start int, count int) {
 	C.vkCmdDraw(c.commandBuffer, C.uint32_t(count), 1, C.uint32_t(start), 0)
+}
+
+func (c *CommandBuffer) DrawIndexed(start int, count int, vertexOffset int) {
+	C.vkCmdDrawIndexed(c.commandBuffer, C.uint32_t(count), 1, C.uint32_t(start), C.int32_t(vertexOffset), 0)
 }
 
 func (c *CommandBuffer) CopyBufferToImage(buffer *Buffer, image *Image) {

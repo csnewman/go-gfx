@@ -6,6 +6,7 @@ package gfx
 import "C"
 
 import (
+	"fmt"
 	"runtime"
 	"unsafe"
 )
@@ -28,15 +29,25 @@ type VertexBinding struct {
 
 type VertexAttribute struct {
 	Location int
-	// TODO: format
-	Offset int
+	Offset   int
+	Format   Format
 }
 
+type CullMode int
+
+const (
+	CullModeNone CullMode = iota
+	CullModeFront
+	CullModeBack
+)
+
 type RenderPipelineDescriptor struct {
-	VertexFunction   *ShaderFunction
-	VertexBindings   []VertexBinding
-	FragmentFunction *ShaderFunction
-	ColorAttachments []RenderPipelineColorAttachment
+	VertexFunction     *ShaderFunction
+	VertexBindings     []VertexBinding
+	FragmentFunction   *ShaderFunction
+	ColorAttachments   []RenderPipelineColorAttachment
+	CullMode           CullMode
+	FrontFaceClockwise bool
 }
 
 type RenderPipeline struct {
@@ -46,17 +57,6 @@ type RenderPipeline struct {
 func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPipeline, error) {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
-
-	var pipelineLayoutInfo C.VkPipelineLayoutCreateInfo
-	pipelineLayoutInfo.sType = C.VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
-	pipelineLayoutInfo.setLayoutCount = 0
-	pipelineLayoutInfo.pushConstantRangeCount = 0
-
-	var pipelineLayout C.VkPipelineLayout
-
-	if err := mapError(C.vkCreatePipelineLayout(g.device, &pipelineLayoutInfo, nil, &pipelineLayout)); err != nil {
-		return nil, err
-	}
 
 	var renderingInfo C.VkPipelineRenderingCreateInfoKHR
 	renderingInfo.sType = C.VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR
@@ -144,10 +144,25 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	rasterizer.depthClampEnable = C.VkBool32(0)
 	rasterizer.rasterizerDiscardEnable = C.VkBool32(0)
 	rasterizer.polygonMode = C.VK_POLYGON_MODE_FILL
-	rasterizer.cullMode = C.VK_CULL_MODE_BACK_BIT
-	rasterizer.frontFace = C.VK_FRONT_FACE_CLOCKWISE
 	rasterizer.depthBiasEnable = C.VkBool32(0)
 	rasterizer.lineWidth = 1.0
+
+	switch des.CullMode {
+	case CullModeNone:
+		rasterizer.cullMode = C.VK_CULL_MODE_NONE
+	case CullModeFront:
+		rasterizer.cullMode = C.VK_CULL_MODE_FRONT_BIT
+	case CullModeBack:
+		rasterizer.cullMode = C.VK_CULL_MODE_BACK_BIT
+	default:
+		return nil, fmt.Errorf("%w: invalid cull mode %d", ErrInvalidDescriptor, des.CullMode)
+	}
+
+	if des.FrontFaceClockwise {
+		rasterizer.frontFace = C.VK_FRONT_FACE_CLOCKWISE
+	} else {
+		rasterizer.frontFace = C.VK_FRONT_FACE_COUNTER_CLOCKWISE
+	}
 
 	var multisampling C.VkPipelineMultisampleStateCreateInfo
 	multisampling.sType = C.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO
@@ -156,12 +171,19 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 
 	var colorBlendAttachment C.VkPipelineColorBlendAttachmentState
 	colorBlendAttachment.colorWriteMask = C.VK_COLOR_COMPONENT_R_BIT | C.VK_COLOR_COMPONENT_G_BIT | C.VK_COLOR_COMPONENT_B_BIT | C.VK_COLOR_COMPONENT_A_BIT
-	colorBlendAttachment.blendEnable = C.VkBool32(0)
+	//colorBlendAttachment.blendEnable = C.VkBool32(0)
+
+	colorBlendAttachment.blendEnable = C.VK_TRUE
+	colorBlendAttachment.srcColorBlendFactor = C.VK_BLEND_FACTOR_SRC_ALPHA
+	colorBlendAttachment.dstColorBlendFactor = C.VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
+	colorBlendAttachment.colorBlendOp = C.VK_BLEND_OP_ADD
+	colorBlendAttachment.srcAlphaBlendFactor = C.VK_BLEND_FACTOR_ONE
+	colorBlendAttachment.dstAlphaBlendFactor = C.VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
+	colorBlendAttachment.alphaBlendOp = C.VK_BLEND_OP_ADD
 
 	var colorBlending C.VkPipelineColorBlendStateCreateInfo
 	colorBlending.sType = C.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO
 	colorBlending.logicOpEnable = C.VkBool32(0)
-	colorBlending.logicOp = C.VK_LOGIC_OP_COPY
 	colorBlending.attachmentCount = 1
 	colorBlending.pAttachments = &colorBlendAttachment
 	pinner.Pin(colorBlending.pAttachments)
@@ -216,7 +238,7 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	pipelineInfo.pDynamicState = &dynamicState
 	pinner.Pin(pipelineInfo.pDynamicState)
 
-	pipelineInfo.layout = pipelineLayout
+	pipelineInfo.layout = g.pipelineLayout
 
 	var pipeline C.VkPipeline
 

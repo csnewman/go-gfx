@@ -138,6 +138,8 @@ func (g *Graphics) CreateImage(des ImageDescriptor) (*Image, error) {
 		image:      img,
 		view:       view,
 		allocation: alloc,
+		width:      des.Width,
+		height:     des.Height,
 	}, nil
 }
 

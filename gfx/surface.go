@@ -24,6 +24,7 @@ type Surface struct {
 	swapchain     C.VkSwapchainKHR
 	images        []*Image
 	entries       []*SurfaceEntry
+	FrameCount    int
 	currentEntry  int
 	width         int
 	height        int
@@ -122,13 +123,14 @@ func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
 		colorSpace:    format.colorSpace,
 		minImageCount: int(capabilities.minImageCount),
 		transform:     capabilities.currentTransform,
+		FrameCount:    3,
 	}
 
 	if err := s.Resize(int(capabilities.currentExtent.width), int(capabilities.currentExtent.height)); err != nil {
 		return nil, err
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < s.FrameCount; i++ {
 		var commandInfo C.VkCommandPoolCreateInfo
 
 		commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
@@ -304,9 +306,8 @@ type SurfaceFrame struct {
 	surface  *Surface
 	entry    *SurfaceEntry
 	img      *Image
-	index    int
-
-	passes []RenderPassDescriptor
+	imgIndex int
+	Index    int
 }
 
 func (s *Surface) Acquire() (*SurfaceFrame, error) {
@@ -347,7 +348,8 @@ func (s *Surface) Acquire() (*SurfaceFrame, error) {
 		surface:  s,
 		entry:    entry,
 		img:      s.images[imgIndex],
-		index:    int(imgIndex),
+		imgIndex: int(imgIndex),
+		Index:    s.currentEntry,
 	}, nil
 }
 
@@ -379,7 +381,7 @@ func (f *SurfaceFrame) Present() error {
 	presentInfo.pSwapchains = &swapchain
 	pinner.Pin(presentInfo.pSwapchains)
 
-	ind := C.uint32_t(f.index)
+	ind := C.uint32_t(f.imgIndex)
 	presentInfo.pImageIndices = &ind
 	pinner.Pin(presentInfo.pImageIndices)
 

@@ -44,6 +44,10 @@ type Graphics struct {
 	graphicsQueue   C.VkQueue
 	memoryAllocator C.VmaAllocator
 	mainCommandPool C.VkCommandPool
+
+	pipelineLayout C.VkPipelineLayout
+	textureLayout  C.VkDescriptorSetLayout
+	textureSet     C.VkDescriptorSet
 }
 
 type Config struct {
@@ -66,6 +70,10 @@ func Init(cfg Config) (*Graphics, error) {
 	}
 
 	if err := g.createDevice(device); err != nil {
+		return nil, err
+	}
+
+	if err := g.createDescriptors(); err != nil {
 		return nil, err
 	}
 
@@ -156,6 +164,9 @@ type selectedDevice struct {
 }
 
 func (g *Graphics) selectDevice() (*selectedDevice, error) {
+	pinner := new(runtime.Pinner)
+	defer pinner.Unpin()
+
 	var physicalDeviceCount C.uint32_t
 
 	if err := mapError(C.vkEnumeratePhysicalDevices(g.instance, &physicalDeviceCount, nil)); err != nil {
@@ -203,6 +214,22 @@ func (g *Graphics) selectDevice() (*selectedDevice, error) {
 		case C.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
 			score = 5
 		default:
+			continue
+		}
+
+		// Check features
+		var features12 C.VkPhysicalDeviceVulkan12Features
+		features12.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES
+
+		var feat2 C.VkPhysicalDeviceFeatures2
+		feat2.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2
+		feat2.pNext = unsafe.Pointer(&features12)
+		pinner.Pin(feat2.pNext)
+
+		C.vkGetPhysicalDeviceFeatures2(device, &feat2)
+
+		// descriptor features are required
+		if features12.descriptorBindingPartiallyBound != 1 || features12.runtimeDescriptorArray != 1 {
 			continue
 		}
 
@@ -316,7 +343,29 @@ func (g *Graphics) createDevice(sel *selectedDevice) error {
 	pinner.Pin(features12.pNext)
 	features12.sType = C.VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES
 	features12.bufferDeviceAddress = C.VkBool32(1)
+
 	features12.descriptorIndexing = C.VkBool32(1)
+	//VkBool32           shaderInputAttachmentArrayDynamicIndexing;
+	//VkBool32           shaderUniformTexelBufferArrayDynamicIndexing;
+	//VkBool32           shaderStorageTexelBufferArrayDynamicIndexing;
+	//VkBool32           shaderUniformBufferArrayNonUniformIndexing;
+	features12.shaderSampledImageArrayNonUniformIndexing = C.VkBool32(1)
+	//VkBool32           shaderStorageBufferArrayNonUniformIndexing;
+	//VkBool32           shaderStorageImageArrayNonUniformIndexing;
+	//VkBool32           shaderInputAttachmentArrayNonUniformIndexing;
+	//VkBool32           shaderUniformTexelBufferArrayNonUniformIndexing;
+	//VkBool32           shaderStorageTexelBufferArrayNonUniformIndexing;
+	//VkBool32           descriptorBindingUniformBufferUpdateAfterBind;
+	//VkBool32           descriptorBindingSampledImageUpdateAfterBind;
+	features12.descriptorBindingSampledImageUpdateAfterBind = C.VkBool32(1)
+	//VkBool32           descriptorBindingStorageImageUpdateAfterBind;
+	//VkBool32           descriptorBindingStorageBufferUpdateAfterBind;
+	//VkBool32           descriptorBindingUniformTexelBufferUpdateAfterBind;
+	//VkBool32           descriptorBindingStorageTexelBufferUpdateAfterBind;
+	//VkBool32           descriptorBindingUpdateUnusedWhilePending;
+	features12.descriptorBindingPartiallyBound = C.VkBool32(1)
+	features12.descriptorBindingVariableDescriptorCount = C.VkBool32(1)
+	features12.runtimeDescriptorArray = C.VkBool32(1)
 
 	var createInfo C.VkDeviceCreateInfo
 	createInfo.pNext = unsafe.Pointer(&features12)

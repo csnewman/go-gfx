@@ -169,6 +169,11 @@ GFX_FUNC(void, vkGetPhysicalDeviceProperties,
     (VkPhysicalDeviceProperties*, pProperties)
 );
 
+GFX_FUNC(void, vkGetPhysicalDeviceFeatures2,
+    (VkPhysicalDevice, physicalDevice),
+    (VkPhysicalDeviceFeatures2*, pFeatures)
+);
+
 GFX_FUNC(void, vkGetPhysicalDeviceQueueFamilyProperties,
     (VkPhysicalDevice, physicalDevice),
     (uint32_t*, pQueueFamilyPropertyCount),
@@ -351,11 +356,40 @@ GFX_FUNC(void, vkCmdBindPipeline,
     (VkPipeline, pipeline)
 );
 
+GFX_FUNC(void, vkCmdBindDescriptorSets,
+    (VkCommandBuffer, commandBuffer),
+    (VkPipelineBindPoint, pipelineBindPoint),
+    (VkPipelineLayout, layout),
+    (uint32_t, firstSet),
+    (uint32_t, descriptorSetCount),
+    (const VkDescriptorSet*, pDescriptorSets),
+    (uint32_t, dynamicOffsetCount),
+    (const uint32_t*, pDynamicOffsets)
+);
+
+GFX_FUNC(void, vkCmdPushConstants,
+    (VkCommandBuffer, commandBuffer),
+    (VkPipelineLayout, layout),
+    (VkShaderStageFlags, stageFlags),
+    (uint32_t, offset),
+    (uint32_t, size),
+    (const void*, pValues)
+);
+
 GFX_FUNC(void, vkCmdDraw,
     (VkCommandBuffer, commandBuffer),
     (uint32_t, vertexCount),
     (uint32_t, instanceCount),
     (uint32_t, firstVertex),
+    (uint32_t, firstInstance)
+);
+
+GFX_FUNC(void, vkCmdDrawIndexed,
+    (VkCommandBuffer, commandBuffer),
+    (uint32_t, indexCount),
+    (uint32_t, instanceCount),
+    (uint32_t, firstIndex),
+    (int32_t, vertexOffset),
     (uint32_t, firstInstance)
 );
 
@@ -391,6 +425,13 @@ GFX_FUNC(VkResult, vkCreateGraphicsPipelines,
 GFX_FUNC(void, vkCmdBeginRenderingKHR,
   	(VkCommandBuffer, commandBuffer),
     (const VkRenderingInfo*, pRenderingInfo)
+);
+
+GFX_FUNC(void, vkCmdBindIndexBuffer,
+    (VkCommandBuffer, commandBuffer),
+    (VkBuffer, buffer),
+    (VkDeviceSize, offset),
+    (VkIndexType, indexType)
 );
 
 GFX_FUNC(void, vkCmdBindVertexBuffers,
@@ -451,4 +492,39 @@ GFX_FUNC(void, vkCmdCopyBufferToImage,
     (VkImageLayout, dstImageLayout),
     (uint32_t, regionCount),
     (const VkBufferImageCopy*, pRegions)
+);
+
+GFX_FUNC(VkResult, vkCreateDescriptorSetLayout,
+    (VkDevice, device),
+    (const VkDescriptorSetLayoutCreateInfo*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkDescriptorSetLayout*, pSetLayout)
+);
+
+GFX_FUNC(VkResult, vkCreateDescriptorPool,
+    (VkDevice, device),
+    (const VkDescriptorPoolCreateInfo*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkDescriptorPool*, pDescriptorPool)
+);
+
+GFX_FUNC(VkResult, vkAllocateDescriptorSets,
+    (VkDevice, device),
+    (const VkDescriptorSetAllocateInfo*, pAllocateInfo),
+    (VkDescriptorSet*, pDescriptorSets)
+);
+
+GFX_FUNC(void, vkUpdateDescriptorSets,
+    (VkDevice, device),
+    (uint32_t, descriptorWriteCount),
+    (const VkWriteDescriptorSet*, pDescriptorWrites),
+    (uint32_t, descriptorCopyCount),
+    (const VkCopyDescriptorSet*, pDescriptorCopies)
+);
+
+GFX_FUNC(VkResult, vkCreateSampler,
+    (VkDevice, device),
+    (const VkSamplerCreateInfo*, pCreateInfo),
+    (const VkAllocationCallbacks*, pAllocator),
+    (VkSampler*, pSampler)
 );
