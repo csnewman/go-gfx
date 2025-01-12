@@ -1,13 +1,7 @@
 package gfx
 
-/*
-#include "vulkan.h"
-*/
-import "C"
-
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -24,26 +18,3 @@ var (
 	ErrMissingFeature           = errors.New("feature missing")
 	ErrInitializationFailed     = errors.New("initialization failed")
 )
-
-func mapError(err C.VkResult) error {
-	if err >= 0 {
-		return nil
-	}
-
-	switch err {
-	case C.VK_ERROR_INITIALIZATION_FAILED:
-		return ErrInitializationFailed
-
-	case C.VK_ERROR_LAYER_NOT_PRESENT:
-		return fmt.Errorf("%w: layer", ErrMissingFeature)
-
-	case C.VK_ERROR_EXTENSION_NOT_PRESENT:
-		return fmt.Errorf("%w: extension", ErrMissingFeature)
-
-	case C.VK_ERROR_INCOMPATIBLE_DRIVER:
-		return ErrIncompatibleDriver
-
-	default:
-		return fmt.Errorf("%w: vulkan %v", ErrUnexpectedStatus, err)
-	}
-}

@@ -1,6 +1,7 @@
-package gfx
+package vulkan
 
 import (
+	"github.com/csnewman/go-gfx/gfx"
 	"runtime"
 	"unsafe"
 )
@@ -29,7 +30,6 @@ import "C"
 
 type CommandBuffer struct {
 	graphics      *Graphics
-	frame         *SurfaceFrame
 	commandBuffer C.VkCommandBuffer
 	pool          C.VkCommandPool
 	setsBound     bool
@@ -189,27 +189,33 @@ func (f *SurfaceFrame) CreateCommandBuffer() *CommandBuffer {
 
 	return &CommandBuffer{
 		graphics:      f.graphics,
-		frame:         f,
 		commandBuffer: commandBuffer,
 	}
 }
 
-type RenderPassDescriptor struct {
-	ColorAttachments []RenderPassColorAttachment
-}
-
-func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
+func (c *CommandBuffer) BeginRenderPass(description gfx.RenderPassDescriptor) {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
-	var cAttachs []C.VkRenderingAttachmentInfo
+	var (
+		cAttachs    []C.VkRenderingAttachmentInfo
+		frameWidth  int
+		frameHeight int
+	)
 
-	for _, c := range description.ColorAttachments {
+	for i, c := range description.ColorAttachments {
 		tv := c.Target.ImageView()
+
+		if i == 0 {
+			frameWidth = tv.Width()
+			frameHeight = tv.Height()
+		}
+
+		vv := (tv).(*ImageView)
 
 		var colorAttachment C.VkRenderingAttachmentInfo
 		colorAttachment.sType = C.VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO
-		colorAttachment.imageView = tv.view
+		colorAttachment.imageView = vv.view
 		colorAttachment.imageLayout = C.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 
 		if c.Load {
@@ -239,8 +245,8 @@ func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 	renderingInfo.sType = C.VK_STRUCTURE_TYPE_RENDERING_INFO
 	renderingInfo.renderArea.offset.x = 0
 	renderingInfo.renderArea.offset.y = 0
-	renderingInfo.renderArea.extent.width = C.uint32_t(c.frame.img.width)
-	renderingInfo.renderArea.extent.height = C.uint32_t(c.frame.img.height)
+	renderingInfo.renderArea.extent.width = C.uint32_t(frameWidth)
+	renderingInfo.renderArea.extent.height = C.uint32_t(frameHeight)
 	renderingInfo.layerCount = 1
 	renderingInfo.colorAttachmentCount = C.uint32_t(len(cAttachs))
 	renderingInfo.pColorAttachments = unsafe.SliceData(cAttachs)
@@ -251,8 +257,8 @@ func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 	var viewport C.VkViewport
 	viewport.x = C.float(0)
 	viewport.y = C.float(0)
-	viewport.width = C.float(c.frame.img.width)
-	viewport.height = C.float(c.frame.img.height)
+	viewport.width = C.float(frameWidth)
+	viewport.height = C.float(frameHeight)
 	viewport.minDepth = C.float(0)
 	viewport.maxDepth = C.float(1)
 
@@ -261,13 +267,15 @@ func (c *CommandBuffer) BeginRenderPass(description RenderPassDescriptor) {
 	var scissor C.VkRect2D
 	scissor.offset.x = 0
 	scissor.offset.y = 0
-	scissor.extent.width = C.uint32_t(c.frame.img.width)
-	scissor.extent.height = C.uint32_t(c.frame.img.height)
+	scissor.extent.width = C.uint32_t(frameWidth)
+	scissor.extent.height = C.uint32_t(frameHeight)
 
 	C.vkCmdSetScissorWithCountEXT(c.commandBuffer, 1, &scissor)
 }
 
-func (c *CommandBuffer) SetRenderPipeline(pipeline *RenderPipeline) {
+func (c *CommandBuffer) SetRenderPipeline(pipeline gfx.RenderPipeline) {
+	vrp := pipeline.(*RenderPipeline)
+
 	if !c.setsBound {
 		C.vkCmdBindDescriptorSets(
 			c.commandBuffer,
@@ -283,7 +291,7 @@ func (c *CommandBuffer) SetRenderPipeline(pipeline *RenderPipeline) {
 		c.setsBound = true
 	}
 
-	C.vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline)
+	C.vkCmdBindPipeline(c.commandBuffer, C.VK_PIPELINE_BIND_POINT_GRAPHICS, vrp.pipeline)
 }
 
 func (c *CommandBuffer) SetPushConstants(offset int, size int, data unsafe.Pointer) {
@@ -297,15 +305,17 @@ func (c *CommandBuffer) SetPushConstants(offset int, size int, data unsafe.Point
 	)
 }
 
-func (c *CommandBuffer) SetVertexBuffer(binding int, buffer *Buffer, offset int) {
-	buf := buffer.buffer
+func (c *CommandBuffer) SetVertexBuffer(binding int, buffer gfx.Buffer, offset int) {
+	vb := buffer.(*Buffer)
+	buf := vb.buffer
 	off := C.VkDeviceSize(offset)
 
 	C.vkCmdBindVertexBuffers(c.commandBuffer, C.uint32_t(binding), C.uint32_t(1), &buf, &off)
 }
 
-func (c *CommandBuffer) SetIndexBuffer(buffer *Buffer, offset int) {
-	C.vkCmdBindIndexBuffer(c.commandBuffer, buffer.buffer, C.VkDeviceSize(offset), C.VK_INDEX_TYPE_UINT32)
+func (c *CommandBuffer) SetIndexBuffer(buffer gfx.Buffer, offset int) {
+	vb := buffer.(*Buffer)
+	C.vkCmdBindIndexBuffer(c.commandBuffer, vb.buffer, C.VkDeviceSize(offset), C.VK_INDEX_TYPE_UINT32)
 }
 
 func (c *CommandBuffer) Draw(start int, count int) {
@@ -371,7 +381,7 @@ func (c *CommandBuffer) SubmitAndWait() error {
 	return nil
 }
 
-func (c *CommandBuffer) Submit() {
+func (c *CommandBuffer) SubmitFrame(frame *SurfaceFrame) error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
@@ -386,7 +396,7 @@ func (c *CommandBuffer) Submit() {
 	var waitInfo C.VkSemaphoreSubmitInfo
 	waitInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO
 	waitInfo.pNext = nil
-	waitInfo.semaphore = c.frame.entry.imgSem
+	waitInfo.semaphore = frame.entry.imgSem
 	waitInfo.stageMask = C.GFX_VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT
 	waitInfo.deviceIndex = 0
 	waitInfo.value = 1
@@ -394,7 +404,7 @@ func (c *CommandBuffer) Submit() {
 	var signalInfo C.VkSemaphoreSubmitInfo
 	signalInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO
 	signalInfo.pNext = nil
-	signalInfo.semaphore = c.frame.entry.completeSem
+	signalInfo.semaphore = frame.entry.completeSem
 	signalInfo.stageMask = C.GFX_VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT
 	signalInfo.deviceIndex = 0
 	signalInfo.value = 1
@@ -416,9 +426,11 @@ func (c *CommandBuffer) Submit() {
 	pinner.Pin(submitInfo.pCommandBufferInfos)
 
 	// TODO: split from frame
-	if err := mapError(C.vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, c.frame.entry.fence)); err != nil {
-		panic(err)
+	if err := mapError(C.vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, frame.entry.fence)); err != nil {
+		return err
 	}
 
 	// TODO: free buffer
+
+	return nil
 }

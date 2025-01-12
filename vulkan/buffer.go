@@ -1,7 +1,8 @@
-package gfx
+package vulkan
 
 import (
 	"errors"
+	"github.com/csnewman/go-gfx/gfx"
 	"unsafe"
 )
 
@@ -18,23 +19,10 @@ type Buffer struct {
 	allocation C.VmaAllocation
 	mappedPtr  unsafe.Pointer
 	mapped     int
-	Size       int
+	size       int
 }
 
-type BufferUsage int
-
-const (
-	BufferUsageHostRandomAccess BufferUsage = 1 << iota
-	BufferUsageHostUpload
-	BufferUsagePersistentMap
-)
-
-type BufferDescriptor struct {
-	Size  int
-	Usage BufferUsage
-}
-
-func (g *Graphics) CreateBuffer(des BufferDescriptor) (*Buffer, error) {
+func (g *Graphics) CreateBuffer(des gfx.BufferDescriptor) (gfx.Buffer, error) {
 	var createInfo C.VkBufferCreateInfo
 	createInfo.sType = C.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
 	createInfo.size = C.VkDeviceSize(des.Size)
@@ -49,15 +37,15 @@ func (g *Graphics) CreateBuffer(des BufferDescriptor) (*Buffer, error) {
 	var allocCreateInfo C.VmaAllocationCreateInfo
 	allocCreateInfo.usage = C.VMA_MEMORY_USAGE_AUTO
 
-	if des.Usage&BufferUsageHostRandomAccess != 0 {
+	if des.Usage&gfx.BufferUsageHostRandomAccess != 0 {
 		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT
 	}
 
-	if des.Usage&BufferUsageHostUpload != 0 {
+	if des.Usage&gfx.BufferUsageHostUpload != 0 {
 		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT
 	}
 
-	if des.Usage&BufferUsagePersistentMap != 0 {
+	if des.Usage&gfx.BufferUsagePersistentMap != 0 {
 		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_MAPPED_BIT
 	}
 
@@ -83,7 +71,7 @@ func (g *Graphics) CreateBuffer(des BufferDescriptor) (*Buffer, error) {
 		buffer:     buffer,
 		allocation: allocation,
 		mappedPtr:  unsafe.Pointer(allocInfo.pMappedData),
-		Size:       des.Size,
+		size:       des.Size,
 	}
 
 	if b.mappedPtr != nil {
@@ -95,6 +83,10 @@ func (g *Graphics) CreateBuffer(des BufferDescriptor) (*Buffer, error) {
 
 func (b *Buffer) Close() {
 	C.vmaDestroyBuffer(b.graphics.memoryAllocator, b.buffer, b.allocation)
+}
+
+func (b *Buffer) Size() int {
+	return b.size
 }
 
 func (b *Buffer) MappedPtr() (unsafe.Pointer, bool) {

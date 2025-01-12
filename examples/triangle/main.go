@@ -3,14 +3,16 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/csnewman/go-gfx/gfx"
-	"github.com/csnewman/go-gfx/sdl2"
 	"log"
 	"log/slog"
 	"os"
 	"runtime"
 	"time"
 	"unsafe"
+
+	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/sdl2"
+	"github.com/csnewman/go-gfx/vulkan"
 )
 
 func init() {
@@ -27,13 +29,13 @@ type Example struct {
 	logger           *slog.Logger
 	platform         *sdl2.Platform
 	window           *sdl2.Window
-	graphics         *gfx.Graphics
-	surface          *gfx.Surface
-	shader           *gfx.Shader
-	vertexFunction   *gfx.ShaderFunction
-	fragmentFunction *gfx.ShaderFunction
-	trianglePipeline *gfx.RenderPipeline
-	vertData         *gfx.Buffer
+	graphics         gfx.Graphics
+	surface          gfx.Surface
+	shader           gfx.Shader
+	vertexFunction   gfx.ShaderFunction
+	fragmentFunction gfx.ShaderFunction
+	trianglePipeline gfx.RenderPipeline
+	vertData         gfx.Buffer
 }
 
 func (e *Example) init() error {
@@ -67,6 +69,7 @@ func (e *Example) init() error {
 					{
 						Location: 0,
 						Offset:   0,
+						Format:   gfx.FormatRGB32SFloat,
 					},
 				},
 			},
@@ -87,8 +90,24 @@ func (e *Example) init() error {
 		0.5, 0.5, 0.0, 0,
 		-0.5, 0.5, 0.0, 0,
 	}
+
 	byteData := unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(floatData))), len(floatData)*4)
-	e.vertData = e.graphics.CreateBuffer(byteData)
+
+	e.vertData, err = e.graphics.CreateBuffer(gfx.BufferDescriptor{
+		Size:  len(byteData),
+		Usage: gfx.BufferUsageHostUpload | gfx.BufferUsagePersistentMap,
+	})
+	if err != nil {
+		return fmt.Errorf("error creating buffer: %w", err)
+	}
+
+	if err := e.vertData.CopyFrom(byteData); err != nil {
+		return fmt.Errorf("error creating buffer: %w", err)
+	}
+
+	if err := e.vertData.Flush(); err != nil {
+		return fmt.Errorf("error creating buffer: %w", err)
+	}
 
 	return nil
 }
@@ -103,12 +122,15 @@ func (e *Example) Run() error {
 		return fmt.Errorf("failed to initialise platform: %w", err)
 	}
 
-	if e.graphics, err = gfx.Init(gfx.Config{
+	vk, err := vulkan.Init(vulkan.Config{
 		Logger:   e.logger,
 		Platform: e.platform,
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
+
+	e.graphics = vk
 
 	e.logger.Info("Creating main window")
 
@@ -123,7 +145,7 @@ func (e *Example) Run() error {
 		return fmt.Errorf("failed to create main window: %w", err)
 	}
 
-	if e.surface, err = e.graphics.CreateSurface(e.window); err != nil {
+	if e.surface, err = vk.CreateSurface(e.window); err != nil {
 		return fmt.Errorf("failed to create surface: %w", err)
 	}
 
@@ -162,19 +184,7 @@ func (e *Example) render() error {
 		count = 0
 	}
 
-	buffer := frame.CreateCommandBuffer()
-
-	buffer.Barrier(gfx.Barrier{
-		Images: []gfx.ImageBarrier{
-			{
-				Image:     frame.Image(),
-				SrcLayout: gfx.ImageLayoutUndefined,
-				DstLayout: gfx.ImageLayoutAttachment,
-			},
-		},
-	})
-
-	buffer.BeginRenderPass(gfx.RenderPassDescriptor{
+	encoder := frame.BeginRenderPass(gfx.RenderPassDescriptor{
 		ColorAttachments: []gfx.RenderPassColorAttachment{
 			{
 				Target:     frame,
@@ -185,23 +195,11 @@ func (e *Example) render() error {
 		},
 	})
 
-	buffer.SetRenderPipeline(e.trianglePipeline)
-	buffer.SetVertexBuffer(0, e.vertData, 0)
-	buffer.Draw(0, 3)
+	encoder.SetRenderPipeline(e.trianglePipeline)
+	encoder.SetVertexBuffer(0, e.vertData, 0)
+	encoder.Draw(0, 3)
 
-	buffer.EndRenderPass()
-
-	buffer.Barrier(gfx.Barrier{
-		Images: []gfx.ImageBarrier{
-			{
-				Image:     frame.Image(),
-				SrcLayout: gfx.ImageLayoutAttachment,
-				DstLayout: gfx.ImageLayoutPresent,
-			},
-		},
-	})
-
-	buffer.Submit()
+	encoder.End()
 
 	if err := frame.Present(); err != nil {
 		return err

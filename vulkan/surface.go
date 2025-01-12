@@ -1,7 +1,8 @@
-package gfx
+package vulkan
 
 import (
 	"fmt"
+	"github.com/csnewman/go-gfx/gfx"
 	"log/slog"
 	"math"
 	"runtime"
@@ -37,12 +38,12 @@ type SurfaceEntry struct {
 	fence       C.VkFence
 }
 
-func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
+func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle) (*Surface, error) {
 	var surface C.VkSurfaceKHR
 
 	switch handle.SurfaceHandleType() {
-	case VulkanSurfaceHandleType:
-		sh := handle.(VulkanSurfaceHandle)
+	case gfx.VulkanSurfaceHandleType:
+		sh := handle.(gfx.VulkanSurfaceHandle)
 
 		rawSurf, err := sh.CreateVkSurface(unsafe.Pointer(g.instance))
 		if err != nil {
@@ -50,8 +51,8 @@ func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
 		}
 
 		surface = C.VkSurfaceKHR(rawSurf)
-	case MetalSurfaceHandleType:
-		sh := handle.(MetalSurfaceHandle)
+	case gfx.MetalSurfaceHandleType:
+		sh := handle.(gfx.MetalSurfaceHandle)
 
 		var createInfo C.VkMetalSurfaceCreateInfoEXT
 		createInfo.sType = C.VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT
@@ -60,8 +61,8 @@ func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
 		if err := mapError(C.vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
 			return nil, err
 		}
-	case Win32SurfaceHandleType:
-		sh := handle.(Win32SurfaceHandle)
+	case gfx.Win32SurfaceHandleType:
+		sh := handle.(gfx.Win32SurfaceHandle)
 
 		var createInfo C.VkWin32SurfaceCreateInfoKHR
 		createInfo.sType = C.VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR
@@ -72,7 +73,7 @@ func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
 			return nil, err
 		}
 	default:
-		return nil, fmt.Errorf("%w: %v", ErrUnsupportedSurfaceHandle, handle.SurfaceHandleType())
+		return nil, fmt.Errorf("%w: %v", gfx.ErrUnsupportedSurfaceHandle, handle.SurfaceHandleType())
 	}
 
 	var capabilities C.VkSurfaceCapabilitiesKHR
@@ -112,7 +113,7 @@ func (g *Graphics) CreateSurface(handle SurfaceHandle) (*Surface, error) {
 	}
 
 	if !foundFormat {
-		return nil, ErrIncompatibleSurface
+		return nil, gfx.ErrIncompatibleSurface
 	}
 
 	s := &Surface{
@@ -295,10 +296,10 @@ func (s *Surface) Resize(width int, height int) error {
 	return s.createSwapchain()
 }
 
-func (s *Surface) Format() Format {
+func (s *Surface) Format() gfx.Format {
 	// TODO: fix
 
-	return FormatBGRA8UNorm
+	return gfx.FormatBGRA8UNorm
 }
 
 type SurfaceFrame struct {
@@ -307,10 +308,11 @@ type SurfaceFrame struct {
 	entry    *SurfaceEntry
 	img      *Image
 	imgIndex int
-	Index    int
+	index    int
+	buffer   *CommandBuffer
 }
 
-func (s *Surface) Acquire() (*SurfaceFrame, error) {
+func (s *Surface) Acquire() (gfx.SurfaceFrame, error) {
 	entry := s.entries[s.currentEntry]
 
 	if err := mapError(C.vkWaitForFences(
@@ -343,17 +345,35 @@ func (s *Surface) Acquire() (*SurfaceFrame, error) {
 
 	s.currentEntry = (s.currentEntry + 1) % len(s.entries)
 
-	return &SurfaceFrame{
+	sf := &SurfaceFrame{
 		graphics: s.graphics,
 		surface:  s,
 		entry:    entry,
 		img:      s.images[imgIndex],
 		imgIndex: int(imgIndex),
-		Index:    s.currentEntry,
-	}, nil
+		index:    s.currentEntry,
+	}
+
+	sf.buffer = sf.CreateCommandBuffer()
+
+	sf.buffer.Barrier(Barrier{
+		Images: []ImageBarrier{
+			{
+				Image:     sf.img,
+				SrcLayout: ImageLayoutUndefined,
+				DstLayout: ImageLayoutAttachment,
+			},
+		},
+	})
+
+	return sf, nil
 }
 
-func (f *SurfaceFrame) ImageView() *ImageView {
+func (f *SurfaceFrame) Index() int {
+	return f.index
+}
+
+func (f *SurfaceFrame) ImageView() gfx.ImageView {
 	return f.img.ImageView()
 }
 
@@ -361,16 +381,31 @@ func (f *SurfaceFrame) Image() *Image {
 	return f.img
 }
 
-type RenderPassColorAttachment struct {
-	Target     ImageViewer
-	Load       bool
-	ClearColor Color
-	Discard    bool
+func (f *SurfaceFrame) BeginRenderPass(descriptor gfx.RenderPassDescriptor) gfx.RenderPassEncoder {
+	f.buffer.BeginRenderPass(descriptor)
+
+	return &RenderPassEncoder{
+		buffer: f.buffer,
+	}
 }
 
 func (f *SurfaceFrame) Present() error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
+
+	f.buffer.Barrier(Barrier{
+		Images: []ImageBarrier{
+			{
+				Image:     f.img,
+				SrcLayout: ImageLayoutAttachment,
+				DstLayout: ImageLayoutPresent,
+			},
+		},
+	})
+
+	if err := f.buffer.SubmitFrame(f); err != nil {
+		return err
+	}
 
 	var presentInfo C.VkPresentInfoKHR
 	presentInfo.sType = C.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR

@@ -1,6 +1,9 @@
-package gfx
+package vulkan
 
-import "unsafe"
+import (
+	"github.com/csnewman/go-gfx/gfx"
+	"unsafe"
+)
 
 /*
 #include "vulkan.h"
@@ -11,11 +14,7 @@ type Shader struct {
 	shader C.VkShaderModule
 }
 
-type ShaderConfig struct {
-	SPIRV []byte
-}
-
-func (g *Graphics) CreateShader(cfg ShaderConfig) (*Shader, error) {
+func (g *Graphics) CreateShader(cfg gfx.ShaderConfig) (gfx.Shader, error) {
 	var createInfo C.VkShaderModuleCreateInfo
 	createInfo.sType = C.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
 	createInfo.codeSize = C.size_t(len(cfg.SPIRV))
@@ -37,7 +36,7 @@ type ShaderFunction struct {
 	function string
 }
 
-func (s *Shader) Function(name string) (*ShaderFunction, error) {
+func (s *Shader) Function(name string) (gfx.ShaderFunction, error) {
 	return &ShaderFunction{
 		shader:   s,
 		function: name,

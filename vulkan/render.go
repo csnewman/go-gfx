@@ -1,4 +1,4 @@
-package gfx
+package vulkan
 
 /*
 #include "vulkan.h"
@@ -9,52 +9,15 @@ import (
 	"fmt"
 	"runtime"
 	"unsafe"
+
+	"github.com/csnewman/go-gfx/gfx"
 )
-
-type RenderPipelineColorAttachment struct {
-	Format Format
-}
-
-type VertexRate int
-
-const VertexRateVertex VertexRate = 0
-const VertexRateInstance VertexRate = 1
-
-type VertexBinding struct {
-	Binding    int
-	Stride     int
-	Rate       VertexRate
-	Attributes []VertexAttribute
-}
-
-type VertexAttribute struct {
-	Location int
-	Offset   int
-	Format   Format
-}
-
-type CullMode int
-
-const (
-	CullModeNone CullMode = iota
-	CullModeFront
-	CullModeBack
-)
-
-type RenderPipelineDescriptor struct {
-	VertexFunction     *ShaderFunction
-	VertexBindings     []VertexBinding
-	FragmentFunction   *ShaderFunction
-	ColorAttachments   []RenderPipelineColorAttachment
-	CullMode           CullMode
-	FrontFaceClockwise bool
-}
 
 type RenderPipeline struct {
 	pipeline C.VkPipeline
 }
 
-func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPipeline, error) {
+func (g *Graphics) CreateRenderPipeline(des gfx.RenderPipelineDescriptor) (gfx.RenderPipeline, error) {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
@@ -74,22 +37,26 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	var shaderStages []C.VkPipelineShaderStageCreateInfo
 
 	if des.VertexFunction != nil {
+		vf := (des.VertexFunction).(*ShaderFunction)
+
 		var stage C.VkPipelineShaderStageCreateInfo
 		stage.sType = C.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO
 		stage.stage = C.VK_SHADER_STAGE_VERTEX_BIT
-		stage.module = des.VertexFunction.shader.shader
-		stage.pName = C.CString(des.VertexFunction.function)
+		stage.module = vf.shader.shader
+		stage.pName = C.CString(vf.function)
 		defer C.free(unsafe.Pointer(stage.pName))
 
 		shaderStages = append(shaderStages, stage)
 	}
 
 	if des.FragmentFunction != nil {
+		vf := (des.FragmentFunction).(*ShaderFunction)
+
 		var stage C.VkPipelineShaderStageCreateInfo
 		stage.sType = C.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO
 		stage.stage = C.VK_SHADER_STAGE_FRAGMENT_BIT
-		stage.module = des.FragmentFunction.shader.shader
-		stage.pName = C.CString(des.FragmentFunction.function)
+		stage.module = vf.shader.shader
+		stage.pName = C.CString(vf.function)
 		defer C.free(unsafe.Pointer(stage.pName))
 
 		shaderStages = append(shaderStages, stage)
@@ -148,14 +115,14 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	rasterizer.lineWidth = 1.0
 
 	switch des.CullMode {
-	case CullModeNone:
+	case gfx.CullModeNone:
 		rasterizer.cullMode = C.VK_CULL_MODE_NONE
-	case CullModeFront:
+	case gfx.CullModeFront:
 		rasterizer.cullMode = C.VK_CULL_MODE_FRONT_BIT
-	case CullModeBack:
+	case gfx.CullModeBack:
 		rasterizer.cullMode = C.VK_CULL_MODE_BACK_BIT
 	default:
-		return nil, fmt.Errorf("%w: invalid cull mode %d", ErrInvalidDescriptor, des.CullMode)
+		return nil, fmt.Errorf("%w: invalid cull mode %d", gfx.ErrInvalidDescriptor, des.CullMode)
 	}
 
 	if des.FrontFaceClockwise {
@@ -249,4 +216,36 @@ func (g *Graphics) CreateRenderPipeline(des RenderPipelineDescriptor) (*RenderPi
 	return &RenderPipeline{
 		pipeline: pipeline,
 	}, nil
+}
+
+type RenderPassEncoder struct {
+	buffer *CommandBuffer
+}
+
+func (r *RenderPassEncoder) SetRenderPipeline(pipeline gfx.RenderPipeline) {
+	r.buffer.SetRenderPipeline(pipeline)
+}
+
+func (r *RenderPassEncoder) SetVertexBuffer(binding int, buffer gfx.Buffer, offset int) {
+	r.buffer.SetVertexBuffer(binding, buffer, offset)
+}
+
+func (r *RenderPassEncoder) SetIndexBuffer(buffer gfx.Buffer, offset int) {
+	r.buffer.SetIndexBuffer(buffer, offset)
+}
+
+func (r *RenderPassEncoder) SetPushConstants(offset int, size int, data unsafe.Pointer) {
+	r.buffer.SetPushConstants(offset, size, data)
+}
+
+func (r *RenderPassEncoder) Draw(start int, count int) {
+	r.buffer.Draw(start, count)
+}
+
+func (r *RenderPassEncoder) DrawIndexed(start int, count int, vertexOffset int) {
+	r.buffer.DrawIndexed(start, count, vertexOffset)
+}
+
+func (r *RenderPassEncoder) End() {
+	r.buffer.EndRenderPass()
 }

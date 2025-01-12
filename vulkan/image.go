@@ -1,4 +1,8 @@
-package gfx
+package vulkan
+
+import (
+	"github.com/csnewman/go-gfx/gfx"
+)
 
 /*
 #include "vulkan.h"
@@ -13,43 +17,17 @@ type Image struct {
 	height     int
 }
 
-type ImageType int
-
-const (
-	ImageType1D ImageType = C.VK_IMAGE_TYPE_1D
-	ImageType2D ImageType = C.VK_IMAGE_TYPE_2D
-	ImageType3D ImageType = C.VK_IMAGE_TYPE_3D
-)
-
-type ImageUsage int
-
-const (
-	ImageUsageAttachment ImageUsage = 1 << iota
-	ImageUsageSampled
-	ImageUsageCopySrc
-	ImageUsageCopyDst
-)
-
-type ImageDescriptor struct {
-	Type   ImageType
-	Width  int
-	Height int
-	Depth  int
-	Format Format
-	Usage  ImageUsage
-}
-
-func (g *Graphics) CreateImage(des ImageDescriptor) (*Image, error) {
+func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
 	switch des.Type {
-	case ImageType1D:
+	case gfx.ImageType1D:
 		des.Height = 1
 		des.Depth = 1
-	case ImageType2D:
+	case gfx.ImageType2D:
 		des.Depth = 1
 	}
 
 	if des.Width <= 0 || des.Height <= 0 || des.Depth <= 0 {
-		return nil, ErrInvalidDescriptor
+		return nil, gfx.ErrInvalidDescriptor
 	}
 
 	var imgInfo C.VkImageCreateInfo
@@ -64,19 +42,19 @@ func (g *Graphics) CreateImage(des ImageDescriptor) (*Image, error) {
 	imgInfo.samples = C.VK_SAMPLE_COUNT_1_BIT
 	imgInfo.tiling = C.VK_IMAGE_TILING_OPTIMAL
 
-	if des.Usage&ImageUsageCopySrc != 0 {
+	if des.Usage&gfx.ImageUsageCopySrc != 0 {
 		imgInfo.usage |= C.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
 	}
 
-	if des.Usage&ImageUsageCopyDst != 0 {
+	if des.Usage&gfx.ImageUsageCopyDst != 0 {
 		imgInfo.usage |= C.VK_IMAGE_USAGE_TRANSFER_DST_BIT
 	}
 
-	if des.Usage&ImageUsageSampled != 0 {
+	if des.Usage&gfx.ImageUsageSampled != 0 {
 		imgInfo.usage |= C.VK_IMAGE_USAGE_SAMPLED_BIT
 	}
 
-	if des.Usage&ImageUsageAttachment != 0 {
+	if des.Usage&gfx.ImageUsageAttachment != 0 {
 		if des.Format.Depth() {
 			imgInfo.usage |= C.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
 		} else {
@@ -106,11 +84,11 @@ func (g *Graphics) CreateImage(des ImageDescriptor) (*Image, error) {
 	viewInfo.image = img
 
 	switch des.Type {
-	case ImageType1D:
+	case gfx.ImageType1D:
 		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_1D
-	case ImageType2D:
+	case gfx.ImageType2D:
 		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_2D
-	case ImageType3D:
+	case gfx.ImageType3D:
 		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_3D
 	default:
 		panic("unexpected image type")
@@ -145,44 +123,37 @@ func (g *Graphics) CreateImage(des ImageDescriptor) (*Image, error) {
 
 func (i *Image) ImageView() *ImageView {
 	return &ImageView{
-		view: i.view,
+		view:   i.view,
+		width:  i.width,
+		height: i.height,
 	}
 }
 
 type ImageView struct {
-	view C.VkImageView
+	view   C.VkImageView
+	width  int
+	height int
 }
 
-type ImageViewer interface {
-	ImageView() *ImageView
+func (i *ImageView) Width() int {
+	return i.width
 }
 
-type Format int
-
-func (f Format) Depth() bool {
-	// TODO
-	return false
+func (i *ImageView) Height() int {
+	return i.height
 }
 
-const (
-	FormatBGRA8UNorm Format = iota
-	FormatRGBA8UNorm
-	FormatRGBA16SFloat
-	FormatRGB32SFloat
-	FormatRG32SFloat
-)
-
-func ToFormat(format Format) C.VkFormat {
+func ToFormat(format gfx.Format) C.VkFormat {
 	switch format {
-	case FormatBGRA8UNorm:
+	case gfx.FormatBGRA8UNorm:
 		return C.VK_FORMAT_B8G8R8A8_UNORM
-	case FormatRGBA8UNorm:
+	case gfx.FormatRGBA8UNorm:
 		return C.VK_FORMAT_R8G8B8A8_UNORM
-	case FormatRGBA16SFloat:
+	case gfx.FormatRGBA16SFloat:
 		return C.VK_FORMAT_R16G16B16A16_SFLOAT
-	case FormatRGB32SFloat:
+	case gfx.FormatRGB32SFloat:
 		return C.VK_FORMAT_R32G32B32_SFLOAT
-	case FormatRG32SFloat:
+	case gfx.FormatRG32SFloat:
 		return C.VK_FORMAT_R32G32_SFLOAT
 	default:
 		panic("unknown format")
