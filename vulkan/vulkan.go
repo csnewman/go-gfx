@@ -28,10 +28,12 @@ VkBool32 gfx_vk_debug_callback(
 import "C"
 import (
 	"fmt"
-	"github.com/csnewman/go-gfx/gfx"
 	"log/slog"
 	"runtime"
 	"unsafe"
+
+	"github.com/bits-and-blooms/bitset"
+	"github.com/csnewman/go-gfx/gfx"
 )
 
 const portabilityExtension = "VK_KHR_portability_subset"
@@ -48,8 +50,17 @@ type Graphics struct {
 	mainCommandPool C.VkCommandPool
 
 	pipelineLayout C.VkPipelineLayout
-	textureLayout  C.VkDescriptorSetLayout
-	textureSet     C.VkDescriptorSet
+	pipelineSets   []C.VkDescriptorSet
+
+	textureLayout C.VkDescriptorSetLayout
+	textureSet    C.VkDescriptorSet
+	textureIDs    bitset.BitSet
+	lastTextureID uint
+
+	samplerLayout C.VkDescriptorSetLayout
+	samplerSet    C.VkDescriptorSet
+	samplerIDs    bitset.BitSet
+	lastSamplerID uint
 }
 
 type Config struct {

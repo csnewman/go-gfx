@@ -72,9 +72,8 @@ type ImageLayout int
 const (
 	ImageLayoutUndefined ImageLayout = iota
 	ImageLayoutAttachment
-	ImageLayoutRead
 	ImageLayoutPresent
-	ImageLayoutTransferDst
+	ImageLayoutGeneral
 )
 
 type ImageBarrier struct {
@@ -114,15 +113,12 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		case ImageLayoutAttachment:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
-		case ImageLayoutRead:
-			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
-			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		case ImageLayoutPresent:
 			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
-		case ImageLayoutTransferDst:
-			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
+		case ImageLayoutGeneral:
+			imgBarrier.oldLayout = C.VK_IMAGE_LAYOUT_GENERAL
+			imgBarrier.srcAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -134,15 +130,12 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 		case ImageLayoutAttachment:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
-		case ImageLayoutRead:
-			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
-			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
 		case ImageLayoutPresent:
 			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT
-		case ImageLayoutTransferDst:
-			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
+		case ImageLayoutGeneral:
+			imgBarrier.newLayout = C.VK_IMAGE_LAYOUT_GENERAL
+			imgBarrier.dstAccessMask = C.GFX_VK_ACCESS_2_MEMORY_READ_BIT | C.GFX_VK_ACCESS_2_MEMORY_WRITE_BIT
 		default:
 			panic("unknown layout")
 		}
@@ -204,14 +197,12 @@ func (c *CommandBuffer) BeginRenderPass(description gfx.RenderPassDescriptor) {
 	)
 
 	for i, c := range description.ColorAttachments {
-		tv := c.Target.ImageView()
-
 		if i == 0 {
-			frameWidth = tv.Width()
-			frameHeight = tv.Height()
+			frameWidth = c.Target.Width()
+			frameHeight = c.Target.Height()
 		}
 
-		vv := (tv).(*ImageView)
+		vv := c.Target.(*ImageView)
 
 		var colorAttachment C.VkRenderingAttachmentInfo
 		colorAttachment.sType = C.VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO
@@ -282,8 +273,8 @@ func (c *CommandBuffer) SetRenderPipeline(pipeline gfx.RenderPipeline) {
 			C.VK_PIPELINE_BIND_POINT_GRAPHICS,
 			c.graphics.pipelineLayout,
 			0,
-			1,
-			&c.graphics.textureSet,
+			C.uint32_t(len(c.graphics.pipelineSets)),
+			unsafe.SliceData(c.graphics.pipelineSets),
 			0,
 			nil,
 		)
@@ -338,7 +329,7 @@ func (c *CommandBuffer) CopyBufferToImage(buffer *Buffer, image *Image) {
 		c.commandBuffer,
 		buffer.buffer,
 		image.image,
-		C.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		C.VK_IMAGE_LAYOUT_GENERAL,
 		1,
 		&region,
 	)
@@ -433,4 +424,42 @@ func (c *CommandBuffer) SubmitFrame(frame *SurfaceFrame) error {
 	// TODO: free buffer
 
 	return nil
+}
+
+type CommandEncoder struct {
+	buffer *CommandBuffer
+}
+
+func (g *Graphics) CreateCommandEncoder() (gfx.CommandEncoder, error) {
+	buffer, err := g.CreateCommandBuffer()
+	if err != nil {
+		return nil, err
+	}
+
+	return &CommandEncoder{
+		buffer: buffer,
+	}, nil
+}
+
+func (c *CommandEncoder) InitImage(img gfx.Image) {
+	vi := img.(*Image)
+
+	c.buffer.Barrier(Barrier{Images: []ImageBarrier{
+		{
+			Image:     vi,
+			SrcLayout: ImageLayoutUndefined,
+			DstLayout: ImageLayoutGeneral,
+		},
+	}})
+}
+
+func (c *CommandEncoder) CopyBufferToImage(buffer gfx.Buffer, image gfx.Image) {
+	vb := buffer.(*Buffer)
+	vi := image.(*Image)
+
+	c.buffer.CopyBufferToImage(vb, vi)
+}
+
+func (c *CommandEncoder) SubmitAndWait() error {
+	return c.buffer.SubmitAndWait()
 }

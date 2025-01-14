@@ -187,7 +187,7 @@ func (e *Example) render() error {
 	encoder := frame.BeginRenderPass(gfx.RenderPassDescriptor{
 		ColorAttachments: []gfx.RenderPassColorAttachment{
 			{
-				Target:     frame,
+				Target:     frame.View(),
 				Load:       false,
 				ClearColor: gfx.NewColor(0, 1, 0, 1),
 				Discard:    false,

@@ -2,6 +2,7 @@ package vulkan
 
 import (
 	"github.com/csnewman/go-gfx/gfx"
+	"runtime"
 )
 
 /*
@@ -11,6 +12,7 @@ import "C"
 
 type Image struct {
 	image      C.VkImage
+	viewID     uint32
 	view       C.VkImageView
 	allocation C.VmaAllocation
 	width      int
@@ -18,6 +20,9 @@ type Image struct {
 }
 
 func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
+	pinner := new(runtime.Pinner)
+	defer pinner.Unpin()
+
 	switch des.Type {
 	case gfx.ImageType1D:
 		des.Height = 1
@@ -112,8 +117,11 @@ func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
 		return nil, err
 	}
 
+	viewID := g.allocTexture(pinner, view)
+
 	return &Image{
 		image:      img,
+		viewID:     viewID,
 		view:       view,
 		allocation: alloc,
 		width:      des.Width,
@@ -121,8 +129,9 @@ func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
 	}, nil
 }
 
-func (i *Image) ImageView() *ImageView {
+func (i *Image) DefaultView() gfx.ImageView {
 	return &ImageView{
+		id:     i.viewID,
 		view:   i.view,
 		width:  i.width,
 		height: i.height,
@@ -130,9 +139,14 @@ func (i *Image) ImageView() *ImageView {
 }
 
 type ImageView struct {
+	id     uint32
 	view   C.VkImageView
 	width  int
 	height int
+}
+
+func (i *ImageView) ID() uint32 {
+	return i.id
 }
 
 func (i *ImageView) Width() int {

@@ -10,6 +10,10 @@ type Graphics interface {
 	CreateImage(descriptor ImageDescriptor) (Image, error)
 
 	CreateBuffer(descriptor BufferDescriptor) (Buffer, error)
+
+	CreateCommandEncoder() (CommandEncoder, error)
+
+	CreateSampler(descriptor SamplerDescriptor) (Sampler, error)
 }
 
 type Surface interface {
@@ -18,10 +22,12 @@ type Surface interface {
 	Acquire() (SurfaceFrame, error)
 
 	Format() Format
+
+	FrameCount() int
 }
 
 type SurfaceFrame interface {
-	ImageViewer
+	View() ImageView
 
 	Index() int
 
@@ -66,7 +72,15 @@ type ImageDescriptor struct {
 	Usage  ImageUsage
 }
 
-type Image interface{}
+type Image interface {
+	DefaultView() ImageView
+}
+
+type ImageView interface {
+	ID() uint32
+	Width() int
+	Height() int
+}
 
 type Format int
 
@@ -121,7 +135,6 @@ type RenderPipelineDescriptor struct {
 	CullMode           CullMode
 	FrontFaceClockwise bool
 }
-
 type RenderPipeline interface{}
 
 type BufferUsage int
@@ -149,21 +162,12 @@ type Buffer interface {
 	Flush() error
 }
 
-type ImageViewer interface {
-	ImageView() ImageView
-}
-
-type ImageView interface {
-	Width() int
-	Height() int
-}
-
 type RenderPassDescriptor struct {
 	ColorAttachments []RenderPassColorAttachment
 }
 
 type RenderPassColorAttachment struct {
-	Target     ImageViewer
+	Target     ImageView
 	Load       bool
 	ClearColor Color
 	Discard    bool
@@ -183,4 +187,19 @@ type RenderPassEncoder interface {
 	DrawIndexed(start int, count int, vertexOffset int)
 
 	End()
+}
+
+type CommandEncoder interface {
+	InitImage(img Image)
+
+	CopyBufferToImage(buffer Buffer, image Image)
+
+	SubmitAndWait() error
+}
+
+type SamplerDescriptor struct {
+}
+
+type Sampler interface {
+	ID() uint32
 }

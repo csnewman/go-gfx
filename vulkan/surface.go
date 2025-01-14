@@ -25,7 +25,7 @@ type Surface struct {
 	swapchain     C.VkSwapchainKHR
 	images        []*Image
 	entries       []*SurfaceEntry
-	FrameCount    int
+	frameCount    int
 	currentEntry  int
 	width         int
 	height        int
@@ -124,14 +124,14 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle) (*Surface, error) {
 		colorSpace:    format.colorSpace,
 		minImageCount: int(capabilities.minImageCount),
 		transform:     capabilities.currentTransform,
-		FrameCount:    3,
+		frameCount:    3,
 	}
 
 	if err := s.Resize(int(capabilities.currentExtent.width), int(capabilities.currentExtent.height)); err != nil {
 		return nil, err
 	}
 
-	for i := 0; i < s.FrameCount; i++ {
+	for i := 0; i < s.frameCount; i++ {
 		var commandInfo C.VkCommandPoolCreateInfo
 
 		commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
@@ -302,6 +302,10 @@ func (s *Surface) Format() gfx.Format {
 	return gfx.FormatBGRA8UNorm
 }
 
+func (s *Surface) FrameCount() int {
+	return s.frameCount
+}
+
 type SurfaceFrame struct {
 	graphics *Graphics
 	surface  *Surface
@@ -373,8 +377,8 @@ func (f *SurfaceFrame) Index() int {
 	return f.index
 }
 
-func (f *SurfaceFrame) ImageView() gfx.ImageView {
-	return f.img.ImageView()
+func (f *SurfaceFrame) View() gfx.ImageView {
+	return f.img.DefaultView()
 }
 
 func (f *SurfaceFrame) Image() *Image {
