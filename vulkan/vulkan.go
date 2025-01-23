@@ -97,6 +97,7 @@ func (g *Graphics) createInstance(p gfx.VulkanPlatform) error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
+	// TODO: check null
 	C.gfx_vkInit(p.VKGetInstanceProcAddr())
 
 	var instInfo C.VkInstanceCreateInfo

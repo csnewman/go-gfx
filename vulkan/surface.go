@@ -38,7 +38,7 @@ type SurfaceEntry struct {
 	fence       C.VkFence
 }
 
-func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle) (*Surface, error) {
+func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize) (*Surface, error) {
 	var surface C.VkSurfaceKHR
 
 	switch handle.SurfaceHandleType() {
@@ -127,7 +127,12 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle) (*Surface, error) {
 		frameCount:    3,
 	}
 
-	if err := s.Resize(int(capabilities.currentExtent.width), int(capabilities.currentExtent.height)); err != nil {
+	if size.Width == 0 && size.Height == 0 {
+		size.Width = int(capabilities.currentExtent.width)
+		size.Height = int(capabilities.currentExtent.height)
+	}
+
+	if err := s.Resize(size); err != nil {
 		return nil, err
 	}
 
@@ -271,11 +276,11 @@ func (s *Surface) destroySwapchain() {
 	C.vkDestroySwapchainKHR(s.graphics.device, s.swapchain, nil)
 }
 
-func (s *Surface) Resize(width int, height int) error {
-	s.logger.Debug("Surface resize", "width", width, "height", height)
+func (s *Surface) Resize(size gfx.PhysicalSize) error {
+	s.logger.Debug("Surface resize", "width", size.Width, "height", size.Height)
 
-	s.width = width
-	s.height = height
+	s.width = size.Width
+	s.height = size.Height
 
 	var capabilities C.VkSurfaceCapabilitiesKHR
 

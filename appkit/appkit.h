@@ -33,7 +33,9 @@ void gfx_ak_window_closed_callback(uint64_t wid);
 
 void gfx_ak_draw_callback(uint64_t wid, id drawable);
 
-void gfx_ak_resize_callback(uint64_t wid, double width, double height);
+void gfx_ak_resize_callback(uint64_t wid, double width, double height, double scale);
+
+void gfx_ak_size(id w, double *width, double *height, double *scale);
 
 void gfx_ak_close_window(id w);
 

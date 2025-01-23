@@ -197,23 +197,8 @@ void gfx_ak_stop() {
 - (void)resizeDrawable {
     CGFloat scaleFactor = self.window.screen.backingScaleFactor;
     CGSize newSize = self.bounds.size;
-    newSize.width *= scaleFactor;
-    newSize.height *= scaleFactor;
 
-    if (newSize.width <= 0 || newSize.height <= 0) {
-        return;
-    }
-
-    if (newSize.width == context->layer.drawableSize.width &&
-        newSize.height == context->layer.drawableSize.height) {
-        return;
-    }
-
-    if (context->layer.drawableSize.width <= 0 || context->layer.drawableSize.width <= 0) {
-        [context->layer setDrawableSize:newSize];
-    }
-
-    gfx_ak_resize_callback(context->wid, newSize.width, newSize.height);
+    gfx_ak_resize_callback(context->wid, newSize.width, newSize.height, scaleFactor);
 }
 
 - (BOOL)canBecomeKeyView {
@@ -308,6 +293,21 @@ int gfx_ak_new_window(uint64_t wid, const void *title, int title_len, int width,
         return GFX_SUCCESS;
     }
 }
+
+
+void gfx_ak_size(id w, double *width, double *height, double *scale) {
+    @autoreleasepool {
+        GfxWindowContext *ctx = w;
+
+        CGFloat scaleFactor = ctx->window.screen.backingScaleFactor;
+        CGSize size = ctx->view.bounds.size;
+
+        *scale = scaleFactor;
+        *width = size.width;
+        *height = size.height;
+    }
+}
+
 
 void gfx_ak_close_window(id w) {
     @autoreleasepool {
