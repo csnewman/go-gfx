@@ -1,8 +1,8 @@
 package vulkan
 
 /*
-#cgo CXXFLAGS: -std=c++20 -I${SRCDIR}/../thirdparty/Vulkan-Headers/include -I${SRCDIR}/../thirdparty/map-macro -I${SRCDIR}/../thirdparty/VulkanMemoryAllocator/include
-#cgo CFLAGS: -I${SRCDIR}/../thirdparty/Vulkan-Headers/include -I${SRCDIR}/../thirdparty/map-macro -I${SRCDIR}/../thirdparty/VulkanMemoryAllocator/include
+#cgo CXXFLAGS: -std=c++20 -I${SRCDIR}/../../thirdparty/Vulkan-Headers/include -I${SRCDIR}/../../thirdparty/map-macro -I${SRCDIR}/../../thirdparty/VulkanMemoryAllocator/include
+#cgo CFLAGS: -I${SRCDIR}/../../thirdparty/Vulkan-Headers/include -I${SRCDIR}/../../thirdparty/map-macro -I${SRCDIR}/../../thirdparty/VulkanMemoryAllocator/include
 
 #include "vulkan.h"
 
@@ -38,8 +38,22 @@ import (
 
 const portabilityExtension = "VK_KHR_portability_subset"
 
+var instance *Graphics
+
+func Register() {
+	if instance != nil {
+		return
+	}
+
+	instance = &Graphics{}
+
+	gfx.RegisterGraphics(instance)
+}
+
 type Graphics struct {
-	logger          *slog.Logger
+	logger   *slog.Logger
+	platform gfx.VulkanPlatform
+
 	instance        C.VkInstance
 	debugMessenger  C.VkDebugUtilsMessengerEXT
 	physicalDevice  C.VkPhysicalDevice
@@ -63,42 +77,61 @@ type Graphics struct {
 	lastSamplerID uint
 }
 
-type Config struct {
-	Logger   *slog.Logger
-	Platform gfx.VulkanPlatform
+func (g *Graphics) Name() string {
+	return "vulkan"
 }
 
-func Init(cfg Config) (*Graphics, error) {
-	g := &Graphics{
-		logger: cfg.Logger,
+func (g *Graphics) Priority() int {
+	return 0
+}
+
+func (g *Graphics) Available(plt gfx.Platform) bool {
+	_, ok := plt.(gfx.VulkanPlatform)
+
+	// TODO: check if vulkan is loadable?
+	return ok
+}
+
+func (g *Graphics) Init(init gfx.GraphicsInit) error {
+	g.logger = init.Logger
+
+	var ok bool
+
+	g.platform, ok = init.Platform.(gfx.VulkanPlatform)
+	if !ok {
+		return gfx.ErrUnsupportedPlatform
 	}
 
-	if err := g.createInstance(cfg.Platform); err != nil {
-		return nil, err
+	if err := g.platform.LoadVulkan(); err != nil {
+		return fmt.Errorf("failed to load vulkan: %w", err)
+	}
+
+	if err := g.createInstance(); err != nil {
+		return err
 	}
 
 	device, err := g.selectDevice()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := g.createDevice(device); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := g.createDescriptors(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return g, nil
+	return nil
 }
 
-func (g *Graphics) createInstance(p gfx.VulkanPlatform) error {
+func (g *Graphics) createInstance() error {
 	pinner := new(runtime.Pinner)
 	defer pinner.Unpin()
 
 	// TODO: check null
-	C.gfx_vkInit(p.VKGetInstanceProcAddr())
+	C.gfx_vkInit(g.platform.VKInstanceProcAddr())
 
 	var instInfo C.VkInstanceCreateInfo
 	instInfo.sType = C.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO
@@ -128,7 +161,7 @@ func (g *Graphics) createInstance(p gfx.VulkanPlatform) error {
 
 	exts = append(exts, C.GFX_VK_KHR_SURFACE_EXTENSION_NAME)
 
-	for _, e := range p.RequiredVKExtensions() {
+	for _, e := range g.platform.RequiredVKExtensions() {
 		str := C.CString(e)
 		defer C.free(unsafe.Pointer(str))
 

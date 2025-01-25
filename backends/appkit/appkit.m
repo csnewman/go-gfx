@@ -11,7 +11,9 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
-    gfx_ak_init_callback();
+//     gfx_ak_init_callback();
+
+//     [NSApp stop:self];
 }
 
 - (void)stubThread:(id)sender {
@@ -35,9 +37,28 @@ int gfx_ak_run() {
 
         [NSApp setDelegate:appDelegate];
 
-        [NSApp run];
+        [NSApp finishLaunching];
+//         [NSApp run];
+
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
         return GFX_SUCCESS;
+    }
+}
+
+void gfx_ak_process_events() {
+    @autoreleasepool {
+        NSEvent* ev;
+        do {
+            ev = [NSApp nextEventMatchingMask: NSAnyEventMask
+                                    untilDate: nil
+                                       inMode: NSDefaultRunLoopMode
+                                      dequeue: YES];
+            if (ev) {
+                // handle events here
+                [NSApp sendEvent: ev];
+            }
+        } while (ev);
     }
 }
 

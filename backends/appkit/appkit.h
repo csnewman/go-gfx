@@ -13,6 +13,8 @@ typedef void *id;
 
 int gfx_ak_run();
 
+void gfx_ak_process_events();
+
 void gfx_ak_stop();
 
 void gfx_ak_init_callback();

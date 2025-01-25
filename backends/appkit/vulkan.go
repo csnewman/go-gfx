@@ -6,10 +6,10 @@ import (
 	"unsafe"
 )
 
-func (p *Platform) vkInit() error {
+func (p *Platform) LoadVulkan() error {
 	_ = os.Setenv("MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS", "1")
 
-	lib := ffi.Open([]string{
+	lib := ffi.Open(p.logger, []string{
 		"libvulkan.dylib",
 		"libvulkan.1.dylib",
 		"libMoltenVK.dylib",
@@ -24,7 +24,7 @@ func (p *Platform) vkInit() error {
 	return nil
 }
 
-func (p *Platform) VKGetInstanceProcAddr() unsafe.Pointer {
+func (p *Platform) VKInstanceProcAddr() unsafe.Pointer {
 	return p.vkAddr
 }
 

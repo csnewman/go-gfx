@@ -38,7 +38,7 @@ type SurfaceEntry struct {
 	fence       C.VkFence
 }
 
-func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize) (*Surface, error) {
+func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize) (gfx.Surface, error) {
 	var surface C.VkSurfaceKHR
 
 	switch handle.SurfaceHandleType() {

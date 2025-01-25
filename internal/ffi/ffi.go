@@ -7,7 +7,7 @@ package ffi
 import "C"
 
 import (
-	"log"
+	"log/slog"
 	"unsafe"
 )
 
@@ -15,9 +15,9 @@ type Library struct {
 	ptr unsafe.Pointer
 }
 
-func Open(libs []string) *Library {
+func Open(logger *slog.Logger, libs []string) *Library {
 	for _, lib := range libs {
-		log.Println("trying", lib)
+		logger.Debug("Trying library", "lib", lib)
 
 		str := C.CString(lib)
 		defer C.free(unsafe.Pointer(str))

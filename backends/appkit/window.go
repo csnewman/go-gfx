@@ -29,7 +29,7 @@ type WindowConfig struct {
 	Title            string
 	Width            int
 	Height           int
-	OnResize         func(width float64, height float64, scale float64)
+	OnResize         func(size gfx.LogicalSize)
 	OnCloseRequested func()
 }
 
@@ -131,5 +131,9 @@ func gfx_ak_resize_callback(id uint64, width float64, height float64, scale floa
 
 	window := raw.(*Window)
 
-	window.cfg.OnResize(width, height, scale)
+	window.cfg.OnResize(gfx.LogicalSize{
+		Width:  width,
+		Height: height,
+		Scale:  scale,
+	})
 }
