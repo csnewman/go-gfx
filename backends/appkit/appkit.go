@@ -146,7 +146,6 @@ func (p *Platform) onResize(size gfx.LogicalSize) {
 	if err := p.renderCallback(); err != nil {
 		panic(err)
 	}
-
 }
 
 func (p *Platform) OnCloseRequested() {

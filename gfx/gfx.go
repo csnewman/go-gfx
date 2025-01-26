@@ -33,7 +33,7 @@ func Run(cfg Config) error {
 	}
 
 	slices.SortFunc(platforms, func(a, b Platform) int {
-		return cmp.Compare(a.Priority(), b.Priority())
+		return cmp.Compare(b.Priority(), a.Priority())
 	})
 
 	var platform Platform
@@ -77,7 +77,7 @@ func (a *Application) init() error {
 	}
 
 	slices.SortFunc(graphics, func(a, b Graphics) int {
-		return cmp.Compare(a.Priority(), b.Priority())
+		return cmp.Compare(b.Priority(), a.Priority())
 	})
 
 	var g Graphics

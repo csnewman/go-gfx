@@ -1,0 +1,13 @@
+#include "sdl_wrapper.h"
+
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoaclipboard.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoaevents.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoakeyboard.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoamessagebox.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoametalview.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoamodes.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoamouse.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoashape.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoavideo.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoavulkan.m"
+#include "../../thirdparty/SDL/src/video/cocoa/SDL_cocoawindow.m"

@@ -15,7 +15,7 @@ type Window struct {
 	id         uint
 	window     *C.SDL_Window
 	render     func() error
-	resize     func(w int, h int) error
+	resize     func(size gfx.LogicalSize) error
 	width      int
 	height     int
 	nextWidth  int
@@ -26,7 +26,7 @@ type WindowConfig struct {
 	Title    string
 	Width    int
 	Height   int
-	OnResize func(w int, h int) error
+	OnResize func(size gfx.LogicalSize) error
 	OnRender func() error
 }
 
@@ -49,10 +49,14 @@ func (p *Platform) NewWindow(cfg WindowConfig) (*Window, error) {
 	id := uint(C.SDL_GetWindowID(window))
 
 	w := &Window{
-		id:     id,
-		window: window,
-		render: cfg.OnRender,
-		resize: cfg.OnResize,
+		id:         id,
+		window:     window,
+		render:     cfg.OnRender,
+		resize:     cfg.OnResize,
+		width:      cfg.Width,
+		nextWidth:  cfg.Width,
+		height:     cfg.Height,
+		nextHeight: cfg.Height,
 	}
 
 	p.windows[id] = w
@@ -69,11 +73,23 @@ func (w *Window) doRender() error {
 		w.width, w.height = w.nextWidth, w.nextHeight
 
 		if w.resize != nil {
-			if err := w.resize(w.width, w.height); err != nil {
+			if err := w.resize(gfx.LogicalSize{
+				Width:  float64(w.width),
+				Height: float64(w.height),
+				Scale:  1.0,
+			}); err != nil {
 				return err
 			}
 		}
 	}
 
 	return w.render()
+}
+
+func (w *Window) Size() gfx.LogicalSize {
+	return gfx.LogicalSize{
+		Width:  float64(w.width),
+		Height: float64(w.height),
+		Scale:  1.0,
+	}
 }

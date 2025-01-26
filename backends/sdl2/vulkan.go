@@ -20,6 +20,8 @@ func (p *Platform) vkInit() error {
 		if err != nil {
 			panic(err)
 		}
+
+		os.Setenv("MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS", "1")
 	}
 
 	p.logger.Debug("Loading Vulkan")
@@ -56,7 +58,11 @@ func (p *Platform) vkInit() error {
 	return nil
 }
 
-func (p *Platform) VKGetInstanceProcAddr() unsafe.Pointer {
+func (p *Platform) LoadVulkan() error {
+	return nil
+}
+
+func (p *Platform) VKInstanceProcAddr() unsafe.Pointer {
 	return p.vkAddr
 }
 
