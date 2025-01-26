@@ -21,6 +21,8 @@ int gfx_windows_init(HMODULE* inst);
 
 void gfx_windows_init_callback();
 
+void gfx_windows_process_events();
+
 int gfx_windows_new_window(
         uint64_t wid,
         LPCWSTR title,
@@ -28,6 +30,8 @@ int gfx_windows_new_window(
         int height,
         HWND* res
 );
+
+void gfx_windows_size(HWND w, int *width, int *height);
 
 void gfx_windows_resize_callback(uint64_t id, int64_t width, int64_t height);
 

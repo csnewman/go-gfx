@@ -44,21 +44,26 @@ int gfx_windows_init(HMODULE *inst) {
     }
 
     gfx_main_id = GetCurrentThreadId();
-    PostThreadMessage(gfx_main_id, GFX_WEVENT_INIT, 0, 0);
+//    PostThreadMessage(gfx_main_id, GFX_WEVENT_INIT, 0, 0);
 
+
+
+    return GFX_SUCCESS;
+}
+
+void gfx_windows_process_events() {
     MSG msg;
 
-    while (GetMessage(&msg, NULL, 0, 0)) {
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
 
-        if (msg.message == GFX_WEVENT_INIT) {
-            gfx_windows_init_callback();
-        }
+//        if (msg.message == GFX_WEVENT_INIT) {
+//            gfx_windows_init_callback();
+//        }
 
         DispatchMessage(&msg);
     }
 
-    return GFX_SUCCESS;
 }
 
 void gfx_windows_exit() {
@@ -97,6 +102,15 @@ int gfx_windows_new_window(
 
 void gfx_windows_close_window(HWND w) {
     PostMessageW(w, GFX_WEVENT_CLOSE, 0, 0);
+}
+
+void gfx_windows_size(HWND w, int *width, int *height) {
+    RECT rect;
+
+    if (GetClientRect(w, &rect)) {
+        *width = rect.right;
+        *height = rect.bottom;
+    }
 }
 
 LRESULT gfx_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
