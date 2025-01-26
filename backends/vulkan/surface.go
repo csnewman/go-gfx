@@ -33,6 +33,8 @@ type Surface struct {
 
 type SurfaceEntry struct {
 	commandPool C.VkCommandPool
+	buffers     []C.VkCommandBuffer
+	bufferPos   int
 	imgSem      C.VkSemaphore
 	completeSem C.VkSemaphore
 	fence       C.VkFence
@@ -362,6 +364,12 @@ func (s *Surface) Acquire() (gfx.SurfaceFrame, error) {
 		imgIndex: int(imgIndex),
 		index:    s.currentEntry,
 	}
+
+	if err := mapError(C.vkResetCommandPool(s.graphics.device, sf.entry.commandPool, 0)); err != nil {
+		return nil, err
+	}
+
+	sf.entry.bufferPos = 0
 
 	sf.buffer = sf.CreateCommandBuffer()
 

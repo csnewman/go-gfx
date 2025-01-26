@@ -160,16 +160,24 @@ func (c *CommandBuffer) Barrier(barrier Barrier) {
 }
 
 func (f *SurfaceFrame) CreateCommandBuffer() *CommandBuffer {
-	var allocInfo C.VkCommandBufferAllocateInfo
-	allocInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO
-	allocInfo.level = C.VK_COMMAND_BUFFER_LEVEL_PRIMARY
-	allocInfo.commandPool = f.entry.commandPool
-	allocInfo.commandBufferCount = 1
-
 	var commandBuffer C.VkCommandBuffer
 
-	if err := mapError(C.vkAllocateCommandBuffers(f.graphics.device, &allocInfo, &commandBuffer)); err != nil {
-		panic(err)
+	if f.entry.bufferPos < len(f.entry.buffers) {
+		commandBuffer = f.entry.buffers[f.entry.bufferPos]
+		f.entry.bufferPos++
+	} else {
+		var allocInfo C.VkCommandBufferAllocateInfo
+		allocInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO
+		allocInfo.level = C.VK_COMMAND_BUFFER_LEVEL_PRIMARY
+		allocInfo.commandPool = f.entry.commandPool
+		allocInfo.commandBufferCount = 1
+
+		if err := mapError(C.vkAllocateCommandBuffers(f.graphics.device, &allocInfo, &commandBuffer)); err != nil {
+			panic(err)
+		}
+
+		f.entry.buffers = append(f.entry.buffers, commandBuffer)
+		f.entry.bufferPos = len(f.entry.buffers)
 	}
 
 	var beginInfo C.VkCommandBufferBeginInfo
@@ -420,8 +428,6 @@ func (c *CommandBuffer) SubmitFrame(frame *SurfaceFrame) error {
 	if err := mapError(C.vkQueueSubmit2KHR(c.graphics.graphicsQueue, 1, &submitInfo, frame.entry.fence)); err != nil {
 		return err
 	}
-
-	// TODO: free buffer
 
 	return nil
 }

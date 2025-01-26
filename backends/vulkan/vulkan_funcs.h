@@ -326,6 +326,12 @@ GFX_FUNC(VkResult, vkCreateCommandPool,
     (VkCommandPool*, pCommandPool)
 );
 
+GFX_FUNC(VkResult, vkResetCommandPool,
+    (VkDevice, device),
+    (VkCommandPool, commandPool),
+    (VkCommandPoolResetFlags, flags)
+);
+
 GFX_FUNC(void, vkDestroyCommandPool,
     (VkDevice, device),
     (VkCommandPool, commandPool),
