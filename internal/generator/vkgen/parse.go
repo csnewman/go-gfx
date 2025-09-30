@@ -9,7 +9,8 @@ import (
 )
 
 type RegistryParser struct {
-	d *Decoder
+	d   *Decoder
+	reg *Registry
 }
 
 func parse(path string) (*Registry, error) {
@@ -25,8 +26,15 @@ func parse(path string) (*Registry, error) {
 		d: rd,
 	}
 
+	reg := &Registry{
+		Types:   make(map[string]*Type),
+		Aliases: make(map[string]string),
+		Enums:   make(map[string]*Enum),
+	}
+
 	rg := &RegistryParser{
-		d: d,
+		d:   d,
+		reg: reg,
 	}
 
 	if _, err := d.ExpectStart("registry", true); err != nil {
@@ -61,7 +69,14 @@ func parse(path string) (*Registry, error) {
 
 			continue
 
-		case "enums", "commands", "feature", "extensions", "formats":
+		case "enums":
+			if err := rg.parseEnums(tok); err != nil {
+				return nil, fmt.Errorf("parsing types: %w", err)
+			}
+
+			continue
+
+		case "commands", "feature", "extensions", "formats":
 			if _, err := d.FindEnd(tok.Name); err != nil {
 				return nil, err
 			}
@@ -75,7 +90,16 @@ func parse(path string) (*Registry, error) {
 		panic("stop")
 	}
 
-	return nil, nil
+	for name, target := range reg.Aliases {
+		targetType, ok := reg.Types[target]
+		if !ok {
+			panic(fmt.Sprintf("unknown type %s for alias %s", target, name))
+		}
+
+		targetType.Aliases = append(targetType.Aliases, name)
+	}
+
+	return reg, nil
 }
 
 type Decoder struct {

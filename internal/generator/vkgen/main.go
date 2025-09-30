@@ -11,4 +11,6 @@ func main() {
 	}
 
 	slog.Info("got", "r", r)
+
+	generate(r)
 }

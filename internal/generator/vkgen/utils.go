@@ -8,3 +8,11 @@ func shouldIgnore(attrs map[string]string) bool {
 
 	return v != "vulkan"
 }
+
+func take[K comparable, V any](m map[K]V, k K) (V, bool) {
+	v, ok := m[k]
+
+	delete(m, k)
+
+	return v, ok
+}

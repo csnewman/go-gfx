@@ -35,8 +35,12 @@ func (p *RegistryParser) parseTypes() error {
 		cat := tok.Attrs["category"]
 
 		switch cat {
-		case "", "include", "define", "basetype", "handle", "enum":
+		case "", "include", "define", "basetype", "handle":
 			if _, err := p.d.FindEnd(tok.Name); err != nil {
+				return err
+			}
+		case "enum":
+			if err := p.parseEnumType(tok); err != nil {
 				return err
 			}
 		case "bitmask":
@@ -66,12 +70,58 @@ func (p *RegistryParser) parseTypes() error {
 	return nil
 }
 
-func take[K comparable, V any](m map[K]V, k K) (V, bool) {
-	v, ok := m[k]
+func (p *RegistryParser) parseEnumType(start Token) error {
+	attrs := maps.Clone(start.Attrs)
 
-	delete(m, k)
+	if shouldIgnore(attrs) {
+		if _, err := p.d.FindEnd(start.Name); err != nil {
+			return err
+		}
 
-	return v, ok
+		return nil
+	}
+
+	delete(attrs, "category")
+
+	name, ok := take(attrs, "name")
+	if !ok {
+		return fmt.Errorf("%w: name missing", ErrTokenMismatch)
+	}
+
+	if alias, ok := start.Attrs["alias"]; ok {
+		slog.Info("enum type", "alias", alias)
+
+		if _, ok := p.reg.Aliases[name]; ok {
+			return fmt.Errorf("%w: alias %q already defined", ErrTokenMismatch, name)
+		}
+
+		p.reg.Aliases[name] = alias
+
+		if _, err := p.d.ExpectEnd("type", false); err != nil {
+			return fmt.Errorf("end missing: %v", err)
+		}
+
+		return nil
+	}
+
+	if len(attrs) > 0 {
+		return fmt.Errorf("%w: unprocessed attributes: %v", ErrTokenMismatch, attrs)
+	}
+
+	if _, ok := p.reg.Types[name]; ok {
+		return fmt.Errorf("%w: type %q already defined", ErrTokenMismatch, name)
+	}
+
+	p.reg.Types[name] = &Type{
+		Name:     name,
+		Category: CategoryEnum,
+	}
+
+	if _, err := p.d.ExpectEnd("type", false); err != nil {
+		return fmt.Errorf("end missing: %v", err)
+	}
+
+	return nil
 }
 
 func (p *RegistryParser) parseBitmaskType(start Token) error {
@@ -88,13 +138,18 @@ func (p *RegistryParser) parseBitmaskType(start Token) error {
 	delete(attrs, "category")
 
 	if alias, ok := start.Attrs["alias"]; ok {
-
-		name, ok := start.Attrs["alias"]
+		name, ok := start.Attrs["name"]
 		if !ok {
 			panic("missing name")
 		}
 
 		slog.Info("bitmask type", "name", name, "alias", alias)
+
+		if _, ok := p.reg.Aliases[name]; ok {
+			return fmt.Errorf("%w: alias %q already defined", ErrTokenMismatch, name)
+		}
+
+		p.reg.Aliases[name] = alias
 
 		if _, err := p.d.ExpectEnd("type", false); err != nil {
 			return fmt.Errorf("end missing: %v", err)
@@ -140,6 +195,26 @@ func (p *RegistryParser) parseBitmaskType(start Token) error {
 
 	if _, err := p.d.ExpectEnd("type", false); err != nil {
 		return fmt.Errorf("end missing: %v", err)
+	}
+
+	if _, ok := p.reg.Types[nameVal]; ok {
+		return fmt.Errorf("%w: type %q already defined", ErrTokenMismatch, nameVal)
+	}
+
+	parsed := &Type{
+		Name:     nameVal,
+		Category: CategoryBitmask,
+	}
+
+	p.reg.Types[nameVal] = parsed
+
+	switch typeName {
+	case "VkFlags":
+		parsed.BitmaskWidth = 32
+	case "VkFlags64":
+		parsed.BitmaskWidth = 64
+	default:
+		panic("unhandled type: " + typeName)
 	}
 
 	return nil
