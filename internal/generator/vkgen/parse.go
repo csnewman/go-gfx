@@ -59,35 +59,29 @@ func parse(path string) (*Registry, error) {
 			if _, err := d.FindEnd(tok.Name); err != nil {
 				return nil, err
 			}
-
-			continue
-
 		case "types":
 			if err := rg.parseTypes(); err != nil {
 				return nil, fmt.Errorf("parsing types: %w", err)
 			}
-
-			continue
-
 		case "enums":
 			if err := rg.parseEnums(tok); err != nil {
 				return nil, fmt.Errorf("parsing types: %w", err)
 			}
-
-			continue
-
-		case "commands", "feature", "extensions", "formats":
+		case "feature":
+			if err := rg.parseFeature(tok); err != nil {
+				return nil, fmt.Errorf("parsing types: %w", err)
+			}
+		case "commands", "extensions", "formats":
 			if _, err := d.FindEnd(tok.Name); err != nil {
 				return nil, err
 			}
 
 			// TODO: support
-
-			continue
+		default:
+			panic("stop")
 
 		}
 
-		panic("stop")
 	}
 
 	for name, target := range reg.Aliases {
@@ -97,6 +91,21 @@ func parse(path string) (*Registry, error) {
 		}
 
 		targetType.Aliases = append(targetType.Aliases, name)
+	}
+
+	for _, feat := range reg.Features {
+		for tyName := range feat.Types {
+			ty, ok := reg.Types[tyName]
+			if !ok {
+				continue
+			}
+
+			if ty.Feature != "" {
+				panic(tyName + " already has feature")
+			}
+
+			ty.Feature = feat.Version
+		}
 	}
 
 	return reg, nil

@@ -1,12 +1,22 @@
 package main
 
+import (
+	"strings"
+)
+
 func shouldIgnore(attrs map[string]string) bool {
 	v, ok := take(attrs, "api")
 	if !ok {
 		return false
 	}
 
-	return v != "vulkan"
+	for _, api := range strings.Split(v, ",") {
+		if api == "vulkan" {
+			return false
+		}
+	}
+
+	return true
 }
 
 func take[K comparable, V any](m map[K]V, k K) (V, bool) {

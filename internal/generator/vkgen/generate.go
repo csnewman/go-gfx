@@ -24,6 +24,10 @@ func generate(reg *Registry) {
 	for _, name := range sortedTypes {
 		ty := reg.Types[name]
 
+		if ty.Feature == "" {
+			continue
+		}
+
 		switch ty.Category {
 		case CategoryEnum:
 			generateEnumType(reg, oEnums, ty)
