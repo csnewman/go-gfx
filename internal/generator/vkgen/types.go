@@ -53,8 +53,7 @@ func (p *RegistryParser) parseTypes() error {
 				return err
 			}
 		case "struct":
-			// TODO
-			if _, err := p.d.FindEnd(tok.Name); err != nil {
+			if err := p.parseStructType(tok); err != nil {
 				return err
 			}
 		case "union":

@@ -11,6 +11,7 @@ type Category string
 const (
 	CategoryEnum    Category = "enum"
 	CategoryBitmask Category = "bitmask"
+	CategoryStruct  Category = "struct"
 )
 
 type Type struct {
@@ -20,6 +21,9 @@ type Type struct {
 
 	// Bitmask fields
 	BitmaskWidth int
+
+	// Struct fields
+	StructReadOnly bool
 }
 
 type Enum struct {

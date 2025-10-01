@@ -14,7 +14,9 @@ func generate(reg *Registry) {
 	oEnums := jen.NewFile("vk")
 	oBitmask := jen.NewFile("vk")
 
-	_ = oEnums
+	oStructs := jen.NewFile("vk")
+	oStructs.CgoPreamble(`#include "vulkan.h"`)
+
 	_ = oBitmask
 
 	sortedTypes := slices.Sorted(maps.Keys(reg.Types))
@@ -28,12 +30,18 @@ func generate(reg *Registry) {
 
 		case CategoryBitmask:
 
+		case CategoryStruct:
+			generateStructType(reg, oStructs, ty)
 		default:
 			panic(fmt.Sprintf("unknown type %v", ty.Category))
 		}
 	}
 
 	if err := oEnums.Save("../../vk/enums.go"); err != nil {
+		panic(err)
+	}
+
+	if err := oStructs.Save("../../vk/structs.go"); err != nil {
 		panic(err)
 	}
 }
@@ -153,4 +161,20 @@ func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
 			})
 		})
 	o.Line()
+}
+
+func generateStructType(reg *Registry, o *jen.File, ty *Type) {
+	name, ok := strings.CutPrefix(ty.Name, "Vk")
+	if !ok {
+		panic(fmt.Sprintf("enum does not have prefix: %s", ty.Name))
+	}
+
+	slog.Info("Generating struct", "name", ty.Name)
+	o.Commentf("%s wraps %s.", name, ty.Name)
+
+	cName := "C." + ty.Name
+
+	o.Type().Id(name).StructFunc(func(g *jen.Group) {
+		g.Id("ptr").Id("*" + cName)
+	})
 }
