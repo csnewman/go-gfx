@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go/token"
 	"log/slog"
 	"maps"
 	"slices"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/dave/jennifer/jen"
 )
+
+const ffiPath = "github.com/csnewman/go-gfx/ffi"
 
 func generate(reg *Registry) {
 	oEnums := jen.NewFile("vk")
@@ -55,11 +58,17 @@ type ToStrEntry struct {
 	Name  string
 }
 
-func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
-	name, ok := strings.CutPrefix(ty.Name, "Vk")
+func convertEnumName(in string) string {
+	name, ok := strings.CutPrefix(in, "Vk")
 	if !ok {
-		panic(fmt.Sprintf("enum does not have prefix: %s", ty.Name))
+		panic(fmt.Sprintf("enum does not have prefix: %s", in))
 	}
+
+	return name
+}
+
+func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
+	name := convertEnumName(ty.Name)
 
 	mapping, hasMapping := reg.Enums[ty.Name]
 	if hasMapping && mapping.Type == "bitmask" {
@@ -167,11 +176,17 @@ func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
 	o.Line()
 }
 
-func generateStructType(reg *Registry, o *jen.File, ty *Type) {
-	name, ok := strings.CutPrefix(ty.Name, "Vk")
+func convertStructName(in string) string {
+	name, ok := strings.CutPrefix(in, "Vk")
 	if !ok {
-		panic(fmt.Sprintf("enum does not have prefix: %s", ty.Name))
+		panic(fmt.Sprintf("struct does not have prefix: %s", in))
 	}
+
+	return name
+}
+
+func generateStructType(reg *Registry, o *jen.File, ty *Type) {
+	name := convertStructName(ty.Name)
 
 	slog.Info("Generating struct", "name", ty.Name)
 	o.Commentf("%s wraps %s.", name, ty.Name)
@@ -181,4 +196,221 @@ func generateStructType(reg *Registry, o *jen.File, ty *Type) {
 	o.Type().Id(name).StructFunc(func(g *jen.Group) {
 		g.Id("ptr").Id("*" + cName)
 	})
+
+	o.Commentf("%s is a null pointer.", name+"Nil")
+	o.Var().Id(name + "Nil").Id(name)
+
+	sizeOfName := name + "SizeOf"
+
+	o.Commentf("%s is the byte size of %s.", sizeOfName, ty.Name)
+	o.Const().Id(sizeOfName).Op("=").Id("int").Call(jen.Id("C.sizeof_" + ty.Name))
+
+	o.Commentf("%s converts a raw pointer to a %s.", name+"FromPtr", name)
+	o.Func().Id(name + "FromPtr").
+		Params(jen.Id("ptr").Qual("unsafe", "Pointer")).
+		Id(name).
+		Block(
+			jen.Return(jen.Id(name).Values(
+				jen.Id("ptr").Op(":").Parens(jen.Id("*" + cName)).Params(jen.Id("ptr"))),
+			),
+		)
+
+	o.Commentf("%s allocates a continuous block of %s.", name+"Alloc", ty.Name)
+	o.Func().Id(name+"Alloc").
+		Types(jen.Id("T").Qual(ffiPath, "Allocator")).
+		Params(jen.Id("alloc").Id("T"), jen.Id("count").Id("int")).
+		Id(name).
+		Block(
+			jen.Id("ptr").Op(":=").Id("alloc").Dot("Allocate").Call(jen.Id(sizeOfName).Op("*").Id("count")),
+
+			jen.Return(jen.Id(name).Values(
+				jen.Id("ptr").Op(":").Parens(jen.Id("*"+cName)).Params(jen.Id("ptr"))),
+			),
+		)
+
+	o.Comment("Raw returns a raw pointer to the struct.")
+	o.Func().Params(jen.Id("p").Id(name)).Id("Raw").Params().Qual("unsafe", "Pointer").Block(
+		jen.Return(jen.Qual("unsafe", "Pointer").Call(jen.Id("p").Dot("ptr"))),
+	)
+
+	o.Comment("Offset returns an offset pointer by the size of the struct and the provided multiple.")
+	o.Func().Params(jen.Id("p").Id(name)).Id("Offset").
+		Params(jen.Id("offset").Id("int")).
+		Id(name).
+		Block(
+			jen.Id("ptr").Op(":=").Qual("unsafe", "Add").Call(
+				jen.Qual("unsafe", "Pointer").Call(jen.Id("p").Dot("ptr")),
+				jen.Id("offset").Op("*").Id(sizeOfName),
+			),
+
+			jen.Return(jen.Id(name).Values(
+				jen.Id("ptr").Op(":").Parens(jen.Id("*"+cName)).Params(jen.Id("ptr"))),
+			),
+		)
+
+	for _, field := range ty.Fields {
+		generateStructField(reg, o, name, ty, field)
+	}
+}
+
+var nativeTypes = map[string]string{
+	"size_t":   "uintptr",
+	"uint8_t":  "uint8",
+	"int8_t":   "int8",
+	"uint16_t": "uint16",
+	"int16_t":  "int16",
+	"uint32_t": "uint32",
+	"int32_t":  "int32",
+	"uint64_t": "uint64",
+	"int64_t":  "int64",
+}
+
+func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, field StructField) {
+	fieldName := strings.ToUpper(field.Name[:1]) + field.Name[1:]
+
+	var (
+		mappedType jen.Code
+		getBody    []jen.Code
+		setBody    []jen.Code
+
+		generateDefault bool
+	)
+
+	cFieldName := field.Name
+
+	if token.IsKeyword(cFieldName) {
+		cFieldName = "_" + cFieldName
+	}
+
+	switch field.Category {
+	case FieldCategoryDirect:
+		if mapping, ok := nativeTypes[field.Type]; ok {
+			mappedType = jen.Id(mapping)
+			generateDefault = true
+
+			break
+		}
+
+		fieldType, ok := reg.Types[field.Type]
+		if !ok {
+			o.Commentf("%s.%s is unsupported: unknown type %s.", tyName, field.Name, field.Type)
+			o.Line()
+
+			return
+		}
+
+		switch fieldType.Category {
+		case CategoryEnum:
+			mapping, hasMapping := reg.Enums[fieldType.Name]
+			if hasMapping && mapping.Type == "bitmask" {
+				o.Commentf("%s.%s is unsupported: bitmask.", tyName, field.Name, field.Type)
+				o.Line()
+
+				return
+			}
+
+			enumName := convertEnumName(fieldType.Name)
+			mappedType = jen.Id(enumName)
+			generateDefault = true
+
+		//case CategoryBitmask, CategoryStruct:
+
+		default:
+			o.Commentf("%s.%s is unsupported: direct category %s.", tyName, field.Name, fieldType.Category)
+			o.Line()
+
+			return
+		}
+
+	case FieldCategoryPointer:
+		if field.Type == "void" {
+			mappedType = jen.Qual("unsafe", "Pointer")
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Add(mappedType).Params(jen.Id("p").Dot("ptr").Dot(cFieldName)),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value"),
+			}
+
+			break
+		}
+
+		if field.Type == "char" {
+			mappedType = jen.Qual(ffiPath, "CString")
+
+			getBody = []jen.Code{
+				jen.Return(jen.Qual(ffiPath, "CStringFromPtr").Parens(
+					jen.Parens(jen.Qual("unsafe", "Pointer")).Parens(
+						jen.Id("p").Dot("ptr").Dot(cFieldName))),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").
+					Parens(jen.Id("*C.char")).Parens(
+					jen.Id("value").Dot("Raw").Params(),
+				),
+			}
+			break
+		}
+
+		fieldType, ok := reg.Types[field.Type]
+		if ok && fieldType.Category == CategoryStruct {
+			structName := convertStructName(fieldType.Name)
+			mappedType = jen.Id(structName)
+
+			getBody = []jen.Code{
+				jen.Return(jen.Id(structName).Values(
+					jen.Id("ptr").Op(":").Id("p").Dot("ptr").Dot(cFieldName)),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value").Dot("ptr"),
+			}
+
+			break
+		}
+
+		o.Commentf("%s.%s is unsupported: category %s.", tyName, field.Name, field.Category)
+		o.Line()
+
+		return
+
+	//case FieldCategoryPointer, FieldCategoryPointer2, FieldCategoryUnsupported:
+	default:
+		o.Commentf("%s.%s is unsupported: category %s.", tyName, field.Name, field.Category)
+		o.Line()
+
+		return
+	}
+
+	if generateDefault {
+		getBody = []jen.Code{
+			jen.Return(
+				jen.Add(mappedType).Params(jen.Id("p").Dot("ptr").Dot(cFieldName)),
+			),
+		}
+
+		setBody = []jen.Code{
+			jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Parens(jen.Id("C." + field.Type)).Params(jen.Id("value")),
+		}
+	}
+
+	o.Line()
+	o.Commentf("Get%s returns the value in %s.", fieldName, field.Name)
+	o.Func().Params(jen.Id("p").Id(tyName)).Id("Get" + fieldName).
+		Params().
+		Add(mappedType).
+		Block(getBody...)
+
+	o.Line()
+	o.Commentf("Set%s sets the value in %s.", fieldName, field.Name)
+	o.Func().Params(jen.Id("p").Id(tyName)).Id("Set" + fieldName).
+		Params(jen.Id("value").Add(mappedType)).
+		Block(setBody...)
 }

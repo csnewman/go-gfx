@@ -112,7 +112,8 @@ func parse(path string) (*Registry, error) {
 }
 
 type Decoder struct {
-	d *xml.Decoder
+	d    *xml.Decoder
+	next *Token
 }
 
 type TokenType string
@@ -138,6 +139,27 @@ func (d *Decoder) ExpectStart(name string, skipChar bool) (Token, error) {
 	return d.Expect(Token{Type: TokenTypeStart, Name: name}, skipChar)
 }
 
+func (d *Decoder) PeekStart(name string) (Token, bool, error) {
+	found, err := d.Next(false)
+	if err != nil {
+		return Token{}, false, err
+	}
+
+	if found.Type != TokenTypeStart {
+		d.Stash(found)
+
+		return Token{}, false, nil
+	}
+
+	if found.Name != name {
+		d.Stash(found)
+
+		return Token{}, false, nil
+	}
+
+	return found, true, nil
+}
+
 func (d *Decoder) ExpectChar(value string) (Token, error) {
 	return d.Expect(Token{Type: TokenTypeChar, Value: value}, false)
 }
@@ -153,6 +175,21 @@ func (d *Decoder) ExpectAnyChar() (Token, error) {
 	}
 
 	return found, nil
+}
+
+func (d *Decoder) PeekAnyChar() (Token, bool, error) {
+	found, err := d.Next(false)
+	if err != nil {
+		return Token{}, false, err
+	}
+
+	if found.Type != TokenTypeChar {
+		d.Stash(found)
+
+		return Token{}, false, nil
+	}
+
+	return found, true, nil
 }
 
 func (d *Decoder) ExpectEnd(name string, skipChar bool) (Token, error) {
@@ -194,7 +231,23 @@ func (d *Decoder) Expect(tk Token, skipChar bool) (Token, error) {
 	return tk, nil
 }
 
+func (d *Decoder) Stash(tok Token) {
+	if d.next != nil {
+		panic("token already stashed")
+	}
+
+	d.next = &tok
+}
+
 func (d *Decoder) Next(skipChar bool) (Token, error) {
+	if d.next != nil {
+		tok := *d.next
+
+		d.next = nil
+
+		return tok, nil
+	}
+
 	for {
 		raw, err := d.d.Token()
 		if err != nil {

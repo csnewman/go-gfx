@@ -27,6 +27,22 @@ type Type struct {
 
 	// Struct fields
 	StructReadOnly bool
+	Fields         []StructField
+}
+
+type FieldCategory string
+
+const (
+	FieldCategoryDirect      FieldCategory = "direct"
+	FieldCategoryPointer     FieldCategory = "pointer"
+	FieldCategoryPointer2    FieldCategory = "pointer2"
+	FieldCategoryUnsupported FieldCategory = "unsupported"
+)
+
+type StructField struct {
+	Name     string
+	Type     string
+	Category FieldCategory
 }
 
 type Enum struct {
