@@ -36,6 +36,7 @@ func generate(reg *Registry) {
 			generateEnumType(reg, oEnums, ty)
 
 		case CategoryBitmask:
+			generateBitmaskType(reg, oBitmask, ty)
 
 		case CategoryStruct:
 			generateStructType(reg, oStructs, ty)
@@ -45,6 +46,10 @@ func generate(reg *Registry) {
 	}
 
 	if err := oEnums.Save("../../vk/enums.go"); err != nil {
+		panic(err)
+	}
+
+	if err := oBitmask.Save("../../vk/bitmasks.go"); err != nil {
 		panic(err)
 	}
 
@@ -62,6 +67,11 @@ func convertEnumName(in string) string {
 	name, ok := strings.CutPrefix(in, "Vk")
 	if !ok {
 		panic(fmt.Sprintf("enum does not have prefix: %s", in))
+	}
+
+	// XXX: bit of a hack! Should properly map these.
+	if removed, ok := strings.CutSuffix(name, "FlagBits"); ok {
+		return removed + "Flags"
 	}
 
 	return name
@@ -91,7 +101,7 @@ func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
 			panic(fmt.Sprintf("enum alias does not have prefix: %s", alias))
 		}
 
-		o.Commentf("%s wraps the enum %s. An alias for %s", aliasName, alias, name)
+		o.Commentf("%s wraps the enum %s. An alias for %s.", aliasName, alias, name)
 
 		o.Type().Id(aliasName).Op("=").Id(name)
 	}
@@ -172,6 +182,104 @@ func generateEnumType(reg *Registry, o *jen.File, ty *Type) {
 						jen.Id("e"),
 					)
 			})
+		})
+	o.Line()
+}
+
+func generateBitmaskType(reg *Registry, o *jen.File, ty *Type) {
+	name := convertEnumName(ty.Name)
+
+	mapping, hasMapping := reg.Enums[ty.Requires]
+
+	slog.Info("Generating bitmask", "name", ty.Name)
+
+	o.Commentf("%s wraps the bitmask %s.", name, ty.Name)
+
+	var goType string
+
+	switch ty.BitmaskWidth {
+	case 32:
+		goType = "int32"
+	case 64:
+		goType = "int64"
+	default:
+		panic(fmt.Sprintf("bitmask bit width %d", ty.BitmaskWidth))
+	}
+
+	o.Type().Id(name).Id(goType)
+
+	slices.Sort(ty.Aliases)
+
+	for _, alias := range ty.Aliases {
+		aliasName, ok := strings.CutPrefix(alias, "Vk")
+		if !ok {
+			panic(fmt.Sprintf("bitmask alias does not have prefix: %s", alias))
+		}
+
+		o.Commentf("%s wraps the bitmask %s. An alias for %s.", aliasName, alias, name)
+
+		o.Type().Id(aliasName).Op("=").Id(name)
+	}
+
+	if hasMapping && len(mapping.Values) > 0 {
+		o.Const().DefsFunc(func(group *jen.Group) {
+			for _, v := range mapping.Values {
+				if v.Name == "" {
+					panic(fmt.Sprintf("bitmask does not have a name: %s", ty.Name))
+				}
+
+				itemName, ok := strings.CutPrefix(v.Name, "VK_")
+				if !ok {
+					panic(fmt.Sprintf("bitmask item does not have prefix: %s", ty.Name))
+				}
+
+				if v.Alias != "" {
+					aliasName, ok := strings.CutPrefix(v.Alias, "VK_")
+					if !ok {
+						panic(fmt.Sprintf("bitmask alias does not have prefix: %s", ty.Name))
+					}
+
+					group.Commentf("%s wraps %s.", itemName, v.Name)
+
+					if v.Deprecated != "" {
+						group.Comment("")
+						group.Commentf("Deprecated: Use %s instead.", aliasName)
+					}
+
+					group.Id(itemName).Id(name).Op("=").Id(aliasName)
+
+					continue
+				}
+
+				var value string
+
+				if v.Value != "" {
+					value = v.Value
+				} else if v.HasBitPos {
+					value = fmt.Sprintf("1<<%d", v.BitPos)
+				} else {
+					panic(fmt.Sprintf("bitmask does not have a value: %s", ty.Name))
+				}
+
+				group.Commentf("%s wraps %s.", itemName, v.Name)
+				group.Id(itemName).Id(name).Op("=").Id(value)
+			}
+		})
+	}
+
+	o.Func().
+		ParamsFunc(func(group *jen.Group) {
+			group.Id("e").Id(name)
+		}).Id("String").
+		Params().
+		Id("string").
+		BlockFunc(func(group *jen.Group) {
+			group.Return().
+				Qual("fmt", "Sprintf").
+				Call(
+					jen.Lit(fmt.Sprintf("%s(%%b)", ty.Name)),
+					jen.Id("e"),
+				)
 		})
 	o.Line()
 }
@@ -263,6 +371,10 @@ var nativeTypes = map[string]string{
 	"int32_t":  "int32",
 	"uint64_t": "uint64",
 	"int64_t":  "int64",
+	"float":    "float32",
+
+	"VkDeviceSize":    "DeviceSize",
+	"VkDeviceAddress": "DeviceAddress",
 }
 
 func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, field StructField) {
@@ -291,6 +403,26 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 			break
 		}
 
+		if field.Type == "VkBool32" {
+			mappedType = jen.Id("bool")
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Id("p").Dot("ptr").Dot(cFieldName).Op("!=").Id("0"),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.If(jen.Id("value")).Block(
+					jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("C.VkBool32").Parens(jen.Id("1")),
+				).Else().Block(
+					jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("C.VkBool32").Parens(jen.Id("0")),
+				),
+			}
+
+			break
+		}
+
 		fieldType, ok := reg.Types[field.Type]
 		if !ok {
 			o.Commentf("%s.%s is unsupported: unknown type %s.", tyName, field.Name, field.Type)
@@ -300,15 +432,7 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 		}
 
 		switch fieldType.Category {
-		case CategoryEnum:
-			mapping, hasMapping := reg.Enums[fieldType.Name]
-			if hasMapping && mapping.Type == "bitmask" {
-				o.Commentf("%s.%s is unsupported: bitmask.", tyName, field.Name, field.Type)
-				o.Line()
-
-				return
-			}
-
+		case CategoryEnum, CategoryBitmask:
 			enumName := convertEnumName(fieldType.Name)
 			mappedType = jen.Id(enumName)
 			generateDefault = true

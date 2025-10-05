@@ -24,6 +24,7 @@ type Type struct {
 
 	// Bitmask fields
 	BitmaskWidth int
+	Requires     string
 
 	// Struct fields
 	StructReadOnly bool
@@ -56,11 +57,13 @@ type Enum struct {
 
 type EnumValue struct {
 	Name       string
-	BitPos     int
 	Value      string
 	Alias      string
 	Deprecated string
 	Comment    string
+
+	BitPos    int
+	HasBitPos bool
 }
 
 type Feature struct {

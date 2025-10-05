@@ -137,6 +137,7 @@ func (p *RegistryParser) parseEnumEntry(enum *Enum, start Token) error {
 		}
 
 		value.BitPos = v
+		value.HasBitPos = true
 	}
 
 	enum.Values = append(enum.Values, value)

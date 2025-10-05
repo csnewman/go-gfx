@@ -160,7 +160,11 @@ func (p *RegistryParser) parseBitmaskType(start Token) error {
 	requires, _ := take(attrs, "requires")
 	bitValues, _ := take(attrs, "bitvalues")
 
-	_ = bitValues
+	if requires == "" && bitValues != "" {
+		requires = bitValues
+	} else if requires != "" && bitValues != "" {
+		return fmt.Errorf("%w: reqs and values %q or %q", ErrTokenMismatch, requires, bitValues)
+	}
 
 	if len(attrs) > 0 {
 		return fmt.Errorf("%w: unprocessed attributes: %v", ErrTokenMismatch, attrs)
@@ -203,6 +207,7 @@ func (p *RegistryParser) parseBitmaskType(start Token) error {
 	parsed := &Type{
 		Name:     nameVal,
 		Category: CategoryBitmask,
+		Requires: requires,
 	}
 
 	p.reg.Types[nameVal] = parsed
