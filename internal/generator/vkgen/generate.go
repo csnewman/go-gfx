@@ -55,6 +55,7 @@ func generate(reg *Registry) {
 		}
 	}
 
+	oCommands.Comment("Load attempts to load all vulkan functions.")
 	oCommands.Func().Id("Load").Params(jen.Id("loader").Qual("unsafe", "Pointer")).Block(
 		jen.Qual("C", "gfx_vkInit").Call(jen.Id("loader")),
 	)
@@ -978,6 +979,7 @@ VKAPI_ATTR %s VKAPI_CALL %s(%s) {
 
 	body = append(body, postCall...)
 
+	o.Commentf("%s wraps %s.", cmdName, cmd.Name)
 	o.Func().Id(cmdName).Params(paramsBlock...).Add(retTypeBlock...).Block(
 		body...,
 	)
