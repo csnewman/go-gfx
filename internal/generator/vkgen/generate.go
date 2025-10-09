@@ -20,9 +20,15 @@ func generate(reg *Registry) {
 	oStructs := jen.NewFile("vk")
 	oStructs.CgoPreamble(`#include "vulkan.h"`)
 
-	_ = oBitmask
+	oHandles := jen.NewFile("vk")
+	oHandles.CgoPreamble(`#include "vulkan.h"`)
+
+	oCommands := jen.NewFile("vk")
+	oCommands.CgoPreamble(`#include "vulkan.h"`)
 
 	sortedTypes := slices.Sorted(maps.Keys(reg.Types))
+
+	generatedOffsets := make(map[string]struct{})
 
 	for _, name := range sortedTypes {
 		ty := reg.Types[name]
@@ -39,21 +45,71 @@ func generate(reg *Registry) {
 			generateBitmaskType(reg, oBitmask, ty)
 
 		case CategoryStruct:
-			generateStructType(reg, oStructs, ty)
+			generateStructType(reg, generatedOffsets, oStructs, ty)
+
+		case CategoryHandle:
+			generateHandleType(reg, oHandles, ty)
+
 		default:
 			panic(fmt.Sprintf("unknown type %v", ty.Category))
 		}
 	}
 
-	if err := oEnums.Save("../../vk/enums.go"); err != nil {
+	oCommands.Func().Id("Load").Params(jen.Id("loader").Qual("unsafe", "Pointer")).Block(
+		jen.Qual("C", "gfx_vkInit").Call(jen.Id("loader")),
+	)
+
+	sortedCmds := slices.Sorted(maps.Keys(reg.Commands))
+
+	generatedCmds := make(map[string]struct{})
+
+	for _, name := range sortedCmds {
+		cmd := reg.Commands[name]
+
+		if cmd.Feature == "" {
+			continue
+		}
+
+		generateCommand(reg, oCommands, cmd, generatedCmds)
+	}
+
+	var loadBody strings.Builder
+
+	for _, name := range slices.Sorted(maps.Keys(generatedCmds)) {
+		loadBody.WriteString("    ptr_")
+		loadBody.WriteString(name)
+		loadBody.WriteString(" = (PFN_")
+		loadBody.WriteString(name)
+		loadBody.WriteString(") ptr_vkGetInstanceProcAddr(context, \"")
+		loadBody.WriteString(name)
+		loadBody.WriteString("\");\n")
+	}
+
+	oCommands.CgoPreamble(fmt.Sprintf(`PFN_vkGetInstanceProcAddr ptr_vkGetInstanceProcAddr;
+
+void gfx_vkInit(void* loader) {
+    ptr_vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr) loader;
+    void* context = NULL;
+
+%s}`, loadBody.String()))
+
+	if err := oEnums.Save("../../vk/enums.gen.go"); err != nil {
 		panic(err)
 	}
 
-	if err := oBitmask.Save("../../vk/bitmasks.go"); err != nil {
+	if err := oBitmask.Save("../../vk/bitmasks.gen.go"); err != nil {
 		panic(err)
 	}
 
-	if err := oStructs.Save("../../vk/structs.go"); err != nil {
+	if err := oStructs.Save("../../vk/structs.gen.go"); err != nil {
+		panic(err)
+	}
+
+	if err := oHandles.Save("../../vk/handles.gen.go"); err != nil {
+		panic(err)
+	}
+
+	if err := oCommands.Save("../../vk/commands.gen.go"); err != nil {
 		panic(err)
 	}
 }
@@ -293,7 +349,7 @@ func convertStructName(in string) string {
 	return name
 }
 
-func generateStructType(reg *Registry, o *jen.File, ty *Type) {
+func generateStructType(reg *Registry, generatedOffsets map[string]struct{}, o *jen.File, ty *Type) {
 	name := convertStructName(ty.Name)
 
 	slog.Info("Generating struct", "name", ty.Name)
@@ -325,8 +381,7 @@ func generateStructType(reg *Registry, o *jen.File, ty *Type) {
 
 	o.Commentf("%s allocates a continuous block of %s.", name+"Alloc", ty.Name)
 	o.Func().Id(name+"Alloc").
-		Types(jen.Id("T").Qual(ffiPath, "Allocator")).
-		Params(jen.Id("alloc").Id("T"), jen.Id("count").Id("int")).
+		Params(jen.Id("alloc").Qual(ffiPath, "Allocator"), jen.Id("count").Id("int")).
 		Id(name).
 		Block(
 			jen.Id("ptr").Op(":=").Id("alloc").Dot("Allocate").Call(jen.Id(sizeOfName).Op("*").Id("count")),
@@ -357,7 +412,7 @@ func generateStructType(reg *Registry, o *jen.File, ty *Type) {
 		)
 
 	for _, field := range ty.Fields {
-		generateStructField(reg, o, name, ty, field)
+		generateStructField(reg, generatedOffsets, o, name, ty, field)
 	}
 }
 
@@ -375,9 +430,10 @@ var nativeTypes = map[string]string{
 
 	"VkDeviceSize":    "DeviceSize",
 	"VkDeviceAddress": "DeviceAddress",
+	"VkSampleMask":    "SampleMask",
 }
 
-func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, field StructField) {
+func generateStructField(reg *Registry, generatedOffsets map[string]struct{}, o *jen.File, tyName string, ty *Type, field StructField) {
 	fieldName := strings.ToUpper(field.Name[:1]) + field.Name[1:]
 
 	var (
@@ -437,7 +493,59 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 			mappedType = jen.Id(enumName)
 			generateDefault = true
 
-		//case CategoryBitmask, CategoryStruct:
+		case CategoryHandle:
+			enumName := convertStructName(fieldType.Name)
+			mappedType = jen.Id(enumName)
+
+			if fieldType.NonDispatchable {
+				generateDefault = true
+			} else {
+				getBody = []jen.Code{
+					jen.Return(
+						jen.Add(mappedType).Params(
+							jen.Qual("unsafe", "Pointer").Params(jen.Id("p").Dot("ptr").Dot(cFieldName)),
+						),
+					),
+				}
+
+				setBody = []jen.Code{
+					jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Parens(
+						jen.Id("C." + field.Type)).Params(jen.Qual("unsafe", "Pointer").Params(jen.Id("value"))),
+				}
+			}
+
+		case CategoryStruct:
+			structName := convertStructName(fieldType.Name)
+			mappedType = jen.Id(structName)
+
+			offsetName := "offsetof_" + ty.Name + "_" + field.Name
+
+			if _, ok := generatedOffsets[offsetName]; !ok {
+				generatedOffsets[offsetName] = struct{}{}
+
+				o.CgoPreamble("static const int " + offsetName + " = offsetof(" + ty.Name + ", " + field.Name + ");")
+			}
+
+			o.Line()
+			o.Commentf("Ref%s returns pointer to the %s field.", fieldName, field.Name)
+			o.Func().Params(jen.Id("p").Id(tyName)).Id("Ref" + fieldName).
+				Params().
+				Add(mappedType).
+				Block(
+					jen.Return(jen.Id(structName).Values(
+						jen.Id("ptr").Op(":").
+							Params(jen.Id("*C." + fieldType.Name)).
+							Params(
+								jen.Qual("unsafe", "Add").
+									Call(
+										jen.Qual("unsafe", "Pointer").Call(jen.Id("p").Dot("ptr")),
+										jen.Id("uintptr").Call(jen.Qual("C", offsetName)),
+									),
+							),
+					)),
+				)
+
+			return
 
 		default:
 			o.Commentf("%s.%s is unsupported: direct category %s.", tyName, field.Name, fieldType.Category)
@@ -482,8 +590,40 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 			break
 		}
 
+		if prim, ok := nativeTypes[field.Type]; ok {
+			mappedType = jen.Qual(ffiPath, "Ref").Types(jen.Id(prim))
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Qual(ffiPath, "RefFromPtr").Types(jen.Id(prim)).Call(
+						jen.Qual("unsafe", "Pointer").Call(
+							jen.Id("p").Dot("ptr").Dot(cFieldName),
+						),
+					),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").
+					Call(jen.Id("*C." + field.Type)).
+					Call(
+						jen.Id("value").Dot("Raw").Call(),
+					),
+			}
+
+			break
+		}
+
 		fieldType, ok := reg.Types[field.Type]
-		if ok && fieldType.Category == CategoryStruct {
+		if !ok {
+			o.Commentf("%s.%s is unsupported: category %s -> ??.", tyName, field.Name, field.Category)
+			o.Line()
+
+			return
+		}
+
+		switch fieldType.Category {
+		case CategoryStruct:
 			structName := convertStructName(fieldType.Name)
 			mappedType = jen.Id(structName)
 
@@ -496,6 +636,57 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 			setBody = []jen.Code{
 				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value").Dot("ptr"),
 			}
+		case CategoryEnum, CategoryHandle, CategoryBitmask:
+			enumName := convertEnumName(fieldType.Name)
+
+			mappedType = jen.Qual(ffiPath, "Ref").Types(jen.Id(enumName))
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Qual(ffiPath, "RefFromPtr").Types(jen.Id(enumName)).Call(
+						jen.Qual("unsafe", "Pointer").Call(
+							jen.Id("p").Dot("ptr").Dot(cFieldName),
+						),
+					),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").
+					Call(jen.Id("*C." + field.Type)).
+					Call(
+						jen.Id("value").Dot("Raw").Call(),
+					),
+			}
+
+		default:
+			o.Commentf("%s.%s is unsupported: category pointer %s -> %s.", tyName, field.Name, fieldType.Category, fieldType.Name)
+			o.Line()
+
+			return
+
+		}
+	case FieldCategoryPointer2:
+		if field.Type == "char" {
+			mappedType = jen.Qual(ffiPath, "Ref").Types(jen.Qual(ffiPath, "CString"))
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Qual(ffiPath, "RefFromPtr").Types(jen.Qual(ffiPath, "CString")).Call(
+						jen.Qual("unsafe", "Pointer").Call(
+							jen.Id("p").Dot("ptr").Dot(cFieldName),
+						),
+					),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").
+					Call(jen.Id("**C." + field.Type)).
+					Call(
+						jen.Id("value").Dot("Raw").Call(),
+					),
+			}
 
 			break
 		}
@@ -505,7 +696,6 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 
 		return
 
-	//case FieldCategoryPointer, FieldCategoryPointer2, FieldCategoryUnsupported:
 	default:
 		o.Commentf("%s.%s is unsupported: category %s.", tyName, field.Name, field.Category)
 		o.Line()
@@ -537,4 +727,261 @@ func generateStructField(reg *Registry, o *jen.File, tyName string, ty *Type, fi
 	o.Func().Params(jen.Id("p").Id(tyName)).Id("Set" + fieldName).
 		Params(jen.Id("value").Add(mappedType)).
 		Block(setBody...)
+}
+
+func generateHandleType(reg *Registry, o *jen.File, ty *Type) {
+	name := convertStructName(ty.Name)
+
+	slog.Info("Generating handle", "name", ty.Name)
+	o.Commentf("%s wraps %s.", name, ty.Name)
+
+	cType := "uintptr"
+
+	if ty.NonDispatchable {
+		cType = "uint64"
+	}
+
+	o.Type().Id(name).Id(cType)
+
+	o.Commentf("%s is a null pointer.", name+"Nil")
+	o.Var().Id(name + "Nil").Id(name)
+}
+
+func convertCommandName(in string) string {
+	name, ok := strings.CutPrefix(in, "vk")
+	if !ok {
+		panic(fmt.Sprintf("cmd does not have prefix: %s", in))
+	}
+
+	return name
+}
+
+func generateCommand(reg *Registry, o *jen.File, cmd *Command, generatedCmds map[string]struct{}) {
+	cmdName := convertCommandName(cmd.Name)
+
+	o.Line()
+
+	var (
+		tmpRetVar     = "ret"
+		retMappedType jen.Code
+		retCType      = cmd.ReturnType
+		postCall      []jen.Code
+	)
+
+	if cmd.ReturnType == "void" {
+		tmpRetVar = ""
+	} else if mapping, ok := nativeTypes[cmd.ReturnType]; ok {
+		retMappedType = jen.Id(mapping)
+		postCall = append(postCall, jen.Return(jen.Id(mapping).Call(jen.Id(tmpRetVar))))
+	} else if cmd.ReturnType == "VkBool32" {
+		retMappedType = jen.Id("bool")
+		postCall = append(postCall, jen.Return(jen.Id("bool").Call(jen.Id(tmpRetVar))))
+	} else if fieldType, ok := reg.Types[cmd.ReturnType]; ok {
+		switch fieldType.Category {
+		case CategoryEnum:
+			retMappedType = jen.Id(convertEnumName(fieldType.Name))
+			postCall = append(postCall, jen.Return(jen.Add(retMappedType).Call(jen.Id(tmpRetVar))))
+		default:
+			o.Commentf("%s is unsupported: unknown category %s.", cmd.Name, fieldType.Category)
+			o.Line()
+
+			return
+		}
+	} else {
+		o.Commentf("%s is unsupported: unknown type %s.", cmd.Name, cmd.ReturnType)
+		o.Line()
+		return
+	}
+
+	var retTypeBlock []jen.Code
+
+	if retMappedType != nil {
+		retTypeBlock = append(retTypeBlock, retMappedType)
+	}
+
+	var (
+		paramsBlock []jen.Code
+		callBlock   []jen.Code
+	)
+
+	var (
+		paramsC     []string
+		paramCNames []string
+
+		preCall []jen.Code
+	)
+
+	for _, member := range cmd.Members {
+		safeName := member.Name
+
+		if token.IsKeyword(safeName) {
+			safeName += "_"
+		}
+
+		paramCNames = append(paramCNames, member.Name)
+
+		switch member.Category {
+		case MemberCategoryDirect:
+			paramsC = append(paramsC, member.Type+" "+member.Name)
+
+			if mapping, ok := nativeTypes[member.Type]; ok {
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id(mapping))
+				callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Id(safeName)))
+
+				break
+			}
+
+			if member.Type == "VkBool32" {
+				tmpName := "tmp_" + member.Name
+
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id("bool"))
+
+				preCall = append(
+					preCall,
+					jen.Id(tmpName).Op(":=").Id("0"),
+					jen.Line(),
+					jen.If(jen.Id(safeName)).Block(
+						jen.Id(tmpName).Op("=").Id("1"),
+					),
+					jen.Line(),
+				)
+
+				callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Id(tmpName)))
+
+				break
+			}
+
+			memberType, ok := reg.Types[member.Type]
+			if !ok {
+				o.Commentf("%s.%s is unsupported: unknown type %s.", cmd.Name, member.Name, member.Type)
+				o.Line()
+
+				return
+			}
+
+			switch memberType.Category {
+			case CategoryEnum, CategoryBitmask:
+				enumName := convertEnumName(memberType.Name)
+
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id(enumName))
+				callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Id(safeName)))
+
+			case CategoryHandle:
+				handleName := convertStructName(memberType.Name)
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id(handleName))
+
+				if memberType.NonDispatchable {
+					callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Id(safeName)))
+				} else {
+					callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Qual("unsafe", "Pointer").Call(jen.Id(safeName))))
+				}
+
+			default:
+				o.Commentf("%s.%s is unsupported: direct category %s.", cmd.Name, member.Name, memberType.Category)
+				o.Line()
+
+				return
+
+			}
+		case MemberCategoryPointer:
+			paramsC = append(paramsC, member.Type+"* "+member.Name)
+
+			if member.Type == "void" {
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual("unsafe", "Pointer"))
+				callBlock = append(callBlock, jen.Id(safeName))
+
+				break
+			}
+
+			if member.Type == "char" {
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "CString"))
+
+				callBlock = append(callBlock, jen.Call(jen.Id("*C.char")).
+					Call(
+						jen.Id(safeName).Dot("Raw").Call(),
+					),
+				)
+
+				break
+			}
+
+			if prim, ok := nativeTypes[member.Type]; ok {
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "Ref").Types(jen.Id(prim)))
+
+				callBlock = append(callBlock, jen.Call(jen.Id("*C."+member.Type)).
+					Call(
+						jen.Id(safeName).Dot("Raw").Call(),
+					),
+				)
+
+				break
+			}
+
+			memberType, ok := reg.Types[member.Type]
+			if !ok {
+				o.Commentf("%s.%s is unsupported: category %s -> ?? %s.", cmd.Name, member.Name, member.Category, member.Type)
+				o.Line()
+
+				return
+			}
+
+			switch memberType.Category {
+			case CategoryStruct:
+				structName := convertStructName(memberType.Name)
+
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id(structName))
+				callBlock = append(callBlock, jen.Id(safeName).Dot("ptr"))
+			case CategoryEnum, CategoryHandle, CategoryBitmask:
+				enumName := convertEnumName(memberType.Name)
+
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "Ref").Types(jen.Id(enumName)))
+
+				callBlock = append(callBlock, jen.Call(jen.Id("*C."+member.Type)).
+					Call(
+						jen.Id(safeName).Dot("Raw").Call(),
+					),
+				)
+
+			default:
+				o.Commentf("%s.%s is unsupported: category %s -> %s.", cmd.Name, member.Name, member.Category, memberType.Category)
+				o.Line()
+
+				return
+			}
+
+		default:
+			o.Commentf("%s.%s is unsupported: category %s.", cmd.Name, member.Name, member.Category)
+			o.Line()
+
+			return
+		}
+	}
+
+	o.CgoPreamble(fmt.Sprintf(`PFN_%s ptr_%s;
+VKAPI_ATTR %s VKAPI_CALL %s(%s) {
+	return ptr_%s(%s);
+}`, cmd.Name, cmd.Name, retCType, cmd.Name, strings.Join(paramsC, ", "), cmd.Name, strings.Join(paramCNames, ", ")))
+
+	var body []jen.Code
+
+	body = append(body, preCall...)
+
+	if tmpRetVar != "" {
+		body = append(
+			body,
+			jen.Id(tmpRetVar).Op(":=").Qual("C", cmd.Name).Call(callBlock...),
+			jen.Line(),
+		)
+	} else {
+		body = append(body, jen.Qual("C", cmd.Name).Call(callBlock...))
+	}
+
+	body = append(body, postCall...)
+
+	o.Func().Id(cmdName).Params(paramsBlock...).Add(retTypeBlock...).Block(
+		body...,
+	)
+
+	generatedCmds[cmd.Name] = struct{}{}
+
 }

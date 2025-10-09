@@ -35,7 +35,7 @@ func (p *RegistryParser) parseTypes() error {
 		cat := tok.Attrs["category"]
 
 		switch cat {
-		case "", "include", "define", "basetype", "handle":
+		case "", "include", "define", "basetype":
 			if _, err := p.d.FindEnd(tok.Name); err != nil {
 				return err
 			}
@@ -59,6 +59,10 @@ func (p *RegistryParser) parseTypes() error {
 		case "union":
 			// TODO
 			if _, err := p.d.FindEnd(tok.Name); err != nil {
+				return err
+			}
+		case "handle":
+			if err := p.parseHandleType(tok); err != nil {
 				return err
 			}
 		default:
@@ -220,6 +224,87 @@ func (p *RegistryParser) parseBitmaskType(start Token) error {
 	default:
 		panic("unhandled type: " + typeName)
 	}
+
+	return nil
+}
+
+func (p *RegistryParser) parseHandleType(start Token) error {
+	attrs := maps.Clone(start.Attrs)
+
+	if shouldIgnore(attrs) {
+		if _, err := p.d.FindEnd(start.Name); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	delete(attrs, "category")
+
+	if alias, ok := start.Attrs["alias"]; ok {
+		name, ok := start.Attrs["name"]
+		if !ok {
+			panic("missing name")
+		}
+
+		slog.Info("bitmask type", "name", name, "alias", alias)
+
+		if _, ok := p.reg.Aliases[name]; ok {
+			return fmt.Errorf("%w: alias %q already defined", ErrTokenMismatch, name)
+		}
+
+		p.reg.Aliases[name] = alias
+
+		if _, err := p.d.ExpectEnd("type", false); err != nil {
+			return fmt.Errorf("end missing: %v", err)
+		}
+
+		return nil
+	}
+
+	delete(attrs, "objtypeenum")
+	delete(attrs, "parent")
+
+	if len(attrs) > 0 {
+		return fmt.Errorf("%w: unprocessed attributes: %v", ErrTokenMismatch, attrs)
+	}
+
+	_, typeName, err := p.d.ExpectSimpleText("type", false)
+	if err != nil {
+		return fmt.Errorf("type missing: %v", err)
+	}
+
+	if _, err := p.d.ExpectChar("("); err != nil {
+		return fmt.Errorf("( missing: %v", err)
+	}
+
+	_, nameVal, err := p.d.ExpectSimpleText("name", false)
+	if err != nil {
+		return fmt.Errorf("name missing: %v", err)
+	}
+
+	if _, err := p.d.ExpectChar(")"); err != nil {
+		return fmt.Errorf(") missing: %v", err)
+	}
+
+	slog.Info("handle type", "type", typeName, "name", nameVal)
+
+	if _, err := p.d.ExpectEnd("type", false); err != nil {
+		return fmt.Errorf("end missing: %v", err)
+	}
+
+	if _, ok := p.reg.Types[nameVal]; ok {
+		return fmt.Errorf("%w: type %q already defined", ErrTokenMismatch, nameVal)
+	}
+
+	parsed := &Type{
+		Name:     nameVal,
+		Category: CategoryHandle,
+
+		NonDispatchable: typeName == "VK_DEFINE_NON_DISPATCHABLE_HANDLE",
+	}
+
+	p.reg.Types[nameVal] = parsed
 
 	return nil
 }

@@ -5,6 +5,8 @@ type Registry struct {
 	Types    map[string]*Type
 	Aliases  map[string]string
 	Features []*Feature
+
+	Commands map[string]*Command
 }
 
 type Category string
@@ -13,6 +15,7 @@ const (
 	CategoryEnum    Category = "enum"
 	CategoryBitmask Category = "bitmask"
 	CategoryStruct  Category = "struct"
+	CategoryHandle  Category = "handle"
 )
 
 type Type struct {
@@ -29,6 +32,9 @@ type Type struct {
 	// Struct fields
 	StructReadOnly bool
 	Fields         []StructField
+
+	// Handle fields
+	NonDispatchable bool
 }
 
 type FieldCategory string
@@ -91,4 +97,29 @@ type FeatureEnumExtension struct {
 
 	// type=value
 	Value string
+}
+
+type MemberCategory string
+
+const (
+	MemberCategoryDirect      MemberCategory = "direct"
+	MemberCategoryPointer     MemberCategory = "pointer"
+	MemberCategoryPointer2    MemberCategory = "pointer2"
+	MemberCategoryUnsupported MemberCategory = "unsupported"
+)
+
+type Command struct {
+	Name    string
+	Aliases []string
+	Feature string
+
+	ReturnType string
+
+	Members []CommandMember
+}
+
+type CommandMember struct {
+	Name     string
+	Type     string
+	Category MemberCategory
 }

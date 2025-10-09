@@ -27,9 +27,10 @@ func parse(path string) (*Registry, error) {
 	}
 
 	reg := &Registry{
-		Types:   make(map[string]*Type),
-		Aliases: make(map[string]string),
-		Enums:   make(map[string]*Enum),
+		Types:    make(map[string]*Type),
+		Aliases:  make(map[string]string),
+		Enums:    make(map[string]*Enum),
+		Commands: make(map[string]*Command),
 	}
 
 	rg := &RegistryParser{
@@ -65,13 +66,17 @@ func parse(path string) (*Registry, error) {
 			}
 		case "enums":
 			if err := rg.parseEnums(tok); err != nil {
-				return nil, fmt.Errorf("parsing types: %w", err)
+				return nil, fmt.Errorf("parsing enums: %w", err)
 			}
 		case "feature":
 			if err := rg.parseFeature(tok); err != nil {
-				return nil, fmt.Errorf("parsing types: %w", err)
+				return nil, fmt.Errorf("parsing features: %w", err)
 			}
-		case "commands", "extensions", "formats":
+		case "commands":
+			if err := rg.parseCommands(tok); err != nil {
+				return nil, fmt.Errorf("parsing commands: %w", err)
+			}
+		case "extensions", "formats":
 			if _, err := d.FindEnd(tok.Name); err != nil {
 				return nil, err
 			}
@@ -87,6 +92,12 @@ func parse(path string) (*Registry, error) {
 	for name, target := range reg.Aliases {
 		targetType, ok := reg.Types[target]
 		if !ok {
+			if cmd, ok := reg.Commands[target]; ok {
+				cmd.Aliases = append(cmd.Aliases, name)
+
+				break
+			}
+
 			panic(fmt.Sprintf("unknown type %s for alias %s", target, name))
 		}
 
@@ -105,6 +116,19 @@ func parse(path string) (*Registry, error) {
 			}
 
 			ty.Feature = feat.Version
+		}
+
+		for cmdName := range feat.Commands {
+			cmd, ok := reg.Commands[cmdName]
+			if !ok {
+				continue
+			}
+
+			if cmd.Feature != "" {
+				panic(cmdName + " already has feature")
+			}
+
+			cmd.Feature = feat.Version
 		}
 	}
 
