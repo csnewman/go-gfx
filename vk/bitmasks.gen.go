@@ -1,0 +1,1373 @@
+package vk
+
+import "fmt"
+
+// AccessFlags wraps the bitmask VkAccessFlags.
+type AccessFlags int32
+
+const (
+	// ACCESS_INDIRECT_COMMAND_READ_BIT wraps VK_ACCESS_INDIRECT_COMMAND_READ_BIT.
+	ACCESS_INDIRECT_COMMAND_READ_BIT AccessFlags = 1 << 0
+	// ACCESS_INDEX_READ_BIT wraps VK_ACCESS_INDEX_READ_BIT.
+	ACCESS_INDEX_READ_BIT AccessFlags = 1 << 1
+	// ACCESS_VERTEX_ATTRIBUTE_READ_BIT wraps VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT.
+	ACCESS_VERTEX_ATTRIBUTE_READ_BIT AccessFlags = 1 << 2
+	// ACCESS_UNIFORM_READ_BIT wraps VK_ACCESS_UNIFORM_READ_BIT.
+	ACCESS_UNIFORM_READ_BIT AccessFlags = 1 << 3
+	// ACCESS_INPUT_ATTACHMENT_READ_BIT wraps VK_ACCESS_INPUT_ATTACHMENT_READ_BIT.
+	ACCESS_INPUT_ATTACHMENT_READ_BIT AccessFlags = 1 << 4
+	// ACCESS_SHADER_READ_BIT wraps VK_ACCESS_SHADER_READ_BIT.
+	ACCESS_SHADER_READ_BIT AccessFlags = 1 << 5
+	// ACCESS_SHADER_WRITE_BIT wraps VK_ACCESS_SHADER_WRITE_BIT.
+	ACCESS_SHADER_WRITE_BIT AccessFlags = 1 << 6
+	// ACCESS_COLOR_ATTACHMENT_READ_BIT wraps VK_ACCESS_COLOR_ATTACHMENT_READ_BIT.
+	ACCESS_COLOR_ATTACHMENT_READ_BIT AccessFlags = 1 << 7
+	// ACCESS_COLOR_ATTACHMENT_WRITE_BIT wraps VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT.
+	ACCESS_COLOR_ATTACHMENT_WRITE_BIT AccessFlags = 1 << 8
+	// ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT wraps VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT.
+	ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT AccessFlags = 1 << 9
+	// ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT wraps VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT.
+	ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT AccessFlags = 1 << 10
+	// ACCESS_TRANSFER_READ_BIT wraps VK_ACCESS_TRANSFER_READ_BIT.
+	ACCESS_TRANSFER_READ_BIT AccessFlags = 1 << 11
+	// ACCESS_TRANSFER_WRITE_BIT wraps VK_ACCESS_TRANSFER_WRITE_BIT.
+	ACCESS_TRANSFER_WRITE_BIT AccessFlags = 1 << 12
+	// ACCESS_HOST_READ_BIT wraps VK_ACCESS_HOST_READ_BIT.
+	ACCESS_HOST_READ_BIT AccessFlags = 1 << 13
+	// ACCESS_HOST_WRITE_BIT wraps VK_ACCESS_HOST_WRITE_BIT.
+	ACCESS_HOST_WRITE_BIT AccessFlags = 1 << 14
+	// ACCESS_MEMORY_READ_BIT wraps VK_ACCESS_MEMORY_READ_BIT.
+	ACCESS_MEMORY_READ_BIT AccessFlags = 1 << 15
+	// ACCESS_MEMORY_WRITE_BIT wraps VK_ACCESS_MEMORY_WRITE_BIT.
+	ACCESS_MEMORY_WRITE_BIT AccessFlags = 1 << 16
+)
+
+func (e AccessFlags) String() string {
+	return fmt.Sprintf("VkAccessFlags(%b)", e)
+}
+
+// AccessFlags2 wraps the bitmask VkAccessFlags2.
+type AccessFlags2 int64
+
+const (
+	// ACCESS_2_NONE wraps VK_ACCESS_2_NONE.
+	ACCESS_2_NONE AccessFlags2 = 0
+	// ACCESS_2_INDIRECT_COMMAND_READ_BIT wraps VK_ACCESS_2_INDIRECT_COMMAND_READ_BIT.
+	ACCESS_2_INDIRECT_COMMAND_READ_BIT AccessFlags2 = 1 << 0
+	// ACCESS_2_INDEX_READ_BIT wraps VK_ACCESS_2_INDEX_READ_BIT.
+	ACCESS_2_INDEX_READ_BIT AccessFlags2 = 1 << 1
+	// ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT wraps VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT.
+	ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT AccessFlags2 = 1 << 2
+	// ACCESS_2_UNIFORM_READ_BIT wraps VK_ACCESS_2_UNIFORM_READ_BIT.
+	ACCESS_2_UNIFORM_READ_BIT AccessFlags2 = 1 << 3
+	// ACCESS_2_INPUT_ATTACHMENT_READ_BIT wraps VK_ACCESS_2_INPUT_ATTACHMENT_READ_BIT.
+	ACCESS_2_INPUT_ATTACHMENT_READ_BIT AccessFlags2 = 1 << 4
+	// ACCESS_2_SHADER_READ_BIT wraps VK_ACCESS_2_SHADER_READ_BIT.
+	ACCESS_2_SHADER_READ_BIT AccessFlags2 = 1 << 5
+	// ACCESS_2_SHADER_WRITE_BIT wraps VK_ACCESS_2_SHADER_WRITE_BIT.
+	ACCESS_2_SHADER_WRITE_BIT AccessFlags2 = 1 << 6
+	// ACCESS_2_COLOR_ATTACHMENT_READ_BIT wraps VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT.
+	ACCESS_2_COLOR_ATTACHMENT_READ_BIT AccessFlags2 = 1 << 7
+	// ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT wraps VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT.
+	ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT AccessFlags2 = 1 << 8
+	// ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT wraps VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT.
+	ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT AccessFlags2 = 1 << 9
+	// ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT wraps VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT.
+	ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT AccessFlags2 = 1 << 10
+	// ACCESS_2_TRANSFER_READ_BIT wraps VK_ACCESS_2_TRANSFER_READ_BIT.
+	ACCESS_2_TRANSFER_READ_BIT AccessFlags2 = 1 << 11
+	// ACCESS_2_TRANSFER_WRITE_BIT wraps VK_ACCESS_2_TRANSFER_WRITE_BIT.
+	ACCESS_2_TRANSFER_WRITE_BIT AccessFlags2 = 1 << 12
+	// ACCESS_2_HOST_READ_BIT wraps VK_ACCESS_2_HOST_READ_BIT.
+	ACCESS_2_HOST_READ_BIT AccessFlags2 = 1 << 13
+	// ACCESS_2_HOST_WRITE_BIT wraps VK_ACCESS_2_HOST_WRITE_BIT.
+	ACCESS_2_HOST_WRITE_BIT AccessFlags2 = 1 << 14
+	// ACCESS_2_MEMORY_READ_BIT wraps VK_ACCESS_2_MEMORY_READ_BIT.
+	ACCESS_2_MEMORY_READ_BIT AccessFlags2 = 1 << 15
+	// ACCESS_2_MEMORY_WRITE_BIT wraps VK_ACCESS_2_MEMORY_WRITE_BIT.
+	ACCESS_2_MEMORY_WRITE_BIT AccessFlags2 = 1 << 16
+	// ACCESS_2_SHADER_SAMPLED_READ_BIT wraps VK_ACCESS_2_SHADER_SAMPLED_READ_BIT.
+	ACCESS_2_SHADER_SAMPLED_READ_BIT AccessFlags2 = 1 << 32
+	// ACCESS_2_SHADER_STORAGE_READ_BIT wraps VK_ACCESS_2_SHADER_STORAGE_READ_BIT.
+	ACCESS_2_SHADER_STORAGE_READ_BIT AccessFlags2 = 1 << 33
+	// ACCESS_2_SHADER_STORAGE_WRITE_BIT wraps VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT.
+	ACCESS_2_SHADER_STORAGE_WRITE_BIT AccessFlags2 = 1 << 34
+)
+
+func (e AccessFlags2) String() string {
+	return fmt.Sprintf("VkAccessFlags2(%b)", e)
+}
+
+// AttachmentDescriptionFlags wraps the bitmask VkAttachmentDescriptionFlags.
+type AttachmentDescriptionFlags int32
+
+const (
+	// ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT wraps VK_ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT.
+	ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT AttachmentDescriptionFlags = 1 << 0
+)
+
+func (e AttachmentDescriptionFlags) String() string {
+	return fmt.Sprintf("VkAttachmentDescriptionFlags(%b)", e)
+}
+
+// BufferCreateFlags wraps the bitmask VkBufferCreateFlags.
+type BufferCreateFlags int32
+
+const (
+	// BUFFER_CREATE_SPARSE_BINDING_BIT wraps VK_BUFFER_CREATE_SPARSE_BINDING_BIT.
+	BUFFER_CREATE_SPARSE_BINDING_BIT BufferCreateFlags = 1 << 0
+	// BUFFER_CREATE_SPARSE_RESIDENCY_BIT wraps VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT.
+	BUFFER_CREATE_SPARSE_RESIDENCY_BIT BufferCreateFlags = 1 << 1
+	// BUFFER_CREATE_SPARSE_ALIASED_BIT wraps VK_BUFFER_CREATE_SPARSE_ALIASED_BIT.
+	BUFFER_CREATE_SPARSE_ALIASED_BIT BufferCreateFlags = 1 << 2
+)
+
+func (e BufferCreateFlags) String() string {
+	return fmt.Sprintf("VkBufferCreateFlags(%b)", e)
+}
+
+// BufferUsageFlags wraps the bitmask VkBufferUsageFlags.
+type BufferUsageFlags int32
+
+const (
+	// BUFFER_USAGE_TRANSFER_SRC_BIT wraps VK_BUFFER_USAGE_TRANSFER_SRC_BIT.
+	BUFFER_USAGE_TRANSFER_SRC_BIT BufferUsageFlags = 1 << 0
+	// BUFFER_USAGE_TRANSFER_DST_BIT wraps VK_BUFFER_USAGE_TRANSFER_DST_BIT.
+	BUFFER_USAGE_TRANSFER_DST_BIT BufferUsageFlags = 1 << 1
+	// BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT wraps VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT.
+	BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT BufferUsageFlags = 1 << 2
+	// BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT wraps VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT.
+	BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT BufferUsageFlags = 1 << 3
+	// BUFFER_USAGE_UNIFORM_BUFFER_BIT wraps VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT.
+	BUFFER_USAGE_UNIFORM_BUFFER_BIT BufferUsageFlags = 1 << 4
+	// BUFFER_USAGE_STORAGE_BUFFER_BIT wraps VK_BUFFER_USAGE_STORAGE_BUFFER_BIT.
+	BUFFER_USAGE_STORAGE_BUFFER_BIT BufferUsageFlags = 1 << 5
+	// BUFFER_USAGE_INDEX_BUFFER_BIT wraps VK_BUFFER_USAGE_INDEX_BUFFER_BIT.
+	BUFFER_USAGE_INDEX_BUFFER_BIT BufferUsageFlags = 1 << 6
+	// BUFFER_USAGE_VERTEX_BUFFER_BIT wraps VK_BUFFER_USAGE_VERTEX_BUFFER_BIT.
+	BUFFER_USAGE_VERTEX_BUFFER_BIT BufferUsageFlags = 1 << 7
+	// BUFFER_USAGE_INDIRECT_BUFFER_BIT wraps VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT.
+	BUFFER_USAGE_INDIRECT_BUFFER_BIT BufferUsageFlags = 1 << 8
+)
+
+func (e BufferUsageFlags) String() string {
+	return fmt.Sprintf("VkBufferUsageFlags(%b)", e)
+}
+
+// BufferUsageFlags2 wraps the bitmask VkBufferUsageFlags2.
+type BufferUsageFlags2 int64
+
+const (
+	// BUFFER_USAGE_2_TRANSFER_SRC_BIT wraps VK_BUFFER_USAGE_2_TRANSFER_SRC_BIT.
+	BUFFER_USAGE_2_TRANSFER_SRC_BIT BufferUsageFlags2 = 1 << 0
+	// BUFFER_USAGE_2_TRANSFER_DST_BIT wraps VK_BUFFER_USAGE_2_TRANSFER_DST_BIT.
+	BUFFER_USAGE_2_TRANSFER_DST_BIT BufferUsageFlags2 = 1 << 1
+	// BUFFER_USAGE_2_UNIFORM_TEXEL_BUFFER_BIT wraps VK_BUFFER_USAGE_2_UNIFORM_TEXEL_BUFFER_BIT.
+	BUFFER_USAGE_2_UNIFORM_TEXEL_BUFFER_BIT BufferUsageFlags2 = 1 << 2
+	// BUFFER_USAGE_2_STORAGE_TEXEL_BUFFER_BIT wraps VK_BUFFER_USAGE_2_STORAGE_TEXEL_BUFFER_BIT.
+	BUFFER_USAGE_2_STORAGE_TEXEL_BUFFER_BIT BufferUsageFlags2 = 1 << 3
+	// BUFFER_USAGE_2_UNIFORM_BUFFER_BIT wraps VK_BUFFER_USAGE_2_UNIFORM_BUFFER_BIT.
+	BUFFER_USAGE_2_UNIFORM_BUFFER_BIT BufferUsageFlags2 = 1 << 4
+	// BUFFER_USAGE_2_STORAGE_BUFFER_BIT wraps VK_BUFFER_USAGE_2_STORAGE_BUFFER_BIT.
+	BUFFER_USAGE_2_STORAGE_BUFFER_BIT BufferUsageFlags2 = 1 << 5
+	// BUFFER_USAGE_2_INDEX_BUFFER_BIT wraps VK_BUFFER_USAGE_2_INDEX_BUFFER_BIT.
+	BUFFER_USAGE_2_INDEX_BUFFER_BIT BufferUsageFlags2 = 1 << 6
+	// BUFFER_USAGE_2_VERTEX_BUFFER_BIT wraps VK_BUFFER_USAGE_2_VERTEX_BUFFER_BIT.
+	BUFFER_USAGE_2_VERTEX_BUFFER_BIT BufferUsageFlags2 = 1 << 7
+	// BUFFER_USAGE_2_INDIRECT_BUFFER_BIT wraps VK_BUFFER_USAGE_2_INDIRECT_BUFFER_BIT.
+	BUFFER_USAGE_2_INDIRECT_BUFFER_BIT BufferUsageFlags2 = 1 << 8
+)
+
+func (e BufferUsageFlags2) String() string {
+	return fmt.Sprintf("VkBufferUsageFlags2(%b)", e)
+}
+
+// BufferViewCreateFlags wraps the bitmask VkBufferViewCreateFlags.
+type BufferViewCreateFlags int32
+
+func (e BufferViewCreateFlags) String() string {
+	return fmt.Sprintf("VkBufferViewCreateFlags(%b)", e)
+}
+
+// ColorComponentFlags wraps the bitmask VkColorComponentFlags.
+type ColorComponentFlags int32
+
+const (
+	// COLOR_COMPONENT_R_BIT wraps VK_COLOR_COMPONENT_R_BIT.
+	COLOR_COMPONENT_R_BIT ColorComponentFlags = 1 << 0
+	// COLOR_COMPONENT_G_BIT wraps VK_COLOR_COMPONENT_G_BIT.
+	COLOR_COMPONENT_G_BIT ColorComponentFlags = 1 << 1
+	// COLOR_COMPONENT_B_BIT wraps VK_COLOR_COMPONENT_B_BIT.
+	COLOR_COMPONENT_B_BIT ColorComponentFlags = 1 << 2
+	// COLOR_COMPONENT_A_BIT wraps VK_COLOR_COMPONENT_A_BIT.
+	COLOR_COMPONENT_A_BIT ColorComponentFlags = 1 << 3
+)
+
+func (e ColorComponentFlags) String() string {
+	return fmt.Sprintf("VkColorComponentFlags(%b)", e)
+}
+
+// CommandBufferResetFlags wraps the bitmask VkCommandBufferResetFlags.
+type CommandBufferResetFlags int32
+
+const (
+	// COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT wraps VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT.
+	COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT CommandBufferResetFlags = 1 << 0
+)
+
+func (e CommandBufferResetFlags) String() string {
+	return fmt.Sprintf("VkCommandBufferResetFlags(%b)", e)
+}
+
+// CommandBufferUsageFlags wraps the bitmask VkCommandBufferUsageFlags.
+type CommandBufferUsageFlags int32
+
+const (
+	// COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT wraps VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT.
+	COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT CommandBufferUsageFlags = 1 << 0
+	// COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT wraps VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT.
+	COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT CommandBufferUsageFlags = 1 << 1
+	// COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT wraps VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT.
+	COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT CommandBufferUsageFlags = 1 << 2
+)
+
+func (e CommandBufferUsageFlags) String() string {
+	return fmt.Sprintf("VkCommandBufferUsageFlags(%b)", e)
+}
+
+// CommandPoolCreateFlags wraps the bitmask VkCommandPoolCreateFlags.
+type CommandPoolCreateFlags int32
+
+const (
+	// COMMAND_POOL_CREATE_TRANSIENT_BIT wraps VK_COMMAND_POOL_CREATE_TRANSIENT_BIT.
+	COMMAND_POOL_CREATE_TRANSIENT_BIT CommandPoolCreateFlags = 1 << 0
+	// COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT wraps VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT.
+	COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT CommandPoolCreateFlags = 1 << 1
+)
+
+func (e CommandPoolCreateFlags) String() string {
+	return fmt.Sprintf("VkCommandPoolCreateFlags(%b)", e)
+}
+
+// CommandPoolResetFlags wraps the bitmask VkCommandPoolResetFlags.
+type CommandPoolResetFlags int32
+
+const (
+	// COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT wraps VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT.
+	COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT CommandPoolResetFlags = 1 << 0
+)
+
+func (e CommandPoolResetFlags) String() string {
+	return fmt.Sprintf("VkCommandPoolResetFlags(%b)", e)
+}
+
+// CommandPoolTrimFlags wraps the bitmask VkCommandPoolTrimFlags.
+type CommandPoolTrimFlags int32
+
+func (e CommandPoolTrimFlags) String() string {
+	return fmt.Sprintf("VkCommandPoolTrimFlags(%b)", e)
+}
+
+// CullModeFlags wraps the bitmask VkCullModeFlags.
+type CullModeFlags int32
+
+const (
+	// CULL_MODE_NONE wraps VK_CULL_MODE_NONE.
+	CULL_MODE_NONE CullModeFlags = 0
+	// CULL_MODE_FRONT_BIT wraps VK_CULL_MODE_FRONT_BIT.
+	CULL_MODE_FRONT_BIT CullModeFlags = 1 << 0
+	// CULL_MODE_BACK_BIT wraps VK_CULL_MODE_BACK_BIT.
+	CULL_MODE_BACK_BIT CullModeFlags = 1 << 1
+	// CULL_MODE_FRONT_AND_BACK wraps VK_CULL_MODE_FRONT_AND_BACK.
+	CULL_MODE_FRONT_AND_BACK CullModeFlags = 0x00000003
+)
+
+func (e CullModeFlags) String() string {
+	return fmt.Sprintf("VkCullModeFlags(%b)", e)
+}
+
+// DependencyFlags wraps the bitmask VkDependencyFlags.
+type DependencyFlags int32
+
+const (
+	// DEPENDENCY_BY_REGION_BIT wraps VK_DEPENDENCY_BY_REGION_BIT.
+	DEPENDENCY_BY_REGION_BIT DependencyFlags = 1 << 0
+)
+
+func (e DependencyFlags) String() string {
+	return fmt.Sprintf("VkDependencyFlags(%b)", e)
+}
+
+// DescriptorBindingFlags wraps the bitmask VkDescriptorBindingFlags.
+type DescriptorBindingFlags int32
+
+const (
+	// DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT wraps VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT.
+	DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT DescriptorBindingFlags = 1 << 0
+	// DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT wraps VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT.
+	DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT DescriptorBindingFlags = 1 << 1
+	// DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT wraps VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT.
+	DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT DescriptorBindingFlags = 1 << 2
+	// DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT wraps VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT.
+	DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT DescriptorBindingFlags = 1 << 3
+)
+
+func (e DescriptorBindingFlags) String() string {
+	return fmt.Sprintf("VkDescriptorBindingFlags(%b)", e)
+}
+
+// DescriptorPoolCreateFlags wraps the bitmask VkDescriptorPoolCreateFlags.
+type DescriptorPoolCreateFlags int32
+
+const (
+	// DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT wraps VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT.
+	DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT DescriptorPoolCreateFlags = 1 << 0
+)
+
+func (e DescriptorPoolCreateFlags) String() string {
+	return fmt.Sprintf("VkDescriptorPoolCreateFlags(%b)", e)
+}
+
+// DescriptorPoolResetFlags wraps the bitmask VkDescriptorPoolResetFlags.
+type DescriptorPoolResetFlags int32
+
+func (e DescriptorPoolResetFlags) String() string {
+	return fmt.Sprintf("VkDescriptorPoolResetFlags(%b)", e)
+}
+
+// DescriptorSetLayoutCreateFlags wraps the bitmask VkDescriptorSetLayoutCreateFlags.
+type DescriptorSetLayoutCreateFlags int32
+
+func (e DescriptorSetLayoutCreateFlags) String() string {
+	return fmt.Sprintf("VkDescriptorSetLayoutCreateFlags(%b)", e)
+}
+
+// DescriptorUpdateTemplateCreateFlags wraps the bitmask VkDescriptorUpdateTemplateCreateFlags.
+type DescriptorUpdateTemplateCreateFlags int32
+
+func (e DescriptorUpdateTemplateCreateFlags) String() string {
+	return fmt.Sprintf("VkDescriptorUpdateTemplateCreateFlags(%b)", e)
+}
+
+// DeviceCreateFlags wraps the bitmask VkDeviceCreateFlags.
+type DeviceCreateFlags int32
+
+func (e DeviceCreateFlags) String() string {
+	return fmt.Sprintf("VkDeviceCreateFlags(%b)", e)
+}
+
+// DeviceQueueCreateFlags wraps the bitmask VkDeviceQueueCreateFlags.
+type DeviceQueueCreateFlags int32
+
+func (e DeviceQueueCreateFlags) String() string {
+	return fmt.Sprintf("VkDeviceQueueCreateFlags(%b)", e)
+}
+
+// EventCreateFlags wraps the bitmask VkEventCreateFlags.
+type EventCreateFlags int32
+
+func (e EventCreateFlags) String() string {
+	return fmt.Sprintf("VkEventCreateFlags(%b)", e)
+}
+
+// ExternalFenceFeatureFlags wraps the bitmask VkExternalFenceFeatureFlags.
+type ExternalFenceFeatureFlags int32
+
+const (
+	// EXTERNAL_FENCE_FEATURE_EXPORTABLE_BIT wraps VK_EXTERNAL_FENCE_FEATURE_EXPORTABLE_BIT.
+	EXTERNAL_FENCE_FEATURE_EXPORTABLE_BIT ExternalFenceFeatureFlags = 1 << 0
+	// EXTERNAL_FENCE_FEATURE_IMPORTABLE_BIT wraps VK_EXTERNAL_FENCE_FEATURE_IMPORTABLE_BIT.
+	EXTERNAL_FENCE_FEATURE_IMPORTABLE_BIT ExternalFenceFeatureFlags = 1 << 1
+)
+
+func (e ExternalFenceFeatureFlags) String() string {
+	return fmt.Sprintf("VkExternalFenceFeatureFlags(%b)", e)
+}
+
+// ExternalFenceHandleTypeFlags wraps the bitmask VkExternalFenceHandleTypeFlags.
+type ExternalFenceHandleTypeFlags int32
+
+const (
+	// EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT wraps VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT.
+	EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT ExternalFenceHandleTypeFlags = 1 << 0
+	// EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_BIT wraps VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_BIT.
+	EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_BIT ExternalFenceHandleTypeFlags = 1 << 1
+	// EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT wraps VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT.
+	EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT ExternalFenceHandleTypeFlags = 1 << 2
+	// EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT wraps VK_EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT.
+	EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT ExternalFenceHandleTypeFlags = 1 << 3
+)
+
+func (e ExternalFenceHandleTypeFlags) String() string {
+	return fmt.Sprintf("VkExternalFenceHandleTypeFlags(%b)", e)
+}
+
+// ExternalMemoryFeatureFlags wraps the bitmask VkExternalMemoryFeatureFlags.
+type ExternalMemoryFeatureFlags int32
+
+const (
+	// EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT wraps VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT.
+	EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT ExternalMemoryFeatureFlags = 1 << 0
+	// EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT wraps VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT.
+	EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT ExternalMemoryFeatureFlags = 1 << 1
+	// EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT wraps VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT.
+	EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT ExternalMemoryFeatureFlags = 1 << 2
+)
+
+func (e ExternalMemoryFeatureFlags) String() string {
+	return fmt.Sprintf("VkExternalMemoryFeatureFlags(%b)", e)
+}
+
+// ExternalMemoryHandleTypeFlags wraps the bitmask VkExternalMemoryHandleTypeFlags.
+type ExternalMemoryHandleTypeFlags int32
+
+const (
+	// EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT ExternalMemoryHandleTypeFlags = 1 << 0
+	// EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT ExternalMemoryHandleTypeFlags = 1 << 1
+	// EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT ExternalMemoryHandleTypeFlags = 1 << 2
+	// EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT ExternalMemoryHandleTypeFlags = 1 << 3
+	// EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_KMT_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_KMT_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_KMT_BIT ExternalMemoryHandleTypeFlags = 1 << 4
+	// EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_HEAP_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_HEAP_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_HEAP_BIT ExternalMemoryHandleTypeFlags = 1 << 5
+	// EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE_BIT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE_BIT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE_BIT ExternalMemoryHandleTypeFlags = 1 << 6
+)
+
+func (e ExternalMemoryHandleTypeFlags) String() string {
+	return fmt.Sprintf("VkExternalMemoryHandleTypeFlags(%b)", e)
+}
+
+// ExternalSemaphoreFeatureFlags wraps the bitmask VkExternalSemaphoreFeatureFlags.
+type ExternalSemaphoreFeatureFlags int32
+
+const (
+	// EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT wraps VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT.
+	EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT ExternalSemaphoreFeatureFlags = 1 << 0
+	// EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT wraps VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT.
+	EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT ExternalSemaphoreFeatureFlags = 1 << 1
+)
+
+func (e ExternalSemaphoreFeatureFlags) String() string {
+	return fmt.Sprintf("VkExternalSemaphoreFeatureFlags(%b)", e)
+}
+
+// ExternalSemaphoreHandleTypeFlags wraps the bitmask VkExternalSemaphoreHandleTypeFlags.
+type ExternalSemaphoreHandleTypeFlags int32
+
+const (
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT ExternalSemaphoreHandleTypeFlags = 1 << 0
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT ExternalSemaphoreHandleTypeFlags = 1 << 1
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT ExternalSemaphoreHandleTypeFlags = 1 << 2
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT ExternalSemaphoreHandleTypeFlags = 1 << 3
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D11_FENCE_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D11_FENCE_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D11_FENCE_BIT ExternalSemaphoreHandleTypeFlags = EXTERNAL_SEMAPHORE_HANDLE_TYPE_D3D12_FENCE_BIT
+	// EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT wraps VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT.
+	EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT ExternalSemaphoreHandleTypeFlags = 1 << 4
+)
+
+func (e ExternalSemaphoreHandleTypeFlags) String() string {
+	return fmt.Sprintf("VkExternalSemaphoreHandleTypeFlags(%b)", e)
+}
+
+// FenceCreateFlags wraps the bitmask VkFenceCreateFlags.
+type FenceCreateFlags int32
+
+const (
+	// FENCE_CREATE_SIGNALED_BIT wraps VK_FENCE_CREATE_SIGNALED_BIT.
+	FENCE_CREATE_SIGNALED_BIT FenceCreateFlags = 1 << 0
+)
+
+func (e FenceCreateFlags) String() string {
+	return fmt.Sprintf("VkFenceCreateFlags(%b)", e)
+}
+
+// FenceImportFlags wraps the bitmask VkFenceImportFlags.
+type FenceImportFlags int32
+
+const (
+	// FENCE_IMPORT_TEMPORARY_BIT wraps VK_FENCE_IMPORT_TEMPORARY_BIT.
+	FENCE_IMPORT_TEMPORARY_BIT FenceImportFlags = 1 << 0
+)
+
+func (e FenceImportFlags) String() string {
+	return fmt.Sprintf("VkFenceImportFlags(%b)", e)
+}
+
+// FormatFeatureFlags wraps the bitmask VkFormatFeatureFlags.
+type FormatFeatureFlags int32
+
+const (
+	// FORMAT_FEATURE_SAMPLED_IMAGE_BIT wraps VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT.
+	FORMAT_FEATURE_SAMPLED_IMAGE_BIT FormatFeatureFlags = 1 << 0
+	// FORMAT_FEATURE_STORAGE_IMAGE_BIT wraps VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT.
+	FORMAT_FEATURE_STORAGE_IMAGE_BIT FormatFeatureFlags = 1 << 1
+	// FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT wraps VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT.
+	FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT FormatFeatureFlags = 1 << 2
+	// FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT wraps VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT.
+	FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT FormatFeatureFlags = 1 << 3
+	// FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT wraps VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT.
+	FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT FormatFeatureFlags = 1 << 4
+	// FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT wraps VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT.
+	FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT FormatFeatureFlags = 1 << 5
+	// FORMAT_FEATURE_VERTEX_BUFFER_BIT wraps VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT.
+	FORMAT_FEATURE_VERTEX_BUFFER_BIT FormatFeatureFlags = 1 << 6
+	// FORMAT_FEATURE_COLOR_ATTACHMENT_BIT wraps VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT.
+	FORMAT_FEATURE_COLOR_ATTACHMENT_BIT FormatFeatureFlags = 1 << 7
+	// FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT wraps VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT.
+	FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT FormatFeatureFlags = 1 << 8
+	// FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT wraps VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT.
+	FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT FormatFeatureFlags = 1 << 9
+	// FORMAT_FEATURE_BLIT_SRC_BIT wraps VK_FORMAT_FEATURE_BLIT_SRC_BIT.
+	FORMAT_FEATURE_BLIT_SRC_BIT FormatFeatureFlags = 1 << 10
+	// FORMAT_FEATURE_BLIT_DST_BIT wraps VK_FORMAT_FEATURE_BLIT_DST_BIT.
+	FORMAT_FEATURE_BLIT_DST_BIT FormatFeatureFlags = 1 << 11
+	// FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT wraps VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT.
+	FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT FormatFeatureFlags = 1 << 12
+)
+
+func (e FormatFeatureFlags) String() string {
+	return fmt.Sprintf("VkFormatFeatureFlags(%b)", e)
+}
+
+// FormatFeatureFlags2 wraps the bitmask VkFormatFeatureFlags2.
+type FormatFeatureFlags2 int64
+
+const (
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT FormatFeatureFlags2 = 1 << 0
+	// FORMAT_FEATURE_2_STORAGE_IMAGE_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_IMAGE_BIT.
+	FORMAT_FEATURE_2_STORAGE_IMAGE_BIT FormatFeatureFlags2 = 1 << 1
+	// FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT.
+	FORMAT_FEATURE_2_STORAGE_IMAGE_ATOMIC_BIT FormatFeatureFlags2 = 1 << 2
+	// FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT wraps VK_FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT.
+	FORMAT_FEATURE_2_UNIFORM_TEXEL_BUFFER_BIT FormatFeatureFlags2 = 1 << 3
+	// FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT.
+	FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_BIT FormatFeatureFlags2 = 1 << 4
+	// FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT.
+	FORMAT_FEATURE_2_STORAGE_TEXEL_BUFFER_ATOMIC_BIT FormatFeatureFlags2 = 1 << 5
+	// FORMAT_FEATURE_2_VERTEX_BUFFER_BIT wraps VK_FORMAT_FEATURE_2_VERTEX_BUFFER_BIT.
+	FORMAT_FEATURE_2_VERTEX_BUFFER_BIT FormatFeatureFlags2 = 1 << 6
+	// FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT wraps VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT.
+	FORMAT_FEATURE_2_COLOR_ATTACHMENT_BIT FormatFeatureFlags2 = 1 << 7
+	// FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT wraps VK_FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT.
+	FORMAT_FEATURE_2_COLOR_ATTACHMENT_BLEND_BIT FormatFeatureFlags2 = 1 << 8
+	// FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT wraps VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT.
+	FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT FormatFeatureFlags2 = 1 << 9
+	// FORMAT_FEATURE_2_BLIT_SRC_BIT wraps VK_FORMAT_FEATURE_2_BLIT_SRC_BIT.
+	FORMAT_FEATURE_2_BLIT_SRC_BIT FormatFeatureFlags2 = 1 << 10
+	// FORMAT_FEATURE_2_BLIT_DST_BIT wraps VK_FORMAT_FEATURE_2_BLIT_DST_BIT.
+	FORMAT_FEATURE_2_BLIT_DST_BIT FormatFeatureFlags2 = 1 << 11
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_LINEAR_BIT FormatFeatureFlags2 = 1 << 12
+	// FORMAT_FEATURE_2_TRANSFER_SRC_BIT wraps VK_FORMAT_FEATURE_2_TRANSFER_SRC_BIT.
+	FORMAT_FEATURE_2_TRANSFER_SRC_BIT FormatFeatureFlags2 = 1 << 14
+	// FORMAT_FEATURE_2_TRANSFER_DST_BIT wraps VK_FORMAT_FEATURE_2_TRANSFER_DST_BIT.
+	FORMAT_FEATURE_2_TRANSFER_DST_BIT FormatFeatureFlags2 = 1 << 15
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_FILTER_MINMAX_BIT FormatFeatureFlags2 = 1 << 16
+	// FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT wraps VK_FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT.
+	FORMAT_FEATURE_2_MIDPOINT_CHROMA_SAMPLES_BIT FormatFeatureFlags2 = 1 << 17
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_LINEAR_FILTER_BIT FormatFeatureFlags2 = 1 << 18
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_SEPARATE_RECONSTRUCTION_FILTER_BIT FormatFeatureFlags2 = 1 << 19
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_BIT FormatFeatureFlags2 = 1 << 20
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_YCBCR_CONVERSION_CHROMA_RECONSTRUCTION_EXPLICIT_FORCEABLE_BIT FormatFeatureFlags2 = 1 << 21
+	// FORMAT_FEATURE_2_DISJOINT_BIT wraps VK_FORMAT_FEATURE_2_DISJOINT_BIT.
+	FORMAT_FEATURE_2_DISJOINT_BIT FormatFeatureFlags2 = 1 << 22
+	// FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT wraps VK_FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT.
+	FORMAT_FEATURE_2_COSITED_CHROMA_SAMPLES_BIT FormatFeatureFlags2 = 1 << 23
+	// FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT.
+	FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT FormatFeatureFlags2 = 1 << 31
+	// FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT wraps VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT.
+	FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT FormatFeatureFlags2 = 1 << 32
+	// FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT wraps VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT.
+	FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT FormatFeatureFlags2 = 1 << 33
+)
+
+func (e FormatFeatureFlags2) String() string {
+	return fmt.Sprintf("VkFormatFeatureFlags2(%b)", e)
+}
+
+// FramebufferCreateFlags wraps the bitmask VkFramebufferCreateFlags.
+type FramebufferCreateFlags int32
+
+func (e FramebufferCreateFlags) String() string {
+	return fmt.Sprintf("VkFramebufferCreateFlags(%b)", e)
+}
+
+// HostImageCopyFlags wraps the bitmask VkHostImageCopyFlags.
+type HostImageCopyFlags int32
+
+const (
+	// HOST_IMAGE_COPY_MEMCPY_BIT wraps VK_HOST_IMAGE_COPY_MEMCPY_BIT.
+	HOST_IMAGE_COPY_MEMCPY_BIT HostImageCopyFlags = 1 << 0
+	// HOST_IMAGE_COPY_MEMCPY wraps VK_HOST_IMAGE_COPY_MEMCPY.
+	//
+	// Deprecated: Use HOST_IMAGE_COPY_MEMCPY_BIT instead.
+	HOST_IMAGE_COPY_MEMCPY HostImageCopyFlags = HOST_IMAGE_COPY_MEMCPY_BIT
+)
+
+func (e HostImageCopyFlags) String() string {
+	return fmt.Sprintf("VkHostImageCopyFlags(%b)", e)
+}
+
+// ImageAspectFlags wraps the bitmask VkImageAspectFlags.
+type ImageAspectFlags int32
+
+const (
+	// IMAGE_ASPECT_COLOR_BIT wraps VK_IMAGE_ASPECT_COLOR_BIT.
+	IMAGE_ASPECT_COLOR_BIT ImageAspectFlags = 1 << 0
+	// IMAGE_ASPECT_DEPTH_BIT wraps VK_IMAGE_ASPECT_DEPTH_BIT.
+	IMAGE_ASPECT_DEPTH_BIT ImageAspectFlags = 1 << 1
+	// IMAGE_ASPECT_STENCIL_BIT wraps VK_IMAGE_ASPECT_STENCIL_BIT.
+	IMAGE_ASPECT_STENCIL_BIT ImageAspectFlags = 1 << 2
+	// IMAGE_ASPECT_METADATA_BIT wraps VK_IMAGE_ASPECT_METADATA_BIT.
+	IMAGE_ASPECT_METADATA_BIT ImageAspectFlags = 1 << 3
+)
+
+func (e ImageAspectFlags) String() string {
+	return fmt.Sprintf("VkImageAspectFlags(%b)", e)
+}
+
+// ImageCreateFlags wraps the bitmask VkImageCreateFlags.
+type ImageCreateFlags int32
+
+const (
+	// IMAGE_CREATE_SPARSE_BINDING_BIT wraps VK_IMAGE_CREATE_SPARSE_BINDING_BIT.
+	IMAGE_CREATE_SPARSE_BINDING_BIT ImageCreateFlags = 1 << 0
+	// IMAGE_CREATE_SPARSE_RESIDENCY_BIT wraps VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT.
+	IMAGE_CREATE_SPARSE_RESIDENCY_BIT ImageCreateFlags = 1 << 1
+	// IMAGE_CREATE_SPARSE_ALIASED_BIT wraps VK_IMAGE_CREATE_SPARSE_ALIASED_BIT.
+	IMAGE_CREATE_SPARSE_ALIASED_BIT ImageCreateFlags = 1 << 2
+	// IMAGE_CREATE_MUTABLE_FORMAT_BIT wraps VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT.
+	IMAGE_CREATE_MUTABLE_FORMAT_BIT ImageCreateFlags = 1 << 3
+	// IMAGE_CREATE_CUBE_COMPATIBLE_BIT wraps VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT.
+	IMAGE_CREATE_CUBE_COMPATIBLE_BIT ImageCreateFlags = 1 << 4
+)
+
+func (e ImageCreateFlags) String() string {
+	return fmt.Sprintf("VkImageCreateFlags(%b)", e)
+}
+
+// ImageUsageFlags wraps the bitmask VkImageUsageFlags.
+type ImageUsageFlags int32
+
+const (
+	// IMAGE_USAGE_TRANSFER_SRC_BIT wraps VK_IMAGE_USAGE_TRANSFER_SRC_BIT.
+	IMAGE_USAGE_TRANSFER_SRC_BIT ImageUsageFlags = 1 << 0
+	// IMAGE_USAGE_TRANSFER_DST_BIT wraps VK_IMAGE_USAGE_TRANSFER_DST_BIT.
+	IMAGE_USAGE_TRANSFER_DST_BIT ImageUsageFlags = 1 << 1
+	// IMAGE_USAGE_SAMPLED_BIT wraps VK_IMAGE_USAGE_SAMPLED_BIT.
+	IMAGE_USAGE_SAMPLED_BIT ImageUsageFlags = 1 << 2
+	// IMAGE_USAGE_STORAGE_BIT wraps VK_IMAGE_USAGE_STORAGE_BIT.
+	IMAGE_USAGE_STORAGE_BIT ImageUsageFlags = 1 << 3
+	// IMAGE_USAGE_COLOR_ATTACHMENT_BIT wraps VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT.
+	IMAGE_USAGE_COLOR_ATTACHMENT_BIT ImageUsageFlags = 1 << 4
+	// IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT wraps VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT.
+	IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT ImageUsageFlags = 1 << 5
+	// IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT wraps VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT.
+	IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT ImageUsageFlags = 1 << 6
+	// IMAGE_USAGE_INPUT_ATTACHMENT_BIT wraps VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT.
+	IMAGE_USAGE_INPUT_ATTACHMENT_BIT ImageUsageFlags = 1 << 7
+)
+
+func (e ImageUsageFlags) String() string {
+	return fmt.Sprintf("VkImageUsageFlags(%b)", e)
+}
+
+// ImageViewCreateFlags wraps the bitmask VkImageViewCreateFlags.
+type ImageViewCreateFlags int32
+
+func (e ImageViewCreateFlags) String() string {
+	return fmt.Sprintf("VkImageViewCreateFlags(%b)", e)
+}
+
+// InstanceCreateFlags wraps the bitmask VkInstanceCreateFlags.
+type InstanceCreateFlags int32
+
+func (e InstanceCreateFlags) String() string {
+	return fmt.Sprintf("VkInstanceCreateFlags(%b)", e)
+}
+
+// MemoryAllocateFlags wraps the bitmask VkMemoryAllocateFlags.
+type MemoryAllocateFlags int32
+
+const (
+	// MEMORY_ALLOCATE_DEVICE_MASK_BIT wraps VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT.
+	MEMORY_ALLOCATE_DEVICE_MASK_BIT MemoryAllocateFlags = 1 << 0
+)
+
+func (e MemoryAllocateFlags) String() string {
+	return fmt.Sprintf("VkMemoryAllocateFlags(%b)", e)
+}
+
+// MemoryHeapFlags wraps the bitmask VkMemoryHeapFlags.
+type MemoryHeapFlags int32
+
+const (
+	// MEMORY_HEAP_DEVICE_LOCAL_BIT wraps VK_MEMORY_HEAP_DEVICE_LOCAL_BIT.
+	MEMORY_HEAP_DEVICE_LOCAL_BIT MemoryHeapFlags = 1 << 0
+)
+
+func (e MemoryHeapFlags) String() string {
+	return fmt.Sprintf("VkMemoryHeapFlags(%b)", e)
+}
+
+// MemoryMapFlags wraps the bitmask VkMemoryMapFlags.
+type MemoryMapFlags int32
+
+func (e MemoryMapFlags) String() string {
+	return fmt.Sprintf("VkMemoryMapFlags(%b)", e)
+}
+
+// MemoryPropertyFlags wraps the bitmask VkMemoryPropertyFlags.
+type MemoryPropertyFlags int32
+
+const (
+	// MEMORY_PROPERTY_DEVICE_LOCAL_BIT wraps VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT.
+	MEMORY_PROPERTY_DEVICE_LOCAL_BIT MemoryPropertyFlags = 1 << 0
+	// MEMORY_PROPERTY_HOST_VISIBLE_BIT wraps VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT.
+	MEMORY_PROPERTY_HOST_VISIBLE_BIT MemoryPropertyFlags = 1 << 1
+	// MEMORY_PROPERTY_HOST_COHERENT_BIT wraps VK_MEMORY_PROPERTY_HOST_COHERENT_BIT.
+	MEMORY_PROPERTY_HOST_COHERENT_BIT MemoryPropertyFlags = 1 << 2
+	// MEMORY_PROPERTY_HOST_CACHED_BIT wraps VK_MEMORY_PROPERTY_HOST_CACHED_BIT.
+	MEMORY_PROPERTY_HOST_CACHED_BIT MemoryPropertyFlags = 1 << 3
+	// MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT wraps VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT.
+	MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT MemoryPropertyFlags = 1 << 4
+)
+
+func (e MemoryPropertyFlags) String() string {
+	return fmt.Sprintf("VkMemoryPropertyFlags(%b)", e)
+}
+
+// MemoryUnmapFlags wraps the bitmask VkMemoryUnmapFlags.
+type MemoryUnmapFlags int32
+
+func (e MemoryUnmapFlags) String() string {
+	return fmt.Sprintf("VkMemoryUnmapFlags(%b)", e)
+}
+
+// PeerMemoryFeatureFlags wraps the bitmask VkPeerMemoryFeatureFlags.
+type PeerMemoryFeatureFlags int32
+
+const (
+	// PEER_MEMORY_FEATURE_COPY_SRC_BIT wraps VK_PEER_MEMORY_FEATURE_COPY_SRC_BIT.
+	PEER_MEMORY_FEATURE_COPY_SRC_BIT PeerMemoryFeatureFlags = 1 << 0
+	// PEER_MEMORY_FEATURE_COPY_DST_BIT wraps VK_PEER_MEMORY_FEATURE_COPY_DST_BIT.
+	PEER_MEMORY_FEATURE_COPY_DST_BIT PeerMemoryFeatureFlags = 1 << 1
+	// PEER_MEMORY_FEATURE_GENERIC_SRC_BIT wraps VK_PEER_MEMORY_FEATURE_GENERIC_SRC_BIT.
+	PEER_MEMORY_FEATURE_GENERIC_SRC_BIT PeerMemoryFeatureFlags = 1 << 2
+	// PEER_MEMORY_FEATURE_GENERIC_DST_BIT wraps VK_PEER_MEMORY_FEATURE_GENERIC_DST_BIT.
+	PEER_MEMORY_FEATURE_GENERIC_DST_BIT PeerMemoryFeatureFlags = 1 << 3
+)
+
+func (e PeerMemoryFeatureFlags) String() string {
+	return fmt.Sprintf("VkPeerMemoryFeatureFlags(%b)", e)
+}
+
+// PipelineCacheCreateFlags wraps the bitmask VkPipelineCacheCreateFlags.
+type PipelineCacheCreateFlags int32
+
+func (e PipelineCacheCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineCacheCreateFlags(%b)", e)
+}
+
+// PipelineColorBlendStateCreateFlags wraps the bitmask VkPipelineColorBlendStateCreateFlags.
+type PipelineColorBlendStateCreateFlags int32
+
+func (e PipelineColorBlendStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineColorBlendStateCreateFlags(%b)", e)
+}
+
+// PipelineCreateFlags wraps the bitmask VkPipelineCreateFlags.
+type PipelineCreateFlags int32
+
+const (
+	// PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT wraps VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT.
+	PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT PipelineCreateFlags = 1 << 0
+	// PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT wraps VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT.
+	PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT PipelineCreateFlags = 1 << 1
+	// PIPELINE_CREATE_DERIVATIVE_BIT wraps VK_PIPELINE_CREATE_DERIVATIVE_BIT.
+	PIPELINE_CREATE_DERIVATIVE_BIT PipelineCreateFlags = 1 << 2
+)
+
+func (e PipelineCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineCreateFlags(%b)", e)
+}
+
+// PipelineCreateFlags2 wraps the bitmask VkPipelineCreateFlags2.
+type PipelineCreateFlags2 int64
+
+const (
+	// PIPELINE_CREATE_2_DISABLE_OPTIMIZATION_BIT wraps VK_PIPELINE_CREATE_2_DISABLE_OPTIMIZATION_BIT.
+	PIPELINE_CREATE_2_DISABLE_OPTIMIZATION_BIT PipelineCreateFlags2 = 1 << 0
+	// PIPELINE_CREATE_2_ALLOW_DERIVATIVES_BIT wraps VK_PIPELINE_CREATE_2_ALLOW_DERIVATIVES_BIT.
+	PIPELINE_CREATE_2_ALLOW_DERIVATIVES_BIT PipelineCreateFlags2 = 1 << 1
+	// PIPELINE_CREATE_2_DERIVATIVE_BIT wraps VK_PIPELINE_CREATE_2_DERIVATIVE_BIT.
+	PIPELINE_CREATE_2_DERIVATIVE_BIT PipelineCreateFlags2 = 1 << 2
+	// PIPELINE_CREATE_2_VIEW_INDEX_FROM_DEVICE_INDEX_BIT wraps VK_PIPELINE_CREATE_2_VIEW_INDEX_FROM_DEVICE_INDEX_BIT.
+	PIPELINE_CREATE_2_VIEW_INDEX_FROM_DEVICE_INDEX_BIT PipelineCreateFlags2 = 1 << 3
+	// PIPELINE_CREATE_2_DISPATCH_BASE_BIT wraps VK_PIPELINE_CREATE_2_DISPATCH_BASE_BIT.
+	PIPELINE_CREATE_2_DISPATCH_BASE_BIT PipelineCreateFlags2 = 1 << 4
+	// PIPELINE_CREATE_2_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT wraps VK_PIPELINE_CREATE_2_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT.
+	PIPELINE_CREATE_2_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT PipelineCreateFlags2 = 1 << 8
+	// PIPELINE_CREATE_2_EARLY_RETURN_ON_FAILURE_BIT wraps VK_PIPELINE_CREATE_2_EARLY_RETURN_ON_FAILURE_BIT.
+	PIPELINE_CREATE_2_EARLY_RETURN_ON_FAILURE_BIT PipelineCreateFlags2 = 1 << 9
+	// PIPELINE_CREATE_2_NO_PROTECTED_ACCESS_BIT wraps VK_PIPELINE_CREATE_2_NO_PROTECTED_ACCESS_BIT.
+	PIPELINE_CREATE_2_NO_PROTECTED_ACCESS_BIT PipelineCreateFlags2 = 1 << 27
+	// PIPELINE_CREATE_2_PROTECTED_ACCESS_ONLY_BIT wraps VK_PIPELINE_CREATE_2_PROTECTED_ACCESS_ONLY_BIT.
+	PIPELINE_CREATE_2_PROTECTED_ACCESS_ONLY_BIT PipelineCreateFlags2 = 1 << 30
+)
+
+func (e PipelineCreateFlags2) String() string {
+	return fmt.Sprintf("VkPipelineCreateFlags2(%b)", e)
+}
+
+// PipelineCreationFeedbackFlags wraps the bitmask VkPipelineCreationFeedbackFlags.
+type PipelineCreationFeedbackFlags int32
+
+const (
+	// PIPELINE_CREATION_FEEDBACK_VALID_BIT wraps VK_PIPELINE_CREATION_FEEDBACK_VALID_BIT.
+	PIPELINE_CREATION_FEEDBACK_VALID_BIT PipelineCreationFeedbackFlags = 1 << 0
+	// PIPELINE_CREATION_FEEDBACK_APPLICATION_PIPELINE_CACHE_HIT_BIT wraps VK_PIPELINE_CREATION_FEEDBACK_APPLICATION_PIPELINE_CACHE_HIT_BIT.
+	PIPELINE_CREATION_FEEDBACK_APPLICATION_PIPELINE_CACHE_HIT_BIT PipelineCreationFeedbackFlags = 1 << 1
+	// PIPELINE_CREATION_FEEDBACK_BASE_PIPELINE_ACCELERATION_BIT wraps VK_PIPELINE_CREATION_FEEDBACK_BASE_PIPELINE_ACCELERATION_BIT.
+	PIPELINE_CREATION_FEEDBACK_BASE_PIPELINE_ACCELERATION_BIT PipelineCreationFeedbackFlags = 1 << 2
+)
+
+func (e PipelineCreationFeedbackFlags) String() string {
+	return fmt.Sprintf("VkPipelineCreationFeedbackFlags(%b)", e)
+}
+
+// PipelineDepthStencilStateCreateFlags wraps the bitmask VkPipelineDepthStencilStateCreateFlags.
+type PipelineDepthStencilStateCreateFlags int32
+
+func (e PipelineDepthStencilStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineDepthStencilStateCreateFlags(%b)", e)
+}
+
+// PipelineDynamicStateCreateFlags wraps the bitmask VkPipelineDynamicStateCreateFlags.
+type PipelineDynamicStateCreateFlags int32
+
+func (e PipelineDynamicStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineDynamicStateCreateFlags(%b)", e)
+}
+
+// PipelineInputAssemblyStateCreateFlags wraps the bitmask VkPipelineInputAssemblyStateCreateFlags.
+type PipelineInputAssemblyStateCreateFlags int32
+
+func (e PipelineInputAssemblyStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineInputAssemblyStateCreateFlags(%b)", e)
+}
+
+// PipelineLayoutCreateFlags wraps the bitmask VkPipelineLayoutCreateFlags.
+type PipelineLayoutCreateFlags int32
+
+func (e PipelineLayoutCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineLayoutCreateFlags(%b)", e)
+}
+
+// PipelineMultisampleStateCreateFlags wraps the bitmask VkPipelineMultisampleStateCreateFlags.
+type PipelineMultisampleStateCreateFlags int32
+
+func (e PipelineMultisampleStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineMultisampleStateCreateFlags(%b)", e)
+}
+
+// PipelineRasterizationStateCreateFlags wraps the bitmask VkPipelineRasterizationStateCreateFlags.
+type PipelineRasterizationStateCreateFlags int32
+
+func (e PipelineRasterizationStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineRasterizationStateCreateFlags(%b)", e)
+}
+
+// PipelineShaderStageCreateFlags wraps the bitmask VkPipelineShaderStageCreateFlags.
+type PipelineShaderStageCreateFlags int32
+
+func (e PipelineShaderStageCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineShaderStageCreateFlags(%b)", e)
+}
+
+// PipelineStageFlags wraps the bitmask VkPipelineStageFlags.
+type PipelineStageFlags int32
+
+const (
+	// PIPELINE_STAGE_TOP_OF_PIPE_BIT wraps VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT.
+	PIPELINE_STAGE_TOP_OF_PIPE_BIT PipelineStageFlags = 1 << 0
+	// PIPELINE_STAGE_DRAW_INDIRECT_BIT wraps VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT.
+	PIPELINE_STAGE_DRAW_INDIRECT_BIT PipelineStageFlags = 1 << 1
+	// PIPELINE_STAGE_VERTEX_INPUT_BIT wraps VK_PIPELINE_STAGE_VERTEX_INPUT_BIT.
+	PIPELINE_STAGE_VERTEX_INPUT_BIT PipelineStageFlags = 1 << 2
+	// PIPELINE_STAGE_VERTEX_SHADER_BIT wraps VK_PIPELINE_STAGE_VERTEX_SHADER_BIT.
+	PIPELINE_STAGE_VERTEX_SHADER_BIT PipelineStageFlags = 1 << 3
+	// PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT wraps VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT.
+	PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT PipelineStageFlags = 1 << 4
+	// PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT wraps VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT.
+	PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT PipelineStageFlags = 1 << 5
+	// PIPELINE_STAGE_GEOMETRY_SHADER_BIT wraps VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT.
+	PIPELINE_STAGE_GEOMETRY_SHADER_BIT PipelineStageFlags = 1 << 6
+	// PIPELINE_STAGE_FRAGMENT_SHADER_BIT wraps VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT.
+	PIPELINE_STAGE_FRAGMENT_SHADER_BIT PipelineStageFlags = 1 << 7
+	// PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT wraps VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT.
+	PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT PipelineStageFlags = 1 << 8
+	// PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT wraps VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT.
+	PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT PipelineStageFlags = 1 << 9
+	// PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT wraps VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT.
+	PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT PipelineStageFlags = 1 << 10
+	// PIPELINE_STAGE_COMPUTE_SHADER_BIT wraps VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT.
+	PIPELINE_STAGE_COMPUTE_SHADER_BIT PipelineStageFlags = 1 << 11
+	// PIPELINE_STAGE_TRANSFER_BIT wraps VK_PIPELINE_STAGE_TRANSFER_BIT.
+	PIPELINE_STAGE_TRANSFER_BIT PipelineStageFlags = 1 << 12
+	// PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT wraps VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT.
+	PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT PipelineStageFlags = 1 << 13
+	// PIPELINE_STAGE_HOST_BIT wraps VK_PIPELINE_STAGE_HOST_BIT.
+	PIPELINE_STAGE_HOST_BIT PipelineStageFlags = 1 << 14
+	// PIPELINE_STAGE_ALL_GRAPHICS_BIT wraps VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT.
+	PIPELINE_STAGE_ALL_GRAPHICS_BIT PipelineStageFlags = 1 << 15
+	// PIPELINE_STAGE_ALL_COMMANDS_BIT wraps VK_PIPELINE_STAGE_ALL_COMMANDS_BIT.
+	PIPELINE_STAGE_ALL_COMMANDS_BIT PipelineStageFlags = 1 << 16
+)
+
+func (e PipelineStageFlags) String() string {
+	return fmt.Sprintf("VkPipelineStageFlags(%b)", e)
+}
+
+// PipelineStageFlags2 wraps the bitmask VkPipelineStageFlags2.
+type PipelineStageFlags2 int64
+
+const (
+	// PIPELINE_STAGE_2_NONE wraps VK_PIPELINE_STAGE_2_NONE.
+	PIPELINE_STAGE_2_NONE PipelineStageFlags2 = 0
+	// PIPELINE_STAGE_2_TOP_OF_PIPE_BIT wraps VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT.
+	PIPELINE_STAGE_2_TOP_OF_PIPE_BIT PipelineStageFlags2 = 1 << 0
+	// PIPELINE_STAGE_2_DRAW_INDIRECT_BIT wraps VK_PIPELINE_STAGE_2_DRAW_INDIRECT_BIT.
+	PIPELINE_STAGE_2_DRAW_INDIRECT_BIT PipelineStageFlags2 = 1 << 1
+	// PIPELINE_STAGE_2_VERTEX_INPUT_BIT wraps VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT.
+	PIPELINE_STAGE_2_VERTEX_INPUT_BIT PipelineStageFlags2 = 1 << 2
+	// PIPELINE_STAGE_2_VERTEX_SHADER_BIT wraps VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT.
+	PIPELINE_STAGE_2_VERTEX_SHADER_BIT PipelineStageFlags2 = 1 << 3
+	// PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT wraps VK_PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT.
+	PIPELINE_STAGE_2_TESSELLATION_CONTROL_SHADER_BIT PipelineStageFlags2 = 1 << 4
+	// PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT wraps VK_PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT.
+	PIPELINE_STAGE_2_TESSELLATION_EVALUATION_SHADER_BIT PipelineStageFlags2 = 1 << 5
+	// PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT wraps VK_PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT.
+	PIPELINE_STAGE_2_GEOMETRY_SHADER_BIT PipelineStageFlags2 = 1 << 6
+	// PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT wraps VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT.
+	PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT PipelineStageFlags2 = 1 << 7
+	// PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT wraps VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT.
+	PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT PipelineStageFlags2 = 1 << 8
+	// PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT wraps VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT.
+	PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT PipelineStageFlags2 = 1 << 9
+	// PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT wraps VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT.
+	PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT PipelineStageFlags2 = 1 << 10
+	// PIPELINE_STAGE_2_COMPUTE_SHADER_BIT wraps VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT.
+	PIPELINE_STAGE_2_COMPUTE_SHADER_BIT PipelineStageFlags2 = 1 << 11
+	// PIPELINE_STAGE_2_ALL_TRANSFER_BIT wraps VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT.
+	PIPELINE_STAGE_2_ALL_TRANSFER_BIT PipelineStageFlags2 = 1 << 12
+	// PIPELINE_STAGE_2_TRANSFER_BIT wraps VK_PIPELINE_STAGE_2_TRANSFER_BIT.
+	PIPELINE_STAGE_2_TRANSFER_BIT PipelineStageFlags2 = PIPELINE_STAGE_2_ALL_TRANSFER_BIT
+	// PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT wraps VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT.
+	PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT PipelineStageFlags2 = 1 << 13
+	// PIPELINE_STAGE_2_HOST_BIT wraps VK_PIPELINE_STAGE_2_HOST_BIT.
+	PIPELINE_STAGE_2_HOST_BIT PipelineStageFlags2 = 1 << 14
+	// PIPELINE_STAGE_2_ALL_GRAPHICS_BIT wraps VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT.
+	PIPELINE_STAGE_2_ALL_GRAPHICS_BIT PipelineStageFlags2 = 1 << 15
+	// PIPELINE_STAGE_2_ALL_COMMANDS_BIT wraps VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT.
+	PIPELINE_STAGE_2_ALL_COMMANDS_BIT PipelineStageFlags2 = 1 << 16
+	// PIPELINE_STAGE_2_COPY_BIT wraps VK_PIPELINE_STAGE_2_COPY_BIT.
+	PIPELINE_STAGE_2_COPY_BIT PipelineStageFlags2 = 1 << 32
+	// PIPELINE_STAGE_2_RESOLVE_BIT wraps VK_PIPELINE_STAGE_2_RESOLVE_BIT.
+	PIPELINE_STAGE_2_RESOLVE_BIT PipelineStageFlags2 = 1 << 33
+	// PIPELINE_STAGE_2_BLIT_BIT wraps VK_PIPELINE_STAGE_2_BLIT_BIT.
+	PIPELINE_STAGE_2_BLIT_BIT PipelineStageFlags2 = 1 << 34
+	// PIPELINE_STAGE_2_CLEAR_BIT wraps VK_PIPELINE_STAGE_2_CLEAR_BIT.
+	PIPELINE_STAGE_2_CLEAR_BIT PipelineStageFlags2 = 1 << 35
+	// PIPELINE_STAGE_2_INDEX_INPUT_BIT wraps VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT.
+	PIPELINE_STAGE_2_INDEX_INPUT_BIT PipelineStageFlags2 = 1 << 36
+	// PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT wraps VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT.
+	PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT PipelineStageFlags2 = 1 << 37
+	// PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT wraps VK_PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT.
+	PIPELINE_STAGE_2_PRE_RASTERIZATION_SHADERS_BIT PipelineStageFlags2 = 1 << 38
+)
+
+func (e PipelineStageFlags2) String() string {
+	return fmt.Sprintf("VkPipelineStageFlags2(%b)", e)
+}
+
+// PipelineTessellationStateCreateFlags wraps the bitmask VkPipelineTessellationStateCreateFlags.
+type PipelineTessellationStateCreateFlags int32
+
+func (e PipelineTessellationStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineTessellationStateCreateFlags(%b)", e)
+}
+
+// PipelineVertexInputStateCreateFlags wraps the bitmask VkPipelineVertexInputStateCreateFlags.
+type PipelineVertexInputStateCreateFlags int32
+
+func (e PipelineVertexInputStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineVertexInputStateCreateFlags(%b)", e)
+}
+
+// PipelineViewportStateCreateFlags wraps the bitmask VkPipelineViewportStateCreateFlags.
+type PipelineViewportStateCreateFlags int32
+
+func (e PipelineViewportStateCreateFlags) String() string {
+	return fmt.Sprintf("VkPipelineViewportStateCreateFlags(%b)", e)
+}
+
+// PrivateDataSlotCreateFlags wraps the bitmask VkPrivateDataSlotCreateFlags.
+type PrivateDataSlotCreateFlags int32
+
+func (e PrivateDataSlotCreateFlags) String() string {
+	return fmt.Sprintf("VkPrivateDataSlotCreateFlags(%b)", e)
+}
+
+// QueryControlFlags wraps the bitmask VkQueryControlFlags.
+type QueryControlFlags int32
+
+const (
+	// QUERY_CONTROL_PRECISE_BIT wraps VK_QUERY_CONTROL_PRECISE_BIT.
+	QUERY_CONTROL_PRECISE_BIT QueryControlFlags = 1 << 0
+)
+
+func (e QueryControlFlags) String() string {
+	return fmt.Sprintf("VkQueryControlFlags(%b)", e)
+}
+
+// QueryPipelineStatisticFlags wraps the bitmask VkQueryPipelineStatisticFlags.
+type QueryPipelineStatisticFlags int32
+
+const (
+	// QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_VERTICES_BIT wraps VK_QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_VERTICES_BIT.
+	QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_VERTICES_BIT QueryPipelineStatisticFlags = 1 << 0
+	// QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_PRIMITIVES_BIT wraps VK_QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_PRIMITIVES_BIT.
+	QUERY_PIPELINE_STATISTIC_INPUT_ASSEMBLY_PRIMITIVES_BIT QueryPipelineStatisticFlags = 1 << 1
+	// QUERY_PIPELINE_STATISTIC_VERTEX_SHADER_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_VERTEX_SHADER_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_VERTEX_SHADER_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 2
+	// QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 3
+	// QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_PRIMITIVES_BIT wraps VK_QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_PRIMITIVES_BIT.
+	QUERY_PIPELINE_STATISTIC_GEOMETRY_SHADER_PRIMITIVES_BIT QueryPipelineStatisticFlags = 1 << 4
+	// QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 5
+	// QUERY_PIPELINE_STATISTIC_CLIPPING_PRIMITIVES_BIT wraps VK_QUERY_PIPELINE_STATISTIC_CLIPPING_PRIMITIVES_BIT.
+	QUERY_PIPELINE_STATISTIC_CLIPPING_PRIMITIVES_BIT QueryPipelineStatisticFlags = 1 << 6
+	// QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 7
+	// QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT wraps VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT.
+	QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT QueryPipelineStatisticFlags = 1 << 8
+	// QUERY_PIPELINE_STATISTIC_TESSELLATION_EVALUATION_SHADER_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_EVALUATION_SHADER_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_TESSELLATION_EVALUATION_SHADER_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 9
+	// QUERY_PIPELINE_STATISTIC_COMPUTE_SHADER_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_COMPUTE_SHADER_INVOCATIONS_BIT.
+	QUERY_PIPELINE_STATISTIC_COMPUTE_SHADER_INVOCATIONS_BIT QueryPipelineStatisticFlags = 1 << 10
+)
+
+func (e QueryPipelineStatisticFlags) String() string {
+	return fmt.Sprintf("VkQueryPipelineStatisticFlags(%b)", e)
+}
+
+// QueryPoolCreateFlags wraps the bitmask VkQueryPoolCreateFlags.
+type QueryPoolCreateFlags int32
+
+func (e QueryPoolCreateFlags) String() string {
+	return fmt.Sprintf("VkQueryPoolCreateFlags(%b)", e)
+}
+
+// QueryResultFlags wraps the bitmask VkQueryResultFlags.
+type QueryResultFlags int32
+
+const (
+	// QUERY_RESULT_64_BIT wraps VK_QUERY_RESULT_64_BIT.
+	QUERY_RESULT_64_BIT QueryResultFlags = 1 << 0
+	// QUERY_RESULT_WAIT_BIT wraps VK_QUERY_RESULT_WAIT_BIT.
+	QUERY_RESULT_WAIT_BIT QueryResultFlags = 1 << 1
+	// QUERY_RESULT_WITH_AVAILABILITY_BIT wraps VK_QUERY_RESULT_WITH_AVAILABILITY_BIT.
+	QUERY_RESULT_WITH_AVAILABILITY_BIT QueryResultFlags = 1 << 2
+	// QUERY_RESULT_PARTIAL_BIT wraps VK_QUERY_RESULT_PARTIAL_BIT.
+	QUERY_RESULT_PARTIAL_BIT QueryResultFlags = 1 << 3
+)
+
+func (e QueryResultFlags) String() string {
+	return fmt.Sprintf("VkQueryResultFlags(%b)", e)
+}
+
+// QueueFlags wraps the bitmask VkQueueFlags.
+type QueueFlags int32
+
+const (
+	// QUEUE_GRAPHICS_BIT wraps VK_QUEUE_GRAPHICS_BIT.
+	QUEUE_GRAPHICS_BIT QueueFlags = 1 << 0
+	// QUEUE_COMPUTE_BIT wraps VK_QUEUE_COMPUTE_BIT.
+	QUEUE_COMPUTE_BIT QueueFlags = 1 << 1
+	// QUEUE_TRANSFER_BIT wraps VK_QUEUE_TRANSFER_BIT.
+	QUEUE_TRANSFER_BIT QueueFlags = 1 << 2
+	// QUEUE_SPARSE_BINDING_BIT wraps VK_QUEUE_SPARSE_BINDING_BIT.
+	QUEUE_SPARSE_BINDING_BIT QueueFlags = 1 << 3
+)
+
+func (e QueueFlags) String() string {
+	return fmt.Sprintf("VkQueueFlags(%b)", e)
+}
+
+// RenderPassCreateFlags wraps the bitmask VkRenderPassCreateFlags.
+type RenderPassCreateFlags int32
+
+func (e RenderPassCreateFlags) String() string {
+	return fmt.Sprintf("VkRenderPassCreateFlags(%b)", e)
+}
+
+// RenderingFlags wraps the bitmask VkRenderingFlags.
+type RenderingFlags int32
+
+const (
+	// RENDERING_CONTENTS_SECONDARY_COMMAND_BUFFERS_BIT wraps VK_RENDERING_CONTENTS_SECONDARY_COMMAND_BUFFERS_BIT.
+	RENDERING_CONTENTS_SECONDARY_COMMAND_BUFFERS_BIT RenderingFlags = 1 << 0
+	// RENDERING_SUSPENDING_BIT wraps VK_RENDERING_SUSPENDING_BIT.
+	RENDERING_SUSPENDING_BIT RenderingFlags = 1 << 1
+	// RENDERING_RESUMING_BIT wraps VK_RENDERING_RESUMING_BIT.
+	RENDERING_RESUMING_BIT RenderingFlags = 1 << 2
+)
+
+func (e RenderingFlags) String() string {
+	return fmt.Sprintf("VkRenderingFlags(%b)", e)
+}
+
+// ResolveModeFlags wraps the bitmask VkResolveModeFlags.
+type ResolveModeFlags int32
+
+const (
+	// RESOLVE_MODE_NONE wraps VK_RESOLVE_MODE_NONE.
+	RESOLVE_MODE_NONE ResolveModeFlags = 0
+	// RESOLVE_MODE_SAMPLE_ZERO_BIT wraps VK_RESOLVE_MODE_SAMPLE_ZERO_BIT.
+	RESOLVE_MODE_SAMPLE_ZERO_BIT ResolveModeFlags = 1 << 0
+	// RESOLVE_MODE_AVERAGE_BIT wraps VK_RESOLVE_MODE_AVERAGE_BIT.
+	RESOLVE_MODE_AVERAGE_BIT ResolveModeFlags = 1 << 1
+	// RESOLVE_MODE_MIN_BIT wraps VK_RESOLVE_MODE_MIN_BIT.
+	RESOLVE_MODE_MIN_BIT ResolveModeFlags = 1 << 2
+	// RESOLVE_MODE_MAX_BIT wraps VK_RESOLVE_MODE_MAX_BIT.
+	RESOLVE_MODE_MAX_BIT ResolveModeFlags = 1 << 3
+)
+
+func (e ResolveModeFlags) String() string {
+	return fmt.Sprintf("VkResolveModeFlags(%b)", e)
+}
+
+// SampleCountFlags wraps the bitmask VkSampleCountFlags.
+type SampleCountFlags int32
+
+const (
+	// SAMPLE_COUNT_1_BIT wraps VK_SAMPLE_COUNT_1_BIT.
+	SAMPLE_COUNT_1_BIT SampleCountFlags = 1 << 0
+	// SAMPLE_COUNT_2_BIT wraps VK_SAMPLE_COUNT_2_BIT.
+	SAMPLE_COUNT_2_BIT SampleCountFlags = 1 << 1
+	// SAMPLE_COUNT_4_BIT wraps VK_SAMPLE_COUNT_4_BIT.
+	SAMPLE_COUNT_4_BIT SampleCountFlags = 1 << 2
+	// SAMPLE_COUNT_8_BIT wraps VK_SAMPLE_COUNT_8_BIT.
+	SAMPLE_COUNT_8_BIT SampleCountFlags = 1 << 3
+	// SAMPLE_COUNT_16_BIT wraps VK_SAMPLE_COUNT_16_BIT.
+	SAMPLE_COUNT_16_BIT SampleCountFlags = 1 << 4
+	// SAMPLE_COUNT_32_BIT wraps VK_SAMPLE_COUNT_32_BIT.
+	SAMPLE_COUNT_32_BIT SampleCountFlags = 1 << 5
+	// SAMPLE_COUNT_64_BIT wraps VK_SAMPLE_COUNT_64_BIT.
+	SAMPLE_COUNT_64_BIT SampleCountFlags = 1 << 6
+)
+
+func (e SampleCountFlags) String() string {
+	return fmt.Sprintf("VkSampleCountFlags(%b)", e)
+}
+
+// SamplerCreateFlags wraps the bitmask VkSamplerCreateFlags.
+type SamplerCreateFlags int32
+
+func (e SamplerCreateFlags) String() string {
+	return fmt.Sprintf("VkSamplerCreateFlags(%b)", e)
+}
+
+// SemaphoreCreateFlags wraps the bitmask VkSemaphoreCreateFlags.
+type SemaphoreCreateFlags int32
+
+func (e SemaphoreCreateFlags) String() string {
+	return fmt.Sprintf("VkSemaphoreCreateFlags(%b)", e)
+}
+
+// SemaphoreImportFlags wraps the bitmask VkSemaphoreImportFlags.
+type SemaphoreImportFlags int32
+
+const (
+	// SEMAPHORE_IMPORT_TEMPORARY_BIT wraps VK_SEMAPHORE_IMPORT_TEMPORARY_BIT.
+	SEMAPHORE_IMPORT_TEMPORARY_BIT SemaphoreImportFlags = 1 << 0
+)
+
+func (e SemaphoreImportFlags) String() string {
+	return fmt.Sprintf("VkSemaphoreImportFlags(%b)", e)
+}
+
+// SemaphoreWaitFlags wraps the bitmask VkSemaphoreWaitFlags.
+type SemaphoreWaitFlags int32
+
+const (
+	// SEMAPHORE_WAIT_ANY_BIT wraps VK_SEMAPHORE_WAIT_ANY_BIT.
+	SEMAPHORE_WAIT_ANY_BIT SemaphoreWaitFlags = 1 << 0
+)
+
+func (e SemaphoreWaitFlags) String() string {
+	return fmt.Sprintf("VkSemaphoreWaitFlags(%b)", e)
+}
+
+// ShaderModuleCreateFlags wraps the bitmask VkShaderModuleCreateFlags.
+type ShaderModuleCreateFlags int32
+
+func (e ShaderModuleCreateFlags) String() string {
+	return fmt.Sprintf("VkShaderModuleCreateFlags(%b)", e)
+}
+
+// ShaderStageFlags wraps the bitmask VkShaderStageFlags.
+type ShaderStageFlags int32
+
+const (
+	// SHADER_STAGE_VERTEX_BIT wraps VK_SHADER_STAGE_VERTEX_BIT.
+	SHADER_STAGE_VERTEX_BIT ShaderStageFlags = 1 << 0
+	// SHADER_STAGE_TESSELLATION_CONTROL_BIT wraps VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT.
+	SHADER_STAGE_TESSELLATION_CONTROL_BIT ShaderStageFlags = 1 << 1
+	// SHADER_STAGE_TESSELLATION_EVALUATION_BIT wraps VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT.
+	SHADER_STAGE_TESSELLATION_EVALUATION_BIT ShaderStageFlags = 1 << 2
+	// SHADER_STAGE_GEOMETRY_BIT wraps VK_SHADER_STAGE_GEOMETRY_BIT.
+	SHADER_STAGE_GEOMETRY_BIT ShaderStageFlags = 1 << 3
+	// SHADER_STAGE_FRAGMENT_BIT wraps VK_SHADER_STAGE_FRAGMENT_BIT.
+	SHADER_STAGE_FRAGMENT_BIT ShaderStageFlags = 1 << 4
+	// SHADER_STAGE_COMPUTE_BIT wraps VK_SHADER_STAGE_COMPUTE_BIT.
+	SHADER_STAGE_COMPUTE_BIT ShaderStageFlags = 1 << 5
+	// SHADER_STAGE_ALL_GRAPHICS wraps VK_SHADER_STAGE_ALL_GRAPHICS.
+	SHADER_STAGE_ALL_GRAPHICS ShaderStageFlags = 0x0000001F
+	// SHADER_STAGE_ALL wraps VK_SHADER_STAGE_ALL.
+	SHADER_STAGE_ALL ShaderStageFlags = 0x7FFFFFFF
+)
+
+func (e ShaderStageFlags) String() string {
+	return fmt.Sprintf("VkShaderStageFlags(%b)", e)
+}
+
+// SparseImageFormatFlags wraps the bitmask VkSparseImageFormatFlags.
+type SparseImageFormatFlags int32
+
+const (
+	// SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT wraps VK_SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT.
+	SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT SparseImageFormatFlags = 1 << 0
+	// SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT wraps VK_SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT.
+	SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT SparseImageFormatFlags = 1 << 1
+	// SPARSE_IMAGE_FORMAT_NONSTANDARD_BLOCK_SIZE_BIT wraps VK_SPARSE_IMAGE_FORMAT_NONSTANDARD_BLOCK_SIZE_BIT.
+	SPARSE_IMAGE_FORMAT_NONSTANDARD_BLOCK_SIZE_BIT SparseImageFormatFlags = 1 << 2
+)
+
+func (e SparseImageFormatFlags) String() string {
+	return fmt.Sprintf("VkSparseImageFormatFlags(%b)", e)
+}
+
+// SparseMemoryBindFlags wraps the bitmask VkSparseMemoryBindFlags.
+type SparseMemoryBindFlags int32
+
+const (
+	// SPARSE_MEMORY_BIND_METADATA_BIT wraps VK_SPARSE_MEMORY_BIND_METADATA_BIT.
+	SPARSE_MEMORY_BIND_METADATA_BIT SparseMemoryBindFlags = 1 << 0
+)
+
+func (e SparseMemoryBindFlags) String() string {
+	return fmt.Sprintf("VkSparseMemoryBindFlags(%b)", e)
+}
+
+// StencilFaceFlags wraps the bitmask VkStencilFaceFlags.
+type StencilFaceFlags int32
+
+const (
+	// STENCIL_FACE_FRONT_BIT wraps VK_STENCIL_FACE_FRONT_BIT.
+	STENCIL_FACE_FRONT_BIT StencilFaceFlags = 1 << 0
+	// STENCIL_FACE_BACK_BIT wraps VK_STENCIL_FACE_BACK_BIT.
+	STENCIL_FACE_BACK_BIT StencilFaceFlags = 1 << 1
+	// STENCIL_FACE_FRONT_AND_BACK wraps VK_STENCIL_FACE_FRONT_AND_BACK.
+	STENCIL_FACE_FRONT_AND_BACK StencilFaceFlags = 0x00000003
+	// STENCIL_FRONT_AND_BACK wraps VK_STENCIL_FRONT_AND_BACK.
+	//
+	// Deprecated: Use STENCIL_FACE_FRONT_AND_BACK instead.
+	STENCIL_FRONT_AND_BACK StencilFaceFlags = STENCIL_FACE_FRONT_AND_BACK
+)
+
+func (e StencilFaceFlags) String() string {
+	return fmt.Sprintf("VkStencilFaceFlags(%b)", e)
+}
+
+// SubgroupFeatureFlags wraps the bitmask VkSubgroupFeatureFlags.
+type SubgroupFeatureFlags int32
+
+const (
+	// SUBGROUP_FEATURE_BASIC_BIT wraps VK_SUBGROUP_FEATURE_BASIC_BIT.
+	SUBGROUP_FEATURE_BASIC_BIT SubgroupFeatureFlags = 1 << 0
+	// SUBGROUP_FEATURE_VOTE_BIT wraps VK_SUBGROUP_FEATURE_VOTE_BIT.
+	SUBGROUP_FEATURE_VOTE_BIT SubgroupFeatureFlags = 1 << 1
+	// SUBGROUP_FEATURE_ARITHMETIC_BIT wraps VK_SUBGROUP_FEATURE_ARITHMETIC_BIT.
+	SUBGROUP_FEATURE_ARITHMETIC_BIT SubgroupFeatureFlags = 1 << 2
+	// SUBGROUP_FEATURE_BALLOT_BIT wraps VK_SUBGROUP_FEATURE_BALLOT_BIT.
+	SUBGROUP_FEATURE_BALLOT_BIT SubgroupFeatureFlags = 1 << 3
+	// SUBGROUP_FEATURE_SHUFFLE_BIT wraps VK_SUBGROUP_FEATURE_SHUFFLE_BIT.
+	SUBGROUP_FEATURE_SHUFFLE_BIT SubgroupFeatureFlags = 1 << 4
+	// SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT wraps VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT.
+	SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT SubgroupFeatureFlags = 1 << 5
+	// SUBGROUP_FEATURE_CLUSTERED_BIT wraps VK_SUBGROUP_FEATURE_CLUSTERED_BIT.
+	SUBGROUP_FEATURE_CLUSTERED_BIT SubgroupFeatureFlags = 1 << 6
+	// SUBGROUP_FEATURE_QUAD_BIT wraps VK_SUBGROUP_FEATURE_QUAD_BIT.
+	SUBGROUP_FEATURE_QUAD_BIT SubgroupFeatureFlags = 1 << 7
+)
+
+func (e SubgroupFeatureFlags) String() string {
+	return fmt.Sprintf("VkSubgroupFeatureFlags(%b)", e)
+}
+
+// SubmitFlags wraps the bitmask VkSubmitFlags.
+type SubmitFlags int32
+
+const (
+	// SUBMIT_PROTECTED_BIT wraps VK_SUBMIT_PROTECTED_BIT.
+	SUBMIT_PROTECTED_BIT SubmitFlags = 1 << 0
+)
+
+func (e SubmitFlags) String() string {
+	return fmt.Sprintf("VkSubmitFlags(%b)", e)
+}
+
+// SubpassDescriptionFlags wraps the bitmask VkSubpassDescriptionFlags.
+type SubpassDescriptionFlags int32
+
+func (e SubpassDescriptionFlags) String() string {
+	return fmt.Sprintf("VkSubpassDescriptionFlags(%b)", e)
+}
+
+// ToolPurposeFlags wraps the bitmask VkToolPurposeFlags.
+type ToolPurposeFlags int32
+
+const (
+	// TOOL_PURPOSE_VALIDATION_BIT wraps VK_TOOL_PURPOSE_VALIDATION_BIT.
+	TOOL_PURPOSE_VALIDATION_BIT ToolPurposeFlags = 1 << 0
+	// TOOL_PURPOSE_PROFILING_BIT wraps VK_TOOL_PURPOSE_PROFILING_BIT.
+	TOOL_PURPOSE_PROFILING_BIT ToolPurposeFlags = 1 << 1
+	// TOOL_PURPOSE_TRACING_BIT wraps VK_TOOL_PURPOSE_TRACING_BIT.
+	TOOL_PURPOSE_TRACING_BIT ToolPurposeFlags = 1 << 2
+	// TOOL_PURPOSE_ADDITIONAL_FEATURES_BIT wraps VK_TOOL_PURPOSE_ADDITIONAL_FEATURES_BIT.
+	TOOL_PURPOSE_ADDITIONAL_FEATURES_BIT ToolPurposeFlags = 1 << 3
+	// TOOL_PURPOSE_MODIFYING_FEATURES_BIT wraps VK_TOOL_PURPOSE_MODIFYING_FEATURES_BIT.
+	TOOL_PURPOSE_MODIFYING_FEATURES_BIT ToolPurposeFlags = 1 << 4
+)
+
+func (e ToolPurposeFlags) String() string {
+	return fmt.Sprintf("VkToolPurposeFlags(%b)", e)
+}
