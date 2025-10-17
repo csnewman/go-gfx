@@ -130,6 +130,10 @@ func parse(path string) (*Registry, error) {
 
 			cmd.Feature = feat.Version
 		}
+
+		for _, extension := range feat.EnumExtensions {
+			applyEnumExtension(extension, reg)
+		}
 	}
 
 	return reg, nil

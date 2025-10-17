@@ -148,3 +148,38 @@ func (p *RegistryParser) parseEnumEntry(enum *Enum, start Token) error {
 
 	return nil
 }
+
+func applyEnumExtension(extension FeatureEnumExtension, reg *Registry) {
+	target, ok := reg.Enums[extension.Extends]
+	if !ok {
+		panic(fmt.Sprintf("enum %v not defined", extension.Extends))
+	}
+
+	switch extension.Type {
+	case "offset":
+		val := 1000000000 + ((extension.Ext - 1) * 1000) + extension.Offset
+
+		target.Values = append(target.Values, &EnumValue{
+			Name:  extension.Name,
+			Value: strconv.Itoa(val),
+		})
+	case "bitpos":
+		target.Values = append(target.Values, &EnumValue{
+			Name:      extension.Name,
+			BitPos:    extension.Bitpos,
+			HasBitPos: true,
+		})
+	case "alias":
+		target.Values = append(target.Values, &EnumValue{
+			Name:  extension.Name,
+			Alias: extension.Alias,
+		})
+	case "value":
+		target.Values = append(target.Values, &EnumValue{
+			Name:  extension.Name,
+			Value: extension.Value,
+		})
+	default:
+		panic(fmt.Sprintf("unknown type %v", extension.Type))
+	}
+}

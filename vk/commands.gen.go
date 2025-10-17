@@ -1,9 +1,8 @@
 package vk
 
 import (
-	"unsafe"
-
 	ffi "github.com/csnewman/go-gfx/ffi"
+	"unsafe"
 )
 
 // #include "vulkan.h"
