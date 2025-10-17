@@ -1382,6 +1382,13 @@ void gfx_vkInit(void* loader) {
     ptr_vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr) loader;
     void* context = NULL;
 
+    ptr_vkCreateInstance = (PFN_vkCreateInstance) ptr_vkGetInstanceProcAddr(context, "vkCreateInstance");
+    ptr_vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceExtensionProperties");
+    ptr_vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceLayerProperties");
+    ptr_vkEnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceVersion");
+}
+
+void gfx_vkInitInstance(VkInstance context) {
     ptr_vkAllocateCommandBuffers = (PFN_vkAllocateCommandBuffers) ptr_vkGetInstanceProcAddr(context, "vkAllocateCommandBuffers");
     ptr_vkAllocateDescriptorSets = (PFN_vkAllocateDescriptorSets) ptr_vkGetInstanceProcAddr(context, "vkAllocateDescriptorSets");
     ptr_vkAllocateMemory = (PFN_vkAllocateMemory) ptr_vkGetInstanceProcAddr(context, "vkAllocateMemory");
@@ -1494,7 +1501,6 @@ void gfx_vkInit(void* loader) {
     ptr_vkCreateGraphicsPipelines = (PFN_vkCreateGraphicsPipelines) ptr_vkGetInstanceProcAddr(context, "vkCreateGraphicsPipelines");
     ptr_vkCreateImage = (PFN_vkCreateImage) ptr_vkGetInstanceProcAddr(context, "vkCreateImage");
     ptr_vkCreateImageView = (PFN_vkCreateImageView) ptr_vkGetInstanceProcAddr(context, "vkCreateImageView");
-    ptr_vkCreateInstance = (PFN_vkCreateInstance) ptr_vkGetInstanceProcAddr(context, "vkCreateInstance");
     ptr_vkCreatePipelineCache = (PFN_vkCreatePipelineCache) ptr_vkGetInstanceProcAddr(context, "vkCreatePipelineCache");
     ptr_vkCreatePipelineLayout = (PFN_vkCreatePipelineLayout) ptr_vkGetInstanceProcAddr(context, "vkCreatePipelineLayout");
     ptr_vkCreatePrivateDataSlot = (PFN_vkCreatePrivateDataSlot) ptr_vkGetInstanceProcAddr(context, "vkCreatePrivateDataSlot");
@@ -1532,9 +1538,6 @@ void gfx_vkInit(void* loader) {
     ptr_vkEndCommandBuffer = (PFN_vkEndCommandBuffer) ptr_vkGetInstanceProcAddr(context, "vkEndCommandBuffer");
     ptr_vkEnumerateDeviceExtensionProperties = (PFN_vkEnumerateDeviceExtensionProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateDeviceExtensionProperties");
     ptr_vkEnumerateDeviceLayerProperties = (PFN_vkEnumerateDeviceLayerProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateDeviceLayerProperties");
-    ptr_vkEnumerateInstanceExtensionProperties = (PFN_vkEnumerateInstanceExtensionProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceExtensionProperties");
-    ptr_vkEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceLayerProperties");
-    ptr_vkEnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion) ptr_vkGetInstanceProcAddr(context, "vkEnumerateInstanceVersion");
     ptr_vkEnumeratePhysicalDeviceGroups = (PFN_vkEnumeratePhysicalDeviceGroups) ptr_vkGetInstanceProcAddr(context, "vkEnumeratePhysicalDeviceGroups");
     ptr_vkEnumeratePhysicalDevices = (PFN_vkEnumeratePhysicalDevices) ptr_vkGetInstanceProcAddr(context, "vkEnumeratePhysicalDevices");
     ptr_vkFlushMappedMemoryRanges = (PFN_vkFlushMappedMemoryRanges) ptr_vkGetInstanceProcAddr(context, "vkFlushMappedMemoryRanges");
@@ -1614,9 +1617,14 @@ void gfx_vkInit(void* loader) {
 */
 import "C"
 
-// Load attempts to load all vulkan functions.
+// Load attempts to load all global vulkan functions.
 func Load(loader unsafe.Pointer) {
 	C.gfx_vkInit(loader)
+}
+
+// LoadInstance attempts to load all instance vulkan functions.
+func LoadInstance(instance Instance) {
+	C.gfx_vkInitInstance(C.VkInstance(unsafe.Pointer(instance)))
 }
 
 // AllocateCommandBuffers wraps vkAllocateCommandBuffers.

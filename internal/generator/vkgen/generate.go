@@ -13,6 +13,13 @@ import (
 
 const ffiPath = "github.com/csnewman/go-gfx/ffi"
 
+var globalCommands = map[string]struct{}{
+	"vkEnumerateInstanceVersion":             {},
+	"vkEnumerateInstanceExtensionProperties": {},
+	"vkEnumerateInstanceLayerProperties":     {},
+	"vkCreateInstance":                       {},
+}
+
 func generate(reg *Registry) {
 	oEnums := jen.NewFile("vk")
 	oBitmask := jen.NewFile("vk")
@@ -55,9 +62,17 @@ func generate(reg *Registry) {
 		}
 	}
 
-	oCommands.Comment("Load attempts to load all vulkan functions.")
+	oCommands.Comment("Load attempts to load all global vulkan functions.")
 	oCommands.Func().Id("Load").Params(jen.Id("loader").Qual("unsafe", "Pointer")).Block(
 		jen.Qual("C", "gfx_vkInit").Call(jen.Id("loader")),
+	)
+	oCommands.Comment("LoadInstance attempts to load all instance vulkan functions.")
+	oCommands.Func().Id("LoadInstance").Params(jen.Id("instance").Id("Instance")).Block(
+		jen.Qual("C", "gfx_vkInitInstance").Call(
+			jen.Qual("C", "VkInstance").Params(
+				jen.Qual("unsafe", "Pointer").Params(jen.Id("instance")),
+			),
+		),
 	)
 
 	sortedCmds := slices.Sorted(maps.Keys(reg.Commands))
@@ -74,16 +89,23 @@ func generate(reg *Registry) {
 		generateCommand(reg, oCommands, cmd, generatedCmds)
 	}
 
-	var loadBody strings.Builder
+	loadBodyGlobal := new(strings.Builder)
+	loadBodyInst := new(strings.Builder)
 
 	for _, name := range slices.Sorted(maps.Keys(generatedCmds)) {
-		loadBody.WriteString("    ptr_")
-		loadBody.WriteString(name)
-		loadBody.WriteString(" = (PFN_")
-		loadBody.WriteString(name)
-		loadBody.WriteString(") ptr_vkGetInstanceProcAddr(context, \"")
-		loadBody.WriteString(name)
-		loadBody.WriteString("\");\n")
+		tgt := loadBodyInst
+
+		if _, ok := globalCommands[name]; ok {
+			tgt = loadBodyGlobal
+		}
+
+		tgt.WriteString("    ptr_")
+		tgt.WriteString(name)
+		tgt.WriteString(" = (PFN_")
+		tgt.WriteString(name)
+		tgt.WriteString(") ptr_vkGetInstanceProcAddr(context, \"")
+		tgt.WriteString(name)
+		tgt.WriteString("\");\n")
 	}
 
 	oCommands.CgoPreamble(fmt.Sprintf(`PFN_vkGetInstanceProcAddr ptr_vkGetInstanceProcAddr;
@@ -92,7 +114,10 @@ void gfx_vkInit(void* loader) {
     ptr_vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr) loader;
     void* context = NULL;
 
-%s}`, loadBody.String()))
+%s}
+
+void gfx_vkInitInstance(VkInstance context) {
+%s}`, loadBodyGlobal.String(), loadBodyInst.String()))
 
 	if err := oEnums.Save("../../vk/enums.gen.go"); err != nil {
 		panic(err)
