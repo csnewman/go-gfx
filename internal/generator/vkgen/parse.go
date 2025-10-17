@@ -91,12 +91,14 @@ func parse(path string) (*Registry, error) {
 	}
 
 	for name, target := range reg.Aliases {
+		slog.Info("Processing alias", "from", name, "to", target)
+
 		targetType, ok := reg.Types[target]
 		if !ok {
 			if cmd, ok := reg.Commands[target]; ok {
 				cmd.Aliases = append(cmd.Aliases, name)
 
-				break
+				continue
 			}
 
 			panic(fmt.Sprintf("unknown type %s for alias %s", target, name))

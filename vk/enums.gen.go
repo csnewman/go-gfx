@@ -218,6 +218,9 @@ func (e BorderColor) String() string {
 // ChromaLocation wraps the enum VkChromaLocation.
 type ChromaLocation int32
 
+// ChromaLocationKHR wraps the enum VkChromaLocationKHR. An alias for ChromaLocation.
+type ChromaLocationKHR = ChromaLocation
+
 const (
 	// CHROMA_LOCATION_COSITED_EVEN wraps VK_CHROMA_LOCATION_COSITED_EVEN.
 	CHROMA_LOCATION_COSITED_EVEN ChromaLocation = 0
@@ -407,6 +410,9 @@ func (e DescriptorType) String() string {
 // DescriptorUpdateTemplateType wraps the enum VkDescriptorUpdateTemplateType.
 type DescriptorUpdateTemplateType int32
 
+// DescriptorUpdateTemplateTypeKHR wraps the enum VkDescriptorUpdateTemplateTypeKHR. An alias for DescriptorUpdateTemplateType.
+type DescriptorUpdateTemplateTypeKHR = DescriptorUpdateTemplateType
+
 const (
 	// DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET wraps VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET.
 	DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET DescriptorUpdateTemplateType = 0
@@ -427,6 +433,9 @@ func (e DescriptorUpdateTemplateType) String() string {
 
 // DriverId wraps the enum VkDriverId.
 type DriverId int32
+
+// DriverIdKHR wraps the enum VkDriverIdKHR. An alias for DriverId.
+type DriverIdKHR = DriverId
 
 const (
 	// DRIVER_ID_AMD_PROPRIETARY wraps VK_DRIVER_ID_AMD_PROPRIETARY.
@@ -1895,6 +1904,12 @@ func (e InternalAllocationType) String() string {
 // LineRasterizationMode wraps the enum VkLineRasterizationMode.
 type LineRasterizationMode int32
 
+// LineRasterizationModeEXT wraps the enum VkLineRasterizationModeEXT. An alias for LineRasterizationMode.
+type LineRasterizationModeEXT = LineRasterizationMode
+
+// LineRasterizationModeKHR wraps the enum VkLineRasterizationModeKHR. An alias for LineRasterizationMode.
+type LineRasterizationModeKHR = LineRasterizationMode
+
 const (
 	// LINE_RASTERIZATION_MODE_DEFAULT wraps VK_LINE_RASTERIZATION_MODE_DEFAULT.
 	LINE_RASTERIZATION_MODE_DEFAULT LineRasterizationMode = 0
@@ -2201,6 +2216,9 @@ func (e PipelineCacheHeaderVersion) String() string {
 // PipelineRobustnessBufferBehavior wraps the enum VkPipelineRobustnessBufferBehavior.
 type PipelineRobustnessBufferBehavior int32
 
+// PipelineRobustnessBufferBehaviorEXT wraps the enum VkPipelineRobustnessBufferBehaviorEXT. An alias for PipelineRobustnessBufferBehavior.
+type PipelineRobustnessBufferBehaviorEXT = PipelineRobustnessBufferBehavior
+
 const (
 	// PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT wraps VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT.
 	PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT PipelineRobustnessBufferBehavior = 0
@@ -2230,6 +2248,9 @@ func (e PipelineRobustnessBufferBehavior) String() string {
 // PipelineRobustnessImageBehavior wraps the enum VkPipelineRobustnessImageBehavior.
 type PipelineRobustnessImageBehavior int32
 
+// PipelineRobustnessImageBehaviorEXT wraps the enum VkPipelineRobustnessImageBehaviorEXT. An alias for PipelineRobustnessImageBehavior.
+type PipelineRobustnessImageBehaviorEXT = PipelineRobustnessImageBehavior
+
 const (
 	// PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_DEVICE_DEFAULT wraps VK_PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_DEVICE_DEFAULT.
 	PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_DEVICE_DEFAULT PipelineRobustnessImageBehavior = 0
@@ -2258,6 +2279,9 @@ func (e PipelineRobustnessImageBehavior) String() string {
 
 // PointClippingBehavior wraps the enum VkPointClippingBehavior.
 type PointClippingBehavior int32
+
+// PointClippingBehaviorKHR wraps the enum VkPointClippingBehaviorKHR. An alias for PointClippingBehavior.
+type PointClippingBehaviorKHR = PointClippingBehavior
 
 const (
 	// POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES wraps VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES.
@@ -2386,6 +2410,12 @@ func (e QueryType) String() string {
 
 // QueueGlobalPriority wraps the enum VkQueueGlobalPriority.
 type QueueGlobalPriority int32
+
+// QueueGlobalPriorityEXT wraps the enum VkQueueGlobalPriorityEXT. An alias for QueueGlobalPriority.
+type QueueGlobalPriorityEXT = QueueGlobalPriority
+
+// QueueGlobalPriorityKHR wraps the enum VkQueueGlobalPriorityKHR. An alias for QueueGlobalPriority.
+type QueueGlobalPriorityKHR = QueueGlobalPriority
 
 const (
 	// QUEUE_GLOBAL_PRIORITY_LOW wraps VK_QUEUE_GLOBAL_PRIORITY_LOW.
@@ -2587,6 +2617,9 @@ func (e SamplerMipmapMode) String() string {
 // SamplerReductionMode wraps the enum VkSamplerReductionMode.
 type SamplerReductionMode int32
 
+// SamplerReductionModeEXT wraps the enum VkSamplerReductionModeEXT. An alias for SamplerReductionMode.
+type SamplerReductionModeEXT = SamplerReductionMode
+
 const (
 	// SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE wraps VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE.
 	SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE SamplerReductionMode = 0
@@ -2611,6 +2644,9 @@ func (e SamplerReductionMode) String() string {
 
 // SamplerYcbcrModelConversion wraps the enum VkSamplerYcbcrModelConversion.
 type SamplerYcbcrModelConversion int32
+
+// SamplerYcbcrModelConversionKHR wraps the enum VkSamplerYcbcrModelConversionKHR. An alias for SamplerYcbcrModelConversion.
+type SamplerYcbcrModelConversionKHR = SamplerYcbcrModelConversion
 
 const (
 	// SAMPLER_YCBCR_MODEL_CONVERSION_RGB_IDENTITY wraps VK_SAMPLER_YCBCR_MODEL_CONVERSION_RGB_IDENTITY.
@@ -2645,6 +2681,9 @@ func (e SamplerYcbcrModelConversion) String() string {
 // SamplerYcbcrRange wraps the enum VkSamplerYcbcrRange.
 type SamplerYcbcrRange int32
 
+// SamplerYcbcrRangeKHR wraps the enum VkSamplerYcbcrRangeKHR. An alias for SamplerYcbcrRange.
+type SamplerYcbcrRangeKHR = SamplerYcbcrRange
+
 const (
 	// SAMPLER_YCBCR_RANGE_ITU_FULL wraps VK_SAMPLER_YCBCR_RANGE_ITU_FULL.
 	SAMPLER_YCBCR_RANGE_ITU_FULL SamplerYcbcrRange = 0
@@ -2666,6 +2705,9 @@ func (e SamplerYcbcrRange) String() string {
 // SemaphoreType wraps the enum VkSemaphoreType.
 type SemaphoreType int32
 
+// SemaphoreTypeKHR wraps the enum VkSemaphoreTypeKHR. An alias for SemaphoreType.
+type SemaphoreTypeKHR = SemaphoreType
+
 const (
 	// SEMAPHORE_TYPE_BINARY wraps VK_SEMAPHORE_TYPE_BINARY.
 	SEMAPHORE_TYPE_BINARY SemaphoreType = 0
@@ -2686,6 +2728,9 @@ func (e SemaphoreType) String() string {
 
 // ShaderFloatControlsIndependence wraps the enum VkShaderFloatControlsIndependence.
 type ShaderFloatControlsIndependence int32
+
+// ShaderFloatControlsIndependenceKHR wraps the enum VkShaderFloatControlsIndependenceKHR. An alias for ShaderFloatControlsIndependence.
+type ShaderFloatControlsIndependenceKHR = ShaderFloatControlsIndependence
 
 const (
 	// SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY wraps VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY.
@@ -3912,6 +3957,9 @@ func (e SystemAllocationScope) String() string {
 
 // TessellationDomainOrigin wraps the enum VkTessellationDomainOrigin.
 type TessellationDomainOrigin int32
+
+// TessellationDomainOriginKHR wraps the enum VkTessellationDomainOriginKHR. An alias for TessellationDomainOrigin.
+type TessellationDomainOriginKHR = TessellationDomainOrigin
 
 const (
 	// TESSELLATION_DOMAIN_ORIGIN_UPPER_LEFT wraps VK_TESSELLATION_DOMAIN_ORIGIN_UPPER_LEFT.
