@@ -1,10 +1,11 @@
 package main
 
 type Registry struct {
-	Enums    map[string]*Enum
-	Types    map[string]*Type
-	Aliases  map[string]string
-	Features []*Feature
+	Enums     map[string]*Enum
+	Constants map[string]*EnumValue
+	Types     map[string]*Type
+	Aliases   map[string]string
+	Features  []*Feature
 
 	Commands map[string]*Command
 }
@@ -70,6 +71,8 @@ type EnumValue struct {
 
 	BitPos    int
 	HasBitPos bool
+
+	ConstType string
 }
 
 type Feature struct {

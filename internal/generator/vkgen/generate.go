@@ -119,6 +119,12 @@ void gfx_vkInit(void* loader) {
 void gfx_vkInitInstance(VkInstance context) {
 %s}`, loadBodyGlobal.String(), loadBodyInst.String()))
 
+	oConsts := jen.NewFile("vk")
+
+	for _, name := range slices.Sorted(maps.Keys(reg.Constants)) {
+		generateConst(reg.Constants[name], oConsts)
+	}
+
 	if err := oEnums.Save("../../vk/enums.gen.go"); err != nil {
 		panic(err)
 	}
@@ -138,6 +144,51 @@ void gfx_vkInitInstance(VkInstance context) {
 	if err := oCommands.Save("../../vk/commands.gen.go"); err != nil {
 		panic(err)
 	}
+
+	if err := oConsts.Save("../../vk/consts.gen.go"); err != nil {
+		panic(err)
+	}
+}
+
+func generateConst(constant *EnumValue, o *jen.File) {
+	if constant.Name == "VK_FALSE" || constant.Name == "VK_TRUE" {
+		return
+	}
+
+	name, ok := strings.CutPrefix(constant.Name, "VK_")
+	if !ok {
+		panic(fmt.Sprintf("consnt does not have prefix: %s", constant.Name))
+	}
+
+	value := constant.Value
+
+	value = strings.TrimPrefix(value, "(")
+	value = strings.TrimSuffix(value, ")")
+	value = strings.TrimSuffix(value, "L")
+	value = strings.TrimSuffix(value, "L")
+	value = strings.TrimSuffix(value, "U")
+	value = strings.TrimSuffix(value, "F")
+
+	value, invert := strings.CutPrefix(value, "~")
+
+	switch constant.ConstType {
+	case "uint32_t":
+		value = "uint32(" + value + ")"
+	case "uint64_t":
+		value = "uint64(" + value + ")"
+	case "float":
+		value = "float32(" + value + ")"
+	default:
+		panic(fmt.Sprintf("unknown constant type: %s", constant.ConstType))
+	}
+
+	if invert {
+		value = "^" + value
+	}
+
+	o.Line()
+	o.Commentf("%s wraps %s.", name, constant.Name)
+	o.Const().Id(name).Op("=").Id(value)
 }
 
 type ToStrEntry struct {

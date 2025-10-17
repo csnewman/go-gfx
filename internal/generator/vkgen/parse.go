@@ -27,10 +27,11 @@ func parse(path string) (*Registry, error) {
 	}
 
 	reg := &Registry{
-		Types:    make(map[string]*Type),
-		Aliases:  make(map[string]string),
-		Enums:    make(map[string]*Enum),
-		Commands: make(map[string]*Command),
+		Types:     make(map[string]*Type),
+		Aliases:   make(map[string]string),
+		Enums:     make(map[string]*Enum),
+		Constants: make(map[string]*EnumValue),
+		Commands:  make(map[string]*Command),
 	}
 
 	rg := &RegistryParser{

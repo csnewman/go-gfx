@@ -24,11 +24,7 @@ func (p *RegistryParser) parseEnums(start Token) error {
 	}
 
 	if enumType == "constants" {
-		if _, err := p.d.FindEnd(start.Name); err != nil {
-			return err
-		}
-
-		return nil
+		return p.parseConstants()
 	}
 
 	name, ok := take(attrs, "name")
@@ -182,4 +178,81 @@ func applyEnumExtension(extension FeatureEnumExtension, reg *Registry) {
 	default:
 		panic(fmt.Sprintf("unknown type %v", extension.Type))
 	}
+}
+
+func (p *RegistryParser) parseConstants() error {
+
+	for {
+		tok, err := p.d.Next(true)
+		if err != nil {
+			return err
+		}
+
+		if tok.Type == TokenTypeEnd {
+			break
+		}
+
+		slog.Info("next", "tok", tok)
+
+		switch tok.Name {
+		case "enum":
+			if err := p.parseConstantEntry(tok); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unexpected type %q", tok.Name)
+		}
+	}
+
+	return nil
+}
+
+func (p *RegistryParser) parseConstantEntry(start Token) error {
+	attrs := maps.Clone(start.Attrs)
+
+	if shouldIgnore(attrs) {
+		if _, err := p.d.FindEnd(start.Name); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	name, ok := take(attrs, "name")
+	if !ok {
+		return fmt.Errorf("%w: name missing", ErrTokenMismatch)
+	}
+
+	constType, ok := take(attrs, "type")
+	if !ok {
+		return fmt.Errorf("%w: type missing", ErrTokenMismatch)
+	}
+
+	comment, _ := take(attrs, "comment")
+
+	valueStr, ok := take(attrs, "value")
+	if !ok {
+		return fmt.Errorf("%w: value missing", ErrTokenMismatch)
+	}
+
+	if len(attrs) > 0 {
+		return fmt.Errorf("%w: unprocessed attributes: %v", ErrTokenMismatch, attrs)
+	}
+
+	if _, ok := p.reg.Constants[name]; ok {
+		return fmt.Errorf("%w: constant %v already defined", ErrTokenMismatch, name)
+	}
+
+	p.reg.Constants[name] = &EnumValue{
+		Name:      name,
+		Value:     valueStr,
+		Comment:   comment,
+		ConstType: constType,
+	}
+
+	if _, err := p.d.ExpectEnd("enum", false); err != nil {
+		return fmt.Errorf("end missing: %v", err)
+	}
+
+	return nil
 }
