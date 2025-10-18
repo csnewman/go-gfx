@@ -203,9 +203,7 @@ func convertEnumName(in string) string {
 	}
 
 	// XXX: bit of a hack! Should properly map these.
-	if removed, ok := strings.CutSuffix(name, "FlagBits"); ok {
-		return removed + "Flags"
-	}
+	name = strings.ReplaceAll(name, "FlagBits", "Flags")
 
 	return name
 }

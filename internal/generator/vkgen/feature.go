@@ -71,6 +71,14 @@ func (p *RegistryParser) parseFeature(start Token) error {
 func (p *RegistryParser) parseRequire(feat *Feature, start Token) error {
 	attrs := maps.Clone(start.Attrs)
 
+	if shouldIgnore(attrs) {
+		if _, err := p.d.FindEnd(start.Name); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	delete(attrs, "comment")
 	delete(attrs, "depends")
 
@@ -141,6 +149,8 @@ func (p *RegistryParser) parseRequireType(feat *Feature, start Token) error {
 func (p *RegistryParser) parseRequireCommand(feat *Feature, start Token) error {
 	attrs := maps.Clone(start.Attrs)
 
+	delete(attrs, "comment")
+
 	name, ok := take(attrs, "name")
 	if !ok {
 		return fmt.Errorf("%w: name missing", ErrTokenMismatch)
@@ -171,6 +181,7 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 	}
 
 	delete(attrs, "comment")
+	delete(attrs, "deprecated")
 
 	name, ok := take(attrs, "name")
 	if !ok {
@@ -179,6 +190,8 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 
 	extends, isExtends := take(attrs, "extends")
 
+	protect, _ := take(attrs, "protect")
+
 	var (
 		aliasStr string
 
@@ -186,25 +199,41 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 
 		offsetStr string
 		extStr    string
+		negDir    bool
 
 		bitStr string
+
+		empty bool
 	)
 
-	if isExtends {
-		if aliasStr, ok = take(attrs, "alias"); ok {
-			delete(attrs, "deprecated")
-		} else if valueStr, ok = take(attrs, "value"); ok {
-		} else if offsetStr, ok = take(attrs, "offset"); ok {
-			extStr, ok = take(attrs, "extnumber")
-			if !ok {
+	//if isExtends {
+	if aliasStr, ok = take(attrs, "alias"); ok {
+		delete(attrs, "deprecated")
+	} else if valueStr, ok = take(attrs, "value"); ok {
+	} else if offsetStr, ok = take(attrs, "offset"); ok {
+		extStr, ok = take(attrs, "extnumber")
+		if !ok {
+			if feat.ExtNumber != "" {
+				extStr = feat.ExtNumber
+			} else {
 				return fmt.Errorf("%w: extnumber missing", ErrTokenMismatch)
 			}
-
-			delete(attrs, "dir")
-		} else if bitStr, ok = take(attrs, "bitpos"); ok {
-		} else {
-			return fmt.Errorf("%w: offset missing", ErrTokenMismatch)
 		}
+
+		dirStr, ok := take(attrs, "dir")
+
+		if ok {
+			if dirStr == "-" {
+				negDir = true
+			} else {
+				panic(dirStr)
+			}
+		}
+	} else if bitStr, ok = take(attrs, "bitpos"); ok {
+	} else if !isExtends {
+		empty = true
+	} else {
+		return fmt.Errorf("%w: offset missing", ErrTokenMismatch)
 	}
 
 	if len(attrs) > 0 {
@@ -219,6 +248,7 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 		ext := FeatureEnumExtension{
 			Name:    name,
 			Extends: extends,
+			Protect: protect,
 		}
 
 		if aliasStr != "" {
@@ -241,6 +271,7 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 			ext.Type = "offset"
 			ext.Offset = offset
 			ext.Ext = extID
+			ext.NegDir = negDir
 		} else {
 			bit, err := strconv.Atoi(bitStr)
 			if err != nil {
@@ -252,6 +283,22 @@ func (p *RegistryParser) parseRequireEnum(feat *Feature, start Token) error {
 		}
 
 		feat.EnumExtensions = append(feat.EnumExtensions, ext)
+	} else if valueStr != "" {
+		feat.Constants = append(feat.Constants, FeatureConstant{
+			Name:    name,
+			Value:   valueStr,
+			Protect: protect,
+		})
+	} else if aliasStr != "" {
+		feat.Constants = append(feat.Constants, FeatureConstant{
+			Name:    name,
+			Alias:   aliasStr,
+			Protect: protect,
+		})
+	} else if empty {
+		// drop
+	} else {
+		panic("unexpected version")
 	}
 
 	return nil

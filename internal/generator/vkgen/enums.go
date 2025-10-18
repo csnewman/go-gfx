@@ -151,9 +151,19 @@ func applyEnumExtension(extension FeatureEnumExtension, reg *Registry) {
 		panic(fmt.Sprintf("enum %v not defined", extension.Extends))
 	}
 
+	for _, existing := range target.Values {
+		if existing.Name == extension.Name {
+			return
+		}
+	}
+
 	switch extension.Type {
 	case "offset":
 		val := 1000000000 + ((extension.Ext - 1) * 1000) + extension.Offset
+
+		if extension.NegDir {
+			val = -val
+		}
 
 		target.Values = append(target.Values, &EnumValue{
 			Name:  extension.Name,

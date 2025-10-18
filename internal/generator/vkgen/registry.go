@@ -1,13 +1,13 @@
 package main
 
 type Registry struct {
-	Enums     map[string]*Enum
-	Constants map[string]*EnumValue
-	Types     map[string]*Type
-	Aliases   map[string]string
-	Features  []*Feature
-
-	Commands map[string]*Command
+	Enums      map[string]*Enum
+	Constants  map[string]*EnumValue
+	Types      map[string]*Type
+	Aliases    map[string]string
+	Features   []*Feature
+	Extensions []*Feature
+	Commands   map[string]*Command
 }
 
 type Category string
@@ -80,17 +80,24 @@ type Feature struct {
 	Types    map[string]struct{}
 	Commands map[string]struct{}
 
+	Name       string
+	ExtNumber  string
+	ExtDepends []string
+
 	EnumExtensions []FeatureEnumExtension
+	Constants      []FeatureConstant
 }
 
 type FeatureEnumExtension struct {
 	Name    string
 	Extends string
 	Type    string
+	Protect string
 
 	// type=offset
 	Offset int
 	Ext    int
+	NegDir bool
 
 	// type=bitpos
 	Bitpos int
@@ -100,6 +107,13 @@ type FeatureEnumExtension struct {
 
 	// type=value
 	Value string
+}
+
+type FeatureConstant struct {
+	Name    string
+	Value   string
+	Alias   string
+	Protect string
 }
 
 type MemberCategory string

@@ -77,7 +77,11 @@ func parse(path string) (*Registry, error) {
 			if err := rg.parseCommands(tok); err != nil {
 				return nil, fmt.Errorf("parsing commands: %w", err)
 			}
-		case "extensions", "formats":
+		case "extensions":
+			if err := rg.parseExtensions(tok); err != nil {
+				return nil, fmt.Errorf("parsing extensions: %w", err)
+			}
+		case "formats":
 			if _, err := d.FindEnd(tok.Name); err != nil {
 				return nil, err
 			}
@@ -135,6 +139,38 @@ func parse(path string) (*Registry, error) {
 		}
 
 		for _, extension := range feat.EnumExtensions {
+			applyEnumExtension(extension, reg)
+		}
+	}
+
+	for _, ext := range reg.Extensions {
+		for tyName := range ext.Types {
+			ty, ok := reg.Types[tyName]
+			if !ok {
+				continue
+			}
+
+			if ty.Feature == "" {
+				ty.Feature = "extension"
+			}
+		}
+
+		for cmdName := range ext.Commands {
+			cmd, ok := reg.Commands[cmdName]
+			if !ok {
+				continue
+			}
+
+			if cmd.Feature == "" {
+				cmd.Feature = "extension"
+			}
+		}
+
+		for _, extension := range ext.EnumExtensions {
+			if extension.Protect != "" {
+				continue
+			}
+
 			applyEnumExtension(extension, reg)
 		}
 	}
