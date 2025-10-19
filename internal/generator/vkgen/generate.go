@@ -157,7 +157,20 @@ func generateConst(constant *EnumValue, o *jen.File) {
 
 	name, ok := strings.CutPrefix(constant.Name, "VK_")
 	if !ok {
-		panic(fmt.Sprintf("consnt does not have prefix: %s", constant.Name))
+		panic(fmt.Sprintf("constant does not have prefix: %s", constant.Name))
+	}
+
+	if constant.Alias != "" {
+		tgt, ok := strings.CutPrefix(constant.Alias, "VK_")
+		if !ok {
+			panic(fmt.Sprintf("constant does not have prefix: %s", constant.Alias))
+		}
+
+		o.Line()
+		o.Commentf("%s wraps %s.", name, constant.Name)
+		o.Const().Id(name).Op("=").Id(tgt)
+
+		return
 	}
 
 	value := constant.Value
@@ -178,6 +191,7 @@ func generateConst(constant *EnumValue, o *jen.File) {
 		value = "uint64(" + value + ")"
 	case "float":
 		value = "float32(" + value + ")"
+	case "int", "string":
 	default:
 		panic(fmt.Sprintf("unknown constant type: %s", constant.ConstType))
 	}

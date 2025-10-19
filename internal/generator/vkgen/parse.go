@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 )
 
 type RegistryParser struct {
@@ -172,6 +173,32 @@ func parse(path string) (*Registry, error) {
 			}
 
 			applyEnumExtension(extension, reg)
+		}
+
+		for _, constant := range ext.Constants {
+			if constant.Protect != "" {
+				continue
+			}
+
+			if constant.Alias != "" {
+				reg.Constants[constant.Name] = &EnumValue{
+					Name:  constant.Name,
+					Alias: constant.Alias,
+				}
+			} else if strings.HasPrefix(constant.Value, `"`) {
+				reg.Constants[constant.Name] = &EnumValue{
+					Name:      constant.Name,
+					Value:     constant.Value,
+					ConstType: "string",
+				}
+			} else {
+				reg.Constants[constant.Name] = &EnumValue{
+					Name:      constant.Name,
+					Value:     constant.Value,
+					ConstType: "int",
+				}
+			}
+
 		}
 	}
 
