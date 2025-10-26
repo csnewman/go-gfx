@@ -84,8 +84,10 @@ func generateCommand(o *jen.File, cmd *repo.Function, generated map[string]struc
 	o.Line()
 
 	retCType := "void"
+	retString := ""
 
 	if cmd.ReturnType != nil {
+		retString = "return "
 		switch cmd.ReturnType.Category {
 		case repo.FieldCategoryDirect:
 			retCType = cmd.ReturnType.Type
@@ -123,8 +125,8 @@ func generateCommand(o *jen.File, cmd *repo.Function, generated map[string]struc
 
 	o.CgoPreamble(fmt.Sprintf(`PFN_%s ptr_%s;
 VKAPI_ATTR %s VKAPI_CALL %s(%s) {
-	return ptr_%s(%s);
-}`, cmd.Name, cmd.Name, retCType, cmd.Name, strings.Join(paramsC, ", "), cmd.Name, strings.Join(paramCNames, ", ")))
+	%sptr_%s(%s);
+}`, cmd.Name, cmd.Name, retCType, cmd.Name, strings.Join(paramsC, ", "), retString, cmd.Name, strings.Join(paramCNames, ", ")))
 
 	generated[cmd.Name] = struct{}{}
 }
