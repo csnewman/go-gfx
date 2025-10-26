@@ -1,4 +1,4 @@
-package main
+package vkparse
 
 import (
 	"encoding/xml"

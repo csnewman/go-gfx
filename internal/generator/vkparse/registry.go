@@ -1,4 +1,4 @@
-package main
+package vkparse
 
 type Registry struct {
 	Enums      map[string]*Enum
