@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define VK_NO_PROTOTYPES 1
 #define VK_USE_64_BIT_PTR_DEFINES 0
 
 #if defined(_WIN32)

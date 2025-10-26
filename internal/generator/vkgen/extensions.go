@@ -83,7 +83,7 @@ func (p *RegistryParser) parseExtension(start Token) error {
 	delete(attrs, "sortorder")
 
 	platform, ok := take(attrs, "platform")
-	if ok && platform != "" {
+	if ok && platform != "" && platform != "metal" && platform != "win32" {
 		if _, err := p.d.FindEnd(start.Name); err != nil {
 			return err
 		}

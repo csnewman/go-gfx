@@ -1,15 +1,25 @@
 package vk
 
 import (
-	ffi "github.com/csnewman/go-gfx/ffi"
 	"unsafe"
+
+	ffi "github.com/csnewman/go-gfx/ffi"
 )
 
-// #include "vulkan.h"
+/*
+#define VK_NO_PROTOTYPES 1
+#include "vulkan.h"
+*/
 /*
 PFN_vkAcquireDrmDisplayEXT ptr_vkAcquireDrmDisplayEXT;
 VKAPI_ATTR VkResult VKAPI_CALL vkAcquireDrmDisplayEXT(VkPhysicalDevice physicalDevice, int32_t drmFd, VkDisplayKHR display) {
 	return ptr_vkAcquireDrmDisplayEXT(physicalDevice, drmFd, display);
+}
+*/
+/*
+PFN_vkAcquireFullScreenExclusiveModeEXT ptr_vkAcquireFullScreenExclusiveModeEXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkAcquireFullScreenExclusiveModeEXT(VkDevice device, VkSwapchainKHR swapchain) {
+	return ptr_vkAcquireFullScreenExclusiveModeEXT(device, swapchain);
 }
 */
 /*
@@ -34,6 +44,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkAcquirePerformanceConfigurationINTEL(VkDevice d
 PFN_vkAcquireProfilingLockKHR ptr_vkAcquireProfilingLockKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkAcquireProfilingLockKHR(VkDevice device, VkAcquireProfilingLockInfoKHR* pInfo) {
 	return ptr_vkAcquireProfilingLockKHR(device, pInfo);
+}
+*/
+/*
+PFN_vkAcquireWinrtDisplayNV ptr_vkAcquireWinrtDisplayNV;
+VKAPI_ATTR VkResult VKAPI_CALL vkAcquireWinrtDisplayNV(VkPhysicalDevice physicalDevice, VkDisplayKHR display) {
+	return ptr_vkAcquireWinrtDisplayNV(physicalDevice, display);
 }
 */
 /*
@@ -1669,6 +1685,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(VkInstanceCreateInfo* pCreateInf
 }
 */
 /*
+PFN_vkCreateMetalSurfaceEXT ptr_vkCreateMetalSurfaceEXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateMetalSurfaceEXT(VkInstance instance, VkMetalSurfaceCreateInfoEXT* pCreateInfo, VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface) {
+	return ptr_vkCreateMetalSurfaceEXT(instance, pCreateInfo, pAllocator, pSurface);
+}
+*/
+/*
 PFN_vkCreateMicromapEXT ptr_vkCreateMicromapEXT;
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateMicromapEXT(VkDevice device, VkMicromapCreateInfoEXT* pCreateInfo, VkAllocationCallbacks* pAllocator, VkMicromapEXT* pMicromap) {
 	return ptr_vkCreateMicromapEXT(device, pCreateInfo, pAllocator, pMicromap);
@@ -1804,6 +1826,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateVideoSessionKHR(VkDevice device, VkVideoS
 PFN_vkCreateVideoSessionParametersKHR ptr_vkCreateVideoSessionParametersKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateVideoSessionParametersKHR(VkDevice device, VkVideoSessionParametersCreateInfoKHR* pCreateInfo, VkAllocationCallbacks* pAllocator, VkVideoSessionParametersKHR* pVideoSessionParameters) {
 	return ptr_vkCreateVideoSessionParametersKHR(device, pCreateInfo, pAllocator, pVideoSessionParameters);
+}
+*/
+/*
+PFN_vkCreateWin32SurfaceKHR ptr_vkCreateWin32SurfaceKHR;
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateWin32SurfaceKHR(VkInstance instance, VkWin32SurfaceCreateInfoKHR* pCreateInfo, VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface) {
+	return ptr_vkCreateWin32SurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
 }
 */
 /*
@@ -2173,6 +2201,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkEnumeratePhysicalDevices(VkInstance instance, u
 }
 */
 /*
+PFN_vkExportMetalObjectsEXT ptr_vkExportMetalObjectsEXT;
+VKAPI_ATTR void VKAPI_CALL vkExportMetalObjectsEXT(VkDevice device, VkExportMetalObjectsInfoEXT* pMetalObjectsInfo) {
+	return ptr_vkExportMetalObjectsEXT(device, pMetalObjectsInfo);
+}
+*/
+/*
 PFN_vkFlushMappedMemoryRanges ptr_vkFlushMappedMemoryRanges;
 VKAPI_ATTR VkResult VKAPI_CALL vkFlushMappedMemoryRanges(VkDevice device, uint32_t memoryRangeCount, VkMappedMemoryRange* pMemoryRanges) {
 	return ptr_vkFlushMappedMemoryRanges(device, memoryRangeCount, pMemoryRanges);
@@ -2305,6 +2339,12 @@ VKAPI_ATTR void VKAPI_CALL vkGetDescriptorEXT(VkDevice device, VkDescriptorGetIn
 }
 */
 /*
+PFN_vkGetDescriptorSetHostMappingVALVE ptr_vkGetDescriptorSetHostMappingVALVE;
+VKAPI_ATTR void VKAPI_CALL vkGetDescriptorSetHostMappingVALVE(VkDevice device, VkDescriptorSet descriptorSet, void** ppData) {
+	return ptr_vkGetDescriptorSetHostMappingVALVE(device, descriptorSet, ppData);
+}
+*/
+/*
 PFN_vkGetDescriptorSetLayoutBindingOffsetEXT ptr_vkGetDescriptorSetLayoutBindingOffsetEXT;
 VKAPI_ATTR void VKAPI_CALL vkGetDescriptorSetLayoutBindingOffsetEXT(VkDevice device, VkDescriptorSetLayout layout, uint32_t binding, VkDeviceSize* pOffset) {
 	return ptr_vkGetDescriptorSetLayoutBindingOffsetEXT(device, layout, binding, pOffset);
@@ -2359,6 +2399,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetDeviceGroupPresentCapabilitiesKHR(VkDevice d
 }
 */
 /*
+PFN_vkGetDeviceGroupSurfacePresentModes2EXT ptr_vkGetDeviceGroupSurfacePresentModes2EXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkGetDeviceGroupSurfacePresentModes2EXT(VkDevice device, VkPhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, VkDeviceGroupPresentModeFlagsKHR* pModes) {
+	return ptr_vkGetDeviceGroupSurfacePresentModes2EXT(device, pSurfaceInfo, pModes);
+}
+*/
+/*
 PFN_vkGetDeviceGroupSurfacePresentModesKHR ptr_vkGetDeviceGroupSurfacePresentModesKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkGetDeviceGroupSurfacePresentModesKHR(VkDevice device, VkSurfaceKHR surface, VkDeviceGroupPresentModeFlagsKHR* pModes) {
 	return ptr_vkGetDeviceGroupSurfacePresentModesKHR(device, surface, pModes);
@@ -2398,6 +2444,12 @@ VKAPI_ATTR uint64_t VKAPI_CALL vkGetDeviceMemoryOpaqueCaptureAddress(VkDevice de
 PFN_vkGetDeviceMicromapCompatibilityEXT ptr_vkGetDeviceMicromapCompatibilityEXT;
 VKAPI_ATTR void VKAPI_CALL vkGetDeviceMicromapCompatibilityEXT(VkDevice device, VkMicromapVersionInfoEXT* pVersionInfo, VkAccelerationStructureCompatibilityKHR* pCompatibility) {
 	return ptr_vkGetDeviceMicromapCompatibilityEXT(device, pVersionInfo, pCompatibility);
+}
+*/
+/*
+PFN_vkGetDeviceProcAddr ptr_vkGetDeviceProcAddr;
+VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, char* pName) {
+	return ptr_vkGetDeviceProcAddr(device, pName);
 }
 */
 /*
@@ -2581,6 +2633,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetImageViewOpaqueCaptureDescriptorDataEXT(VkDe
 }
 */
 /*
+PFN_vkGetInstanceProcAddr ptr_vkGetInstanceProcAddr;
+VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, char* pName) {
+	return ptr_vkGetInstanceProcAddr(instance, pName);
+}
+*/
+/*
 PFN_vkGetLatencyTimingsNV ptr_vkGetLatencyTimingsNV;
 VKAPI_ATTR void VKAPI_CALL vkGetLatencyTimingsNV(VkDevice device, VkSwapchainKHR swapchain, VkGetLatencyMarkerInfoNV* pLatencyMarkerInfo) {
 	return ptr_vkGetLatencyTimingsNV(device, swapchain, pLatencyMarkerInfo);
@@ -2590,6 +2648,18 @@ VKAPI_ATTR void VKAPI_CALL vkGetLatencyTimingsNV(VkDevice device, VkSwapchainKHR
 PFN_vkGetMemoryHostPointerPropertiesEXT ptr_vkGetMemoryHostPointerPropertiesEXT;
 VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryHostPointerPropertiesEXT(VkDevice device, VkExternalMemoryHandleTypeFlagBits handleType, void* pHostPointer, VkMemoryHostPointerPropertiesEXT* pMemoryHostPointerProperties) {
 	return ptr_vkGetMemoryHostPointerPropertiesEXT(device, handleType, pHostPointer, pMemoryHostPointerProperties);
+}
+*/
+/*
+PFN_vkGetMemoryMetalHandleEXT ptr_vkGetMemoryMetalHandleEXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryMetalHandleEXT(VkDevice device, VkMemoryGetMetalHandleInfoEXT* pGetMetalHandleInfo, void** pHandle) {
+	return ptr_vkGetMemoryMetalHandleEXT(device, pGetMetalHandleInfo, pHandle);
+}
+*/
+/*
+PFN_vkGetMemoryMetalHandlePropertiesEXT ptr_vkGetMemoryMetalHandlePropertiesEXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryMetalHandlePropertiesEXT(VkDevice device, VkExternalMemoryHandleTypeFlagBits handleType, void* pHandle, VkMemoryMetalHandlePropertiesEXT* pMemoryMetalHandleProperties) {
+	return ptr_vkGetMemoryMetalHandlePropertiesEXT(device, handleType, pHandle, pMemoryMetalHandleProperties);
 }
 */
 /*
@@ -2863,6 +2933,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDe
 }
 */
 /*
+PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT ptr_vkGetPhysicalDeviceSurfacePresentModes2EXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfacePresentModes2EXT(VkPhysicalDevice physicalDevice, VkPhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, uint32_t* pPresentModeCount, VkPresentModeKHR* pPresentModes) {
+	return ptr_vkGetPhysicalDeviceSurfacePresentModes2EXT(physicalDevice, pSurfaceInfo, pPresentModeCount, pPresentModes);
+}
+*/
+/*
 PFN_vkGetPhysicalDeviceSurfacePresentModesKHR ptr_vkGetPhysicalDeviceSurfacePresentModesKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t* pPresentModeCount, VkPresentModeKHR* pPresentModes) {
 	return ptr_vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
@@ -2890,6 +2966,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceVideoEncodeQualityLevelPropert
 PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR ptr_vkGetPhysicalDeviceVideoFormatPropertiesKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceVideoFormatPropertiesKHR(VkPhysicalDevice physicalDevice, VkPhysicalDeviceVideoFormatInfoKHR* pVideoFormatInfo, uint32_t* pVideoFormatPropertyCount, VkVideoFormatPropertiesKHR* pVideoFormatProperties) {
 	return ptr_vkGetPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice, pVideoFormatInfo, pVideoFormatPropertyCount, pVideoFormatProperties);
+}
+*/
+/*
+PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR ptr_vkGetPhysicalDeviceWin32PresentationSupportKHR;
+VKAPI_ATTR VkBool32 VKAPI_CALL vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex) {
+	return ptr_vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice, queueFamilyIndex);
 }
 */
 /*
@@ -3085,15 +3167,33 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetVideoSessionMemoryRequirementsKHR(VkDevice d
 }
 */
 /*
+PFN_vkGetWinrtDisplayNV ptr_vkGetWinrtDisplayNV;
+VKAPI_ATTR VkResult VKAPI_CALL vkGetWinrtDisplayNV(VkPhysicalDevice physicalDevice, uint32_t deviceRelativeId, VkDisplayKHR* pDisplay) {
+	return ptr_vkGetWinrtDisplayNV(physicalDevice, deviceRelativeId, pDisplay);
+}
+*/
+/*
 PFN_vkImportFenceFdKHR ptr_vkImportFenceFdKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkImportFenceFdKHR(VkDevice device, VkImportFenceFdInfoKHR* pImportFenceFdInfo) {
 	return ptr_vkImportFenceFdKHR(device, pImportFenceFdInfo);
 }
 */
 /*
+PFN_vkImportFenceWin32HandleKHR ptr_vkImportFenceWin32HandleKHR;
+VKAPI_ATTR VkResult VKAPI_CALL vkImportFenceWin32HandleKHR(VkDevice device, VkImportFenceWin32HandleInfoKHR* pImportFenceWin32HandleInfo) {
+	return ptr_vkImportFenceWin32HandleKHR(device, pImportFenceWin32HandleInfo);
+}
+*/
+/*
 PFN_vkImportSemaphoreFdKHR ptr_vkImportSemaphoreFdKHR;
 VKAPI_ATTR VkResult VKAPI_CALL vkImportSemaphoreFdKHR(VkDevice device, VkImportSemaphoreFdInfoKHR* pImportSemaphoreFdInfo) {
 	return ptr_vkImportSemaphoreFdKHR(device, pImportSemaphoreFdInfo);
+}
+*/
+/*
+PFN_vkImportSemaphoreWin32HandleKHR ptr_vkImportSemaphoreWin32HandleKHR;
+VKAPI_ATTR VkResult VKAPI_CALL vkImportSemaphoreWin32HandleKHR(VkDevice device, VkImportSemaphoreWin32HandleInfoKHR* pImportSemaphoreWin32HandleInfo) {
+	return ptr_vkImportSemaphoreWin32HandleKHR(device, pImportSemaphoreWin32HandleInfo);
 }
 */
 /*
@@ -3112,6 +3212,18 @@ VKAPI_ATTR VkResult VKAPI_CALL vkInvalidateMappedMemoryRanges(VkDevice device, u
 PFN_vkLatencySleepNV ptr_vkLatencySleepNV;
 VKAPI_ATTR VkResult VKAPI_CALL vkLatencySleepNV(VkDevice device, VkSwapchainKHR swapchain, VkLatencySleepInfoNV* pSleepInfo) {
 	return ptr_vkLatencySleepNV(device, swapchain, pSleepInfo);
+}
+*/
+/*
+PFN_vkMapMemory ptr_vkMapMemory;
+VKAPI_ATTR VkResult VKAPI_CALL vkMapMemory(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData) {
+	return ptr_vkMapMemory(device, memory, offset, size, flags, ppData);
+}
+*/
+/*
+PFN_vkMapMemory2 ptr_vkMapMemory2;
+VKAPI_ATTR VkResult VKAPI_CALL vkMapMemory2(VkDevice device, VkMemoryMapInfo* pMemoryMapInfo, void** ppData) {
+	return ptr_vkMapMemory2(device, pMemoryMapInfo, ppData);
 }
 */
 /*
@@ -3208,6 +3320,12 @@ VKAPI_ATTR VkResult VKAPI_CALL vkReleaseCapturedPipelineDataKHR(VkDevice device,
 PFN_vkReleaseDisplayEXT ptr_vkReleaseDisplayEXT;
 VKAPI_ATTR VkResult VKAPI_CALL vkReleaseDisplayEXT(VkPhysicalDevice physicalDevice, VkDisplayKHR display) {
 	return ptr_vkReleaseDisplayEXT(physicalDevice, display);
+}
+*/
+/*
+PFN_vkReleaseFullScreenExclusiveModeEXT ptr_vkReleaseFullScreenExclusiveModeEXT;
+VKAPI_ATTR VkResult VKAPI_CALL vkReleaseFullScreenExclusiveModeEXT(VkDevice device, VkSwapchainKHR swapchain) {
+	return ptr_vkReleaseFullScreenExclusiveModeEXT(device, swapchain);
 }
 */
 /*
@@ -3441,10 +3559,12 @@ void gfx_vkInit(void* loader) {
 
 void gfx_vkInitInstance(VkInstance context) {
     ptr_vkAcquireDrmDisplayEXT = (PFN_vkAcquireDrmDisplayEXT) ptr_vkGetInstanceProcAddr(context, "vkAcquireDrmDisplayEXT");
+    ptr_vkAcquireFullScreenExclusiveModeEXT = (PFN_vkAcquireFullScreenExclusiveModeEXT) ptr_vkGetInstanceProcAddr(context, "vkAcquireFullScreenExclusiveModeEXT");
     ptr_vkAcquireNextImage2KHR = (PFN_vkAcquireNextImage2KHR) ptr_vkGetInstanceProcAddr(context, "vkAcquireNextImage2KHR");
     ptr_vkAcquireNextImageKHR = (PFN_vkAcquireNextImageKHR) ptr_vkGetInstanceProcAddr(context, "vkAcquireNextImageKHR");
     ptr_vkAcquirePerformanceConfigurationINTEL = (PFN_vkAcquirePerformanceConfigurationINTEL) ptr_vkGetInstanceProcAddr(context, "vkAcquirePerformanceConfigurationINTEL");
     ptr_vkAcquireProfilingLockKHR = (PFN_vkAcquireProfilingLockKHR) ptr_vkGetInstanceProcAddr(context, "vkAcquireProfilingLockKHR");
+    ptr_vkAcquireWinrtDisplayNV = (PFN_vkAcquireWinrtDisplayNV) ptr_vkGetInstanceProcAddr(context, "vkAcquireWinrtDisplayNV");
     ptr_vkAllocateCommandBuffers = (PFN_vkAllocateCommandBuffers) ptr_vkGetInstanceProcAddr(context, "vkAllocateCommandBuffers");
     ptr_vkAllocateDescriptorSets = (PFN_vkAllocateDescriptorSets) ptr_vkGetInstanceProcAddr(context, "vkAllocateDescriptorSets");
     ptr_vkAllocateMemory = (PFN_vkAllocateMemory) ptr_vkGetInstanceProcAddr(context, "vkAllocateMemory");
@@ -3716,6 +3836,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkCreateIndirectCommandsLayoutEXT = (PFN_vkCreateIndirectCommandsLayoutEXT) ptr_vkGetInstanceProcAddr(context, "vkCreateIndirectCommandsLayoutEXT");
     ptr_vkCreateIndirectCommandsLayoutNV = (PFN_vkCreateIndirectCommandsLayoutNV) ptr_vkGetInstanceProcAddr(context, "vkCreateIndirectCommandsLayoutNV");
     ptr_vkCreateIndirectExecutionSetEXT = (PFN_vkCreateIndirectExecutionSetEXT) ptr_vkGetInstanceProcAddr(context, "vkCreateIndirectExecutionSetEXT");
+    ptr_vkCreateMetalSurfaceEXT = (PFN_vkCreateMetalSurfaceEXT) ptr_vkGetInstanceProcAddr(context, "vkCreateMetalSurfaceEXT");
     ptr_vkCreateMicromapEXT = (PFN_vkCreateMicromapEXT) ptr_vkGetInstanceProcAddr(context, "vkCreateMicromapEXT");
     ptr_vkCreateOpticalFlowSessionNV = (PFN_vkCreateOpticalFlowSessionNV) ptr_vkGetInstanceProcAddr(context, "vkCreateOpticalFlowSessionNV");
     ptr_vkCreatePipelineBinariesKHR = (PFN_vkCreatePipelineBinariesKHR) ptr_vkGetInstanceProcAddr(context, "vkCreatePipelineBinariesKHR");
@@ -3739,6 +3860,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkCreateValidationCacheEXT = (PFN_vkCreateValidationCacheEXT) ptr_vkGetInstanceProcAddr(context, "vkCreateValidationCacheEXT");
     ptr_vkCreateVideoSessionKHR = (PFN_vkCreateVideoSessionKHR) ptr_vkGetInstanceProcAddr(context, "vkCreateVideoSessionKHR");
     ptr_vkCreateVideoSessionParametersKHR = (PFN_vkCreateVideoSessionParametersKHR) ptr_vkGetInstanceProcAddr(context, "vkCreateVideoSessionParametersKHR");
+    ptr_vkCreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR) ptr_vkGetInstanceProcAddr(context, "vkCreateWin32SurfaceKHR");
     ptr_vkDebugMarkerSetObjectNameEXT = (PFN_vkDebugMarkerSetObjectNameEXT) ptr_vkGetInstanceProcAddr(context, "vkDebugMarkerSetObjectNameEXT");
     ptr_vkDebugMarkerSetObjectTagEXT = (PFN_vkDebugMarkerSetObjectTagEXT) ptr_vkGetInstanceProcAddr(context, "vkDebugMarkerSetObjectTagEXT");
     ptr_vkDebugReportMessageEXT = (PFN_vkDebugReportMessageEXT) ptr_vkGetInstanceProcAddr(context, "vkDebugReportMessageEXT");
@@ -3797,6 +3919,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkEnumeratePhysicalDeviceGroups = (PFN_vkEnumeratePhysicalDeviceGroups) ptr_vkGetInstanceProcAddr(context, "vkEnumeratePhysicalDeviceGroups");
     ptr_vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR = (PFN_vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR) ptr_vkGetInstanceProcAddr(context, "vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR");
     ptr_vkEnumeratePhysicalDevices = (PFN_vkEnumeratePhysicalDevices) ptr_vkGetInstanceProcAddr(context, "vkEnumeratePhysicalDevices");
+    ptr_vkExportMetalObjectsEXT = (PFN_vkExportMetalObjectsEXT) ptr_vkGetInstanceProcAddr(context, "vkExportMetalObjectsEXT");
     ptr_vkFlushMappedMemoryRanges = (PFN_vkFlushMappedMemoryRanges) ptr_vkGetInstanceProcAddr(context, "vkFlushMappedMemoryRanges");
     ptr_vkFreeCommandBuffers = (PFN_vkFreeCommandBuffers) ptr_vkGetInstanceProcAddr(context, "vkFreeCommandBuffers");
     ptr_vkFreeDescriptorSets = (PFN_vkFreeDescriptorSets) ptr_vkGetInstanceProcAddr(context, "vkFreeDescriptorSets");
@@ -3819,6 +3942,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetDeferredOperationMaxConcurrencyKHR = (PFN_vkGetDeferredOperationMaxConcurrencyKHR) ptr_vkGetInstanceProcAddr(context, "vkGetDeferredOperationMaxConcurrencyKHR");
     ptr_vkGetDeferredOperationResultKHR = (PFN_vkGetDeferredOperationResultKHR) ptr_vkGetInstanceProcAddr(context, "vkGetDeferredOperationResultKHR");
     ptr_vkGetDescriptorEXT = (PFN_vkGetDescriptorEXT) ptr_vkGetInstanceProcAddr(context, "vkGetDescriptorEXT");
+    ptr_vkGetDescriptorSetHostMappingVALVE = (PFN_vkGetDescriptorSetHostMappingVALVE) ptr_vkGetInstanceProcAddr(context, "vkGetDescriptorSetHostMappingVALVE");
     ptr_vkGetDescriptorSetLayoutBindingOffsetEXT = (PFN_vkGetDescriptorSetLayoutBindingOffsetEXT) ptr_vkGetInstanceProcAddr(context, "vkGetDescriptorSetLayoutBindingOffsetEXT");
     ptr_vkGetDescriptorSetLayoutHostMappingInfoVALVE = (PFN_vkGetDescriptorSetLayoutHostMappingInfoVALVE) ptr_vkGetInstanceProcAddr(context, "vkGetDescriptorSetLayoutHostMappingInfoVALVE");
     ptr_vkGetDescriptorSetLayoutSizeEXT = (PFN_vkGetDescriptorSetLayoutSizeEXT) ptr_vkGetInstanceProcAddr(context, "vkGetDescriptorSetLayoutSizeEXT");
@@ -3828,6 +3952,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceFaultInfoEXT");
     ptr_vkGetDeviceGroupPeerMemoryFeatures = (PFN_vkGetDeviceGroupPeerMemoryFeatures) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceGroupPeerMemoryFeatures");
     ptr_vkGetDeviceGroupPresentCapabilitiesKHR = (PFN_vkGetDeviceGroupPresentCapabilitiesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceGroupPresentCapabilitiesKHR");
+    ptr_vkGetDeviceGroupSurfacePresentModes2EXT = (PFN_vkGetDeviceGroupSurfacePresentModes2EXT) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceGroupSurfacePresentModes2EXT");
     ptr_vkGetDeviceGroupSurfacePresentModesKHR = (PFN_vkGetDeviceGroupSurfacePresentModesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceGroupSurfacePresentModesKHR");
     ptr_vkGetDeviceImageMemoryRequirements = (PFN_vkGetDeviceImageMemoryRequirements) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceImageMemoryRequirements");
     ptr_vkGetDeviceImageSparseMemoryRequirements = (PFN_vkGetDeviceImageSparseMemoryRequirements) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceImageSparseMemoryRequirements");
@@ -3835,6 +3960,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetDeviceMemoryCommitment = (PFN_vkGetDeviceMemoryCommitment) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceMemoryCommitment");
     ptr_vkGetDeviceMemoryOpaqueCaptureAddress = (PFN_vkGetDeviceMemoryOpaqueCaptureAddress) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceMemoryOpaqueCaptureAddress");
     ptr_vkGetDeviceMicromapCompatibilityEXT = (PFN_vkGetDeviceMicromapCompatibilityEXT) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceMicromapCompatibilityEXT");
+    ptr_vkGetDeviceProcAddr = (PFN_vkGetDeviceProcAddr) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceProcAddr");
     ptr_vkGetDeviceQueue = (PFN_vkGetDeviceQueue) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceQueue");
     ptr_vkGetDeviceQueue2 = (PFN_vkGetDeviceQueue2) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceQueue2");
     ptr_vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI = (PFN_vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI) ptr_vkGetInstanceProcAddr(context, "vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI");
@@ -3865,8 +3991,11 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetImageViewHandle64NVX = (PFN_vkGetImageViewHandle64NVX) ptr_vkGetInstanceProcAddr(context, "vkGetImageViewHandle64NVX");
     ptr_vkGetImageViewHandleNVX = (PFN_vkGetImageViewHandleNVX) ptr_vkGetInstanceProcAddr(context, "vkGetImageViewHandleNVX");
     ptr_vkGetImageViewOpaqueCaptureDescriptorDataEXT = (PFN_vkGetImageViewOpaqueCaptureDescriptorDataEXT) ptr_vkGetInstanceProcAddr(context, "vkGetImageViewOpaqueCaptureDescriptorDataEXT");
+    ptr_vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr) ptr_vkGetInstanceProcAddr(context, "vkGetInstanceProcAddr");
     ptr_vkGetLatencyTimingsNV = (PFN_vkGetLatencyTimingsNV) ptr_vkGetInstanceProcAddr(context, "vkGetLatencyTimingsNV");
     ptr_vkGetMemoryHostPointerPropertiesEXT = (PFN_vkGetMemoryHostPointerPropertiesEXT) ptr_vkGetInstanceProcAddr(context, "vkGetMemoryHostPointerPropertiesEXT");
+    ptr_vkGetMemoryMetalHandleEXT = (PFN_vkGetMemoryMetalHandleEXT) ptr_vkGetInstanceProcAddr(context, "vkGetMemoryMetalHandleEXT");
+    ptr_vkGetMemoryMetalHandlePropertiesEXT = (PFN_vkGetMemoryMetalHandlePropertiesEXT) ptr_vkGetInstanceProcAddr(context, "vkGetMemoryMetalHandlePropertiesEXT");
     ptr_vkGetMicromapBuildSizesEXT = (PFN_vkGetMicromapBuildSizesEXT) ptr_vkGetInstanceProcAddr(context, "vkGetMicromapBuildSizesEXT");
     ptr_vkGetPartitionedAccelerationStructuresBuildSizesNV = (PFN_vkGetPartitionedAccelerationStructuresBuildSizesNV) ptr_vkGetInstanceProcAddr(context, "vkGetPartitionedAccelerationStructuresBuildSizesNV");
     ptr_vkGetPastPresentationTimingGOOGLE = (PFN_vkGetPastPresentationTimingGOOGLE) ptr_vkGetInstanceProcAddr(context, "vkGetPastPresentationTimingGOOGLE");
@@ -3912,11 +4041,13 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetPhysicalDeviceSurfaceCapabilitiesKHR = (PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
     ptr_vkGetPhysicalDeviceSurfaceFormats2KHR = (PFN_vkGetPhysicalDeviceSurfaceFormats2KHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceSurfaceFormats2KHR");
     ptr_vkGetPhysicalDeviceSurfaceFormatsKHR = (PFN_vkGetPhysicalDeviceSurfaceFormatsKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+    ptr_vkGetPhysicalDeviceSurfacePresentModes2EXT = (PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceSurfacePresentModes2EXT");
     ptr_vkGetPhysicalDeviceSurfacePresentModesKHR = (PFN_vkGetPhysicalDeviceSurfacePresentModesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceSurfacePresentModesKHR");
     ptr_vkGetPhysicalDeviceToolProperties = (PFN_vkGetPhysicalDeviceToolProperties) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceToolProperties");
     ptr_vkGetPhysicalDeviceVideoCapabilitiesKHR = (PFN_vkGetPhysicalDeviceVideoCapabilitiesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
     ptr_vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR = (PFN_vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR");
     ptr_vkGetPhysicalDeviceVideoFormatPropertiesKHR = (PFN_vkGetPhysicalDeviceVideoFormatPropertiesKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceVideoFormatPropertiesKHR");
+    ptr_vkGetPhysicalDeviceWin32PresentationSupportKHR = (PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPhysicalDeviceWin32PresentationSupportKHR");
     ptr_vkGetPipelineBinaryDataKHR = (PFN_vkGetPipelineBinaryDataKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPipelineBinaryDataKHR");
     ptr_vkGetPipelineCacheData = (PFN_vkGetPipelineCacheData) ptr_vkGetInstanceProcAddr(context, "vkGetPipelineCacheData");
     ptr_vkGetPipelineExecutableInternalRepresentationsKHR = (PFN_vkGetPipelineExecutableInternalRepresentationsKHR) ptr_vkGetInstanceProcAddr(context, "vkGetPipelineExecutableInternalRepresentationsKHR");
@@ -3949,11 +4080,16 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkGetTensorViewOpaqueCaptureDescriptorDataARM = (PFN_vkGetTensorViewOpaqueCaptureDescriptorDataARM) ptr_vkGetInstanceProcAddr(context, "vkGetTensorViewOpaqueCaptureDescriptorDataARM");
     ptr_vkGetValidationCacheDataEXT = (PFN_vkGetValidationCacheDataEXT) ptr_vkGetInstanceProcAddr(context, "vkGetValidationCacheDataEXT");
     ptr_vkGetVideoSessionMemoryRequirementsKHR = (PFN_vkGetVideoSessionMemoryRequirementsKHR) ptr_vkGetInstanceProcAddr(context, "vkGetVideoSessionMemoryRequirementsKHR");
+    ptr_vkGetWinrtDisplayNV = (PFN_vkGetWinrtDisplayNV) ptr_vkGetInstanceProcAddr(context, "vkGetWinrtDisplayNV");
     ptr_vkImportFenceFdKHR = (PFN_vkImportFenceFdKHR) ptr_vkGetInstanceProcAddr(context, "vkImportFenceFdKHR");
+    ptr_vkImportFenceWin32HandleKHR = (PFN_vkImportFenceWin32HandleKHR) ptr_vkGetInstanceProcAddr(context, "vkImportFenceWin32HandleKHR");
     ptr_vkImportSemaphoreFdKHR = (PFN_vkImportSemaphoreFdKHR) ptr_vkGetInstanceProcAddr(context, "vkImportSemaphoreFdKHR");
+    ptr_vkImportSemaphoreWin32HandleKHR = (PFN_vkImportSemaphoreWin32HandleKHR) ptr_vkGetInstanceProcAddr(context, "vkImportSemaphoreWin32HandleKHR");
     ptr_vkInitializePerformanceApiINTEL = (PFN_vkInitializePerformanceApiINTEL) ptr_vkGetInstanceProcAddr(context, "vkInitializePerformanceApiINTEL");
     ptr_vkInvalidateMappedMemoryRanges = (PFN_vkInvalidateMappedMemoryRanges) ptr_vkGetInstanceProcAddr(context, "vkInvalidateMappedMemoryRanges");
     ptr_vkLatencySleepNV = (PFN_vkLatencySleepNV) ptr_vkGetInstanceProcAddr(context, "vkLatencySleepNV");
+    ptr_vkMapMemory = (PFN_vkMapMemory) ptr_vkGetInstanceProcAddr(context, "vkMapMemory");
+    ptr_vkMapMemory2 = (PFN_vkMapMemory2) ptr_vkGetInstanceProcAddr(context, "vkMapMemory2");
     ptr_vkMergePipelineCaches = (PFN_vkMergePipelineCaches) ptr_vkGetInstanceProcAddr(context, "vkMergePipelineCaches");
     ptr_vkMergeValidationCachesEXT = (PFN_vkMergeValidationCachesEXT) ptr_vkGetInstanceProcAddr(context, "vkMergeValidationCachesEXT");
     ptr_vkQueueBeginDebugUtilsLabelEXT = (PFN_vkQueueBeginDebugUtilsLabelEXT) ptr_vkGetInstanceProcAddr(context, "vkQueueBeginDebugUtilsLabelEXT");
@@ -3970,6 +4106,7 @@ void gfx_vkInitInstance(VkInstance context) {
     ptr_vkRegisterDisplayEventEXT = (PFN_vkRegisterDisplayEventEXT) ptr_vkGetInstanceProcAddr(context, "vkRegisterDisplayEventEXT");
     ptr_vkReleaseCapturedPipelineDataKHR = (PFN_vkReleaseCapturedPipelineDataKHR) ptr_vkGetInstanceProcAddr(context, "vkReleaseCapturedPipelineDataKHR");
     ptr_vkReleaseDisplayEXT = (PFN_vkReleaseDisplayEXT) ptr_vkGetInstanceProcAddr(context, "vkReleaseDisplayEXT");
+    ptr_vkReleaseFullScreenExclusiveModeEXT = (PFN_vkReleaseFullScreenExclusiveModeEXT) ptr_vkGetInstanceProcAddr(context, "vkReleaseFullScreenExclusiveModeEXT");
     ptr_vkReleasePerformanceConfigurationINTEL = (PFN_vkReleasePerformanceConfigurationINTEL) ptr_vkGetInstanceProcAddr(context, "vkReleasePerformanceConfigurationINTEL");
     ptr_vkReleaseProfilingLockKHR = (PFN_vkReleaseProfilingLockKHR) ptr_vkGetInstanceProcAddr(context, "vkReleaseProfilingLockKHR");
     ptr_vkReleaseSwapchainImagesKHR = (PFN_vkReleaseSwapchainImagesKHR) ptr_vkGetInstanceProcAddr(context, "vkReleaseSwapchainImagesKHR");
@@ -4027,6 +4164,13 @@ func AcquireDrmDisplayEXT(physicalDevice PhysicalDevice, drmFd int32, display Di
 	return Result(ret)
 }
 
+// AcquireFullScreenExclusiveModeEXT wraps vkAcquireFullScreenExclusiveModeEXT.
+func AcquireFullScreenExclusiveModeEXT(device Device, swapchain SwapchainKHR) Result {
+	ret := C.vkAcquireFullScreenExclusiveModeEXT(C.VkDevice(unsafe.Pointer(device)), C.VkSwapchainKHR(swapchain))
+
+	return Result(ret)
+}
+
 // AcquireNextImage2KHR wraps vkAcquireNextImage2KHR.
 func AcquireNextImage2KHR(device Device, pAcquireInfo AcquireNextImageInfoKHR, pImageIndex ffi.Ref[uint32]) Result {
 	ret := C.vkAcquireNextImage2KHR(C.VkDevice(unsafe.Pointer(device)), pAcquireInfo.ptr, (*C.uint32_t)(pImageIndex.Raw()))
@@ -4051,6 +4195,13 @@ func AcquirePerformanceConfigurationINTEL(device Device, pAcquireInfo Performanc
 // AcquireProfilingLockKHR wraps vkAcquireProfilingLockKHR.
 func AcquireProfilingLockKHR(device Device, pInfo AcquireProfilingLockInfoKHR) Result {
 	ret := C.vkAcquireProfilingLockKHR(C.VkDevice(unsafe.Pointer(device)), pInfo.ptr)
+
+	return Result(ret)
+}
+
+// AcquireWinrtDisplayNV wraps vkAcquireWinrtDisplayNV.
+func AcquireWinrtDisplayNV(physicalDevice PhysicalDevice, display DisplayKHR) Result {
+	ret := C.vkAcquireWinrtDisplayNV(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), C.VkDisplayKHR(display))
 
 	return Result(ret)
 }
@@ -4151,7 +4302,7 @@ func BindVideoSessionMemoryKHR(device Device, videoSession VideoSessionKHR, bind
 	return Result(ret)
 }
 
-// vkBuildAccelerationStructuresKHR.ppBuildRangeInfos is unsupported: category pointer2.
+// vkBuildAccelerationStructuresKHR.ppBuildRangeInfos is unsupported: category pointer2 type VkAccelerationStructureBuildRangeInfoKHR.
 
 // BuildMicromapsEXT wraps vkBuildMicromapsEXT.
 func BuildMicromapsEXT(device Device, deferredOperation DeferredOperationKHR, infoCount uint32, pInfos MicromapBuildInfoEXT) Result {
@@ -4311,9 +4462,9 @@ func CmdBuildAccelerationStructureNV(commandBuffer CommandBuffer, pInfo Accelera
 	C.vkCmdBuildAccelerationStructureNV(C.VkCommandBuffer(unsafe.Pointer(commandBuffer)), pInfo.ptr, C.VkBuffer(instanceData), C.VkDeviceSize(instanceOffset), C.VkBool32(tmp_update), C.VkAccelerationStructureNV(dst), C.VkAccelerationStructureNV(src), C.VkBuffer(scratch), C.VkDeviceSize(scratchOffset))
 }
 
-// vkCmdBuildAccelerationStructuresIndirectKHR.ppMaxPrimitiveCounts is unsupported: category pointer2.
+// vkCmdBuildAccelerationStructuresIndirectKHR.ppMaxPrimitiveCounts is unsupported: category pointer2 type uint32_t.
 
-// vkCmdBuildAccelerationStructuresKHR.ppBuildRangeInfos is unsupported: category pointer2.
+// vkCmdBuildAccelerationStructuresKHR.ppBuildRangeInfos is unsupported: category pointer2 type VkAccelerationStructureBuildRangeInfoKHR.
 
 // CmdBuildClusterAccelerationStructureIndirectNV wraps vkCmdBuildClusterAccelerationStructureIndirectNV.
 func CmdBuildClusterAccelerationStructureIndirectNV(commandBuffer CommandBuffer, pCommandInfos ClusterAccelerationStructureCommandsInfoNV) {
@@ -5699,6 +5850,13 @@ func CreateInstance(pCreateInfo InstanceCreateInfo, pAllocator AllocationCallbac
 	return Result(ret)
 }
 
+// CreateMetalSurfaceEXT wraps vkCreateMetalSurfaceEXT.
+func CreateMetalSurfaceEXT(instance Instance, pCreateInfo MetalSurfaceCreateInfoEXT, pAllocator AllocationCallbacks, pSurface ffi.Ref[SurfaceKHR]) Result {
+	ret := C.vkCreateMetalSurfaceEXT(C.VkInstance(unsafe.Pointer(instance)), pCreateInfo.ptr, pAllocator.ptr, (*C.VkSurfaceKHR)(pSurface.Raw()))
+
+	return Result(ret)
+}
+
 // CreateMicromapEXT wraps vkCreateMicromapEXT.
 func CreateMicromapEXT(device Device, pCreateInfo MicromapCreateInfoEXT, pAllocator AllocationCallbacks, pMicromap ffi.Ref[MicromapEXT]) Result {
 	ret := C.vkCreateMicromapEXT(C.VkDevice(unsafe.Pointer(device)), pCreateInfo.ptr, pAllocator.ptr, (*C.VkMicromapEXT)(pMicromap.Raw()))
@@ -5856,6 +6014,13 @@ func CreateVideoSessionKHR(device Device, pCreateInfo VideoSessionCreateInfoKHR,
 // CreateVideoSessionParametersKHR wraps vkCreateVideoSessionParametersKHR.
 func CreateVideoSessionParametersKHR(device Device, pCreateInfo VideoSessionParametersCreateInfoKHR, pAllocator AllocationCallbacks, pVideoSessionParameters ffi.Ref[VideoSessionParametersKHR]) Result {
 	ret := C.vkCreateVideoSessionParametersKHR(C.VkDevice(unsafe.Pointer(device)), pCreateInfo.ptr, pAllocator.ptr, (*C.VkVideoSessionParametersKHR)(pVideoSessionParameters.Raw()))
+
+	return Result(ret)
+}
+
+// CreateWin32SurfaceKHR wraps vkCreateWin32SurfaceKHR.
+func CreateWin32SurfaceKHR(instance Instance, pCreateInfo Win32SurfaceCreateInfoKHR, pAllocator AllocationCallbacks, pSurface ffi.Ref[SurfaceKHR]) Result {
+	ret := C.vkCreateWin32SurfaceKHR(C.VkInstance(unsafe.Pointer(instance)), pCreateInfo.ptr, pAllocator.ptr, (*C.VkSurfaceKHR)(pSurface.Raw()))
 
 	return Result(ret)
 }
@@ -6193,6 +6358,11 @@ func EnumeratePhysicalDevices(instance Instance, pPhysicalDeviceCount ffi.Ref[ui
 	return Result(ret)
 }
 
+// ExportMetalObjectsEXT wraps vkExportMetalObjectsEXT.
+func ExportMetalObjectsEXT(device Device, pMetalObjectsInfo ExportMetalObjectsInfoEXT) {
+	C.vkExportMetalObjectsEXT(C.VkDevice(unsafe.Pointer(device)), pMetalObjectsInfo.ptr)
+}
+
 // FlushMappedMemoryRanges wraps vkFlushMappedMemoryRanges.
 func FlushMappedMemoryRanges(device Device, memoryRangeCount uint32, pMemoryRanges MappedMemoryRange) Result {
 	ret := C.vkFlushMappedMemoryRanges(C.VkDevice(unsafe.Pointer(device)), C.uint32_t(memoryRangeCount), pMemoryRanges.ptr)
@@ -6333,7 +6503,10 @@ func GetDescriptorEXT(device Device, pDescriptorInfo DescriptorGetInfoEXT, dataS
 	C.vkGetDescriptorEXT(C.VkDevice(unsafe.Pointer(device)), pDescriptorInfo.ptr, C.size_t(dataSize), pDescriptor)
 }
 
-// vkGetDescriptorSetHostMappingVALVE.ppData is unsupported: category pointer2.
+// GetDescriptorSetHostMappingVALVE wraps vkGetDescriptorSetHostMappingVALVE.
+func GetDescriptorSetHostMappingVALVE(device Device, descriptorSet DescriptorSet, ppData ffi.Ref[unsafe.Pointer]) {
+	C.vkGetDescriptorSetHostMappingVALVE(C.VkDevice(unsafe.Pointer(device)), C.VkDescriptorSet(descriptorSet), (*unsafe.Pointer)(ppData.Raw()))
+}
 
 // GetDescriptorSetLayoutBindingOffsetEXT wraps vkGetDescriptorSetLayoutBindingOffsetEXT.
 func GetDescriptorSetLayoutBindingOffsetEXT(device Device, layout DescriptorSetLayout, binding uint32, pOffset ffi.Ref[DeviceSize]) {
@@ -6384,6 +6557,13 @@ func GetDeviceGroupPresentCapabilitiesKHR(device Device, pDeviceGroupPresentCapa
 	return Result(ret)
 }
 
+// GetDeviceGroupSurfacePresentModes2EXT wraps vkGetDeviceGroupSurfacePresentModes2EXT.
+func GetDeviceGroupSurfacePresentModes2EXT(device Device, pSurfaceInfo PhysicalDeviceSurfaceInfo2KHR, pModes ffi.Ref[DeviceGroupPresentModeFlagsKHR]) Result {
+	ret := C.vkGetDeviceGroupSurfacePresentModes2EXT(C.VkDevice(unsafe.Pointer(device)), pSurfaceInfo.ptr, (*C.VkDeviceGroupPresentModeFlagsKHR)(pModes.Raw()))
+
+	return Result(ret)
+}
+
 // GetDeviceGroupSurfacePresentModesKHR wraps vkGetDeviceGroupSurfacePresentModesKHR.
 func GetDeviceGroupSurfacePresentModesKHR(device Device, surface SurfaceKHR, pModes ffi.Ref[DeviceGroupPresentModeFlagsKHR]) Result {
 	ret := C.vkGetDeviceGroupSurfacePresentModesKHR(C.VkDevice(unsafe.Pointer(device)), C.VkSurfaceKHR(surface), (*C.VkDeviceGroupPresentModeFlagsKHR)(pModes.Raw()))
@@ -6423,7 +6603,12 @@ func GetDeviceMicromapCompatibilityEXT(device Device, pVersionInfo MicromapVersi
 	C.vkGetDeviceMicromapCompatibilityEXT(C.VkDevice(unsafe.Pointer(device)), pVersionInfo.ptr, (*C.VkAccelerationStructureCompatibilityKHR)(pCompatibility.Raw()))
 }
 
-// vkGetDeviceProcAddr is unsupported: unknown type PFN_vkVoidFunction.
+// GetDeviceProcAddr wraps vkGetDeviceProcAddr.
+func GetDeviceProcAddr(device Device, pName ffi.CString) unsafe.Pointer {
+	ret := C.vkGetDeviceProcAddr(C.VkDevice(unsafe.Pointer(device)), (*C.char)(pName.Raw()))
+
+	return unsafe.Pointer(ret)
+}
 
 // GetDeviceQueue wraps vkGetDeviceQueue.
 func GetDeviceQueue(device Device, queueFamilyIndex uint32, queueIndex uint32, pQueue ffi.Ref[Queue]) {
@@ -6524,6 +6709,8 @@ func GetFenceStatus(device Device, fence Fence) Result {
 	return Result(ret)
 }
 
+// vkGetFenceWin32HandleKHR.pHandle is unsupported: category pointer -> ?? HANDLE.
+
 // GetFramebufferTilePropertiesQCOM wraps vkGetFramebufferTilePropertiesQCOM.
 func GetFramebufferTilePropertiesQCOM(device Device, framebuffer Framebuffer, pPropertiesCount ffi.Ref[uint32], pProperties TilePropertiesQCOM) Result {
 	ret := C.vkGetFramebufferTilePropertiesQCOM(C.VkDevice(unsafe.Pointer(device)), C.VkFramebuffer(framebuffer), (*C.uint32_t)(pPropertiesCount.Raw()), pProperties.ptr)
@@ -6613,7 +6800,12 @@ func GetImageViewOpaqueCaptureDescriptorDataEXT(device Device, pInfo ImageViewCa
 	return Result(ret)
 }
 
-// vkGetInstanceProcAddr is unsupported: unknown type PFN_vkVoidFunction.
+// GetInstanceProcAddr wraps vkGetInstanceProcAddr.
+func GetInstanceProcAddr(instance Instance, pName ffi.CString) unsafe.Pointer {
+	ret := C.vkGetInstanceProcAddr(C.VkInstance(unsafe.Pointer(instance)), (*C.char)(pName.Raw()))
+
+	return unsafe.Pointer(ret)
+}
 
 // GetLatencyTimingsNV wraps vkGetLatencyTimingsNV.
 func GetLatencyTimingsNV(device Device, swapchain SwapchainKHR, pLatencyMarkerInfo GetLatencyMarkerInfoNV) {
@@ -6631,7 +6823,27 @@ func GetMemoryHostPointerPropertiesEXT(device Device, handleType ExternalMemoryH
 	return Result(ret)
 }
 
+// GetMemoryMetalHandleEXT wraps vkGetMemoryMetalHandleEXT.
+func GetMemoryMetalHandleEXT(device Device, pGetMetalHandleInfo MemoryGetMetalHandleInfoEXT, pHandle ffi.Ref[unsafe.Pointer]) Result {
+	ret := C.vkGetMemoryMetalHandleEXT(C.VkDevice(unsafe.Pointer(device)), pGetMetalHandleInfo.ptr, (*unsafe.Pointer)(pHandle.Raw()))
+
+	return Result(ret)
+}
+
+// GetMemoryMetalHandlePropertiesEXT wraps vkGetMemoryMetalHandlePropertiesEXT.
+func GetMemoryMetalHandlePropertiesEXT(device Device, handleType ExternalMemoryHandleTypeFlags, pHandle unsafe.Pointer, pMemoryMetalHandleProperties MemoryMetalHandlePropertiesEXT) Result {
+	ret := C.vkGetMemoryMetalHandlePropertiesEXT(C.VkDevice(unsafe.Pointer(device)), C.VkExternalMemoryHandleTypeFlagBits(handleType), pHandle, pMemoryMetalHandleProperties.ptr)
+
+	return Result(ret)
+}
+
 // vkGetMemoryRemoteAddressNV.pAddress is unsupported: category pointer -> ?? VkRemoteAddressNV.
+
+// vkGetMemoryWin32HandleKHR.pHandle is unsupported: category pointer -> ?? HANDLE.
+
+// vkGetMemoryWin32HandleNV.pHandle is unsupported: category pointer -> ?? HANDLE.
+
+// vkGetMemoryWin32HandlePropertiesKHR.handle is unsupported: unknown type HANDLE.
 
 // GetMicromapBuildSizesEXT wraps vkGetMicromapBuildSizesEXT.
 func GetMicromapBuildSizesEXT(device Device, buildType AccelerationStructureBuildTypeKHR, pBuildInfo MicromapBuildInfoEXT, pSizeInfo MicromapBuildSizesInfoEXT) {
@@ -6906,6 +7118,13 @@ func GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice PhysicalDevice, surface S
 	return Result(ret)
 }
 
+// GetPhysicalDeviceSurfacePresentModes2EXT wraps vkGetPhysicalDeviceSurfacePresentModes2EXT.
+func GetPhysicalDeviceSurfacePresentModes2EXT(physicalDevice PhysicalDevice, pSurfaceInfo PhysicalDeviceSurfaceInfo2KHR, pPresentModeCount ffi.Ref[uint32], pPresentModes ffi.Ref[PresentModeKHR]) Result {
+	ret := C.vkGetPhysicalDeviceSurfacePresentModes2EXT(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), pSurfaceInfo.ptr, (*C.uint32_t)(pPresentModeCount.Raw()), (*C.VkPresentModeKHR)(pPresentModes.Raw()))
+
+	return Result(ret)
+}
+
 // GetPhysicalDeviceSurfacePresentModesKHR wraps vkGetPhysicalDeviceSurfacePresentModesKHR.
 func GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice PhysicalDevice, surface SurfaceKHR, pPresentModeCount ffi.Ref[uint32], pPresentModes ffi.Ref[PresentModeKHR]) Result {
 	ret := C.vkGetPhysicalDeviceSurfacePresentModesKHR(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), C.VkSurfaceKHR(surface), (*C.uint32_t)(pPresentModeCount.Raw()), (*C.VkPresentModeKHR)(pPresentModes.Raw()))
@@ -6941,6 +7160,17 @@ func GetPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice PhysicalDevice, pV
 	ret := C.vkGetPhysicalDeviceVideoFormatPropertiesKHR(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), pVideoFormatInfo.ptr, (*C.uint32_t)(pVideoFormatPropertyCount.Raw()), pVideoFormatProperties.ptr)
 
 	return Result(ret)
+}
+
+// GetPhysicalDeviceWin32PresentationSupportKHR wraps vkGetPhysicalDeviceWin32PresentationSupportKHR.
+func GetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice PhysicalDevice, queueFamilyIndex uint32) bool {
+	ret := C.vkGetPhysicalDeviceWin32PresentationSupportKHR(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), C.uint32_t(queueFamilyIndex))
+
+	if ret > 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 // GetPipelineBinaryDataKHR wraps vkGetPipelineBinaryDataKHR.
@@ -7075,6 +7305,8 @@ func GetSemaphoreCounterValue(device Device, semaphore Semaphore, pValue ffi.Ref
 
 // vkGetSemaphoreFdKHR.pFd is unsupported: category pointer -> ?? int.
 
+// vkGetSemaphoreWin32HandleKHR.pHandle is unsupported: category pointer -> ?? HANDLE.
+
 // GetShaderBinaryDataEXT wraps vkGetShaderBinaryDataEXT.
 func GetShaderBinaryDataEXT(device Device, shader ShaderEXT, pDataSize ffi.Ref[uintptr], pData unsafe.Pointer) Result {
 	ret := C.vkGetShaderBinaryDataEXT(C.VkDevice(unsafe.Pointer(device)), C.VkShaderEXT(shader), (*C.size_t)(pDataSize.Raw()), pData)
@@ -7153,6 +7385,13 @@ func GetVideoSessionMemoryRequirementsKHR(device Device, videoSession VideoSessi
 	return Result(ret)
 }
 
+// GetWinrtDisplayNV wraps vkGetWinrtDisplayNV.
+func GetWinrtDisplayNV(physicalDevice PhysicalDevice, deviceRelativeId uint32, pDisplay ffi.Ref[DisplayKHR]) Result {
+	ret := C.vkGetWinrtDisplayNV(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), C.uint32_t(deviceRelativeId), (*C.VkDisplayKHR)(pDisplay.Raw()))
+
+	return Result(ret)
+}
+
 // ImportFenceFdKHR wraps vkImportFenceFdKHR.
 func ImportFenceFdKHR(device Device, pImportFenceFdInfo ImportFenceFdInfoKHR) Result {
 	ret := C.vkImportFenceFdKHR(C.VkDevice(unsafe.Pointer(device)), pImportFenceFdInfo.ptr)
@@ -7160,9 +7399,23 @@ func ImportFenceFdKHR(device Device, pImportFenceFdInfo ImportFenceFdInfoKHR) Re
 	return Result(ret)
 }
 
+// ImportFenceWin32HandleKHR wraps vkImportFenceWin32HandleKHR.
+func ImportFenceWin32HandleKHR(device Device, pImportFenceWin32HandleInfo ImportFenceWin32HandleInfoKHR) Result {
+	ret := C.vkImportFenceWin32HandleKHR(C.VkDevice(unsafe.Pointer(device)), pImportFenceWin32HandleInfo.ptr)
+
+	return Result(ret)
+}
+
 // ImportSemaphoreFdKHR wraps vkImportSemaphoreFdKHR.
 func ImportSemaphoreFdKHR(device Device, pImportSemaphoreFdInfo ImportSemaphoreFdInfoKHR) Result {
 	ret := C.vkImportSemaphoreFdKHR(C.VkDevice(unsafe.Pointer(device)), pImportSemaphoreFdInfo.ptr)
+
+	return Result(ret)
+}
+
+// ImportSemaphoreWin32HandleKHR wraps vkImportSemaphoreWin32HandleKHR.
+func ImportSemaphoreWin32HandleKHR(device Device, pImportSemaphoreWin32HandleInfo ImportSemaphoreWin32HandleInfoKHR) Result {
+	ret := C.vkImportSemaphoreWin32HandleKHR(C.VkDevice(unsafe.Pointer(device)), pImportSemaphoreWin32HandleInfo.ptr)
 
 	return Result(ret)
 }
@@ -7188,9 +7441,19 @@ func LatencySleepNV(device Device, swapchain SwapchainKHR, pSleepInfo LatencySle
 	return Result(ret)
 }
 
-// vkMapMemory.ppData is unsupported: category pointer2.
+// MapMemory wraps vkMapMemory.
+func MapMemory(device Device, memory DeviceMemory, offset DeviceSize, size DeviceSize, flags MemoryMapFlags, ppData ffi.Ref[unsafe.Pointer]) Result {
+	ret := C.vkMapMemory(C.VkDevice(unsafe.Pointer(device)), C.VkDeviceMemory(memory), C.VkDeviceSize(offset), C.VkDeviceSize(size), C.VkMemoryMapFlags(flags), (*unsafe.Pointer)(ppData.Raw()))
 
-// vkMapMemory2.ppData is unsupported: category pointer2.
+	return Result(ret)
+}
+
+// MapMemory2 wraps vkMapMemory2.
+func MapMemory2(device Device, pMemoryMapInfo MemoryMapInfo, ppData ffi.Ref[unsafe.Pointer]) Result {
+	ret := C.vkMapMemory2(C.VkDevice(unsafe.Pointer(device)), pMemoryMapInfo.ptr, (*unsafe.Pointer)(ppData.Raw()))
+
+	return Result(ret)
+}
 
 // MergePipelineCaches wraps vkMergePipelineCaches.
 func MergePipelineCaches(device Device, dstCache PipelineCache, srcCacheCount uint32, pSrcCaches ffi.Ref[PipelineCache]) Result {
@@ -7292,6 +7555,13 @@ func ReleaseCapturedPipelineDataKHR(device Device, pInfo ReleaseCapturedPipeline
 // ReleaseDisplayEXT wraps vkReleaseDisplayEXT.
 func ReleaseDisplayEXT(physicalDevice PhysicalDevice, display DisplayKHR) Result {
 	ret := C.vkReleaseDisplayEXT(C.VkPhysicalDevice(unsafe.Pointer(physicalDevice)), C.VkDisplayKHR(display))
+
+	return Result(ret)
+}
+
+// ReleaseFullScreenExclusiveModeEXT wraps vkReleaseFullScreenExclusiveModeEXT.
+func ReleaseFullScreenExclusiveModeEXT(device Device, swapchain SwapchainKHR) Result {
+	ret := C.vkReleaseFullScreenExclusiveModeEXT(C.VkDevice(unsafe.Pointer(device)), C.VkSwapchainKHR(swapchain))
 
 	return Result(ret)
 }

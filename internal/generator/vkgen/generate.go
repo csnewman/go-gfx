@@ -31,7 +31,8 @@ func generate(reg *Registry) {
 	oHandles.CgoPreamble(`#include "vulkan.h"`)
 
 	oCommands := jen.NewFile("vk")
-	oCommands.CgoPreamble(`#include "vulkan.h"`)
+	oCommands.CgoPreamble(`#define VK_NO_PROTOTYPES 1
+#include "vulkan.h"`)
 
 	sortedTypes := slices.Sorted(maps.Keys(reg.Types))
 
@@ -568,6 +569,27 @@ func generateStructField(reg *Registry, generatedOffsets map[string]struct{}, o 
 			break
 		}
 
+		if field.Type == "HINSTANCE" || field.Type == "HWND" {
+			mappedType = jen.Qual("unsafe", "Pointer")
+			//
+			//if fieldType.NonDispatchable {
+			//	generateDefault = true
+			//} else {
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Qual("unsafe", "Pointer").Params(jen.Id("p").Dot("ptr").Dot(cFieldName)),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Parens(
+					jen.Id("C." + field.Type)).Params(jen.Qual("unsafe", "Pointer").Params(jen.Id("value"))),
+			}
+			//}
+
+			break
+		}
+
 		fieldType, ok := reg.Types[field.Type]
 		if !ok {
 			o.Commentf("%s.%s is unsupported: unknown type %s.", tyName, field.Name, field.Type)
@@ -656,6 +678,26 @@ func generateStructField(reg *Registry, generatedOffsets map[string]struct{}, o 
 			setBody = []jen.Code{
 				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value"),
 			}
+
+			break
+		}
+
+		if field.Type == "CAMetalLayer" {
+			mappedType = jen.Qual("unsafe", "Pointer")
+
+			getBody = []jen.Code{
+				jen.Return(
+					jen.Add(mappedType).Params(jen.Id("p").Dot("ptr").Dot(cFieldName)),
+				),
+			}
+
+			setBody = []jen.Code{
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value"),
+			}
+
+			//setBody = []jen.Code{
+			//	jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Call(jen.Id("*C." + field.Type)).Call(jen.Id("value")),
+			//}
 
 			break
 		}
@@ -864,7 +906,16 @@ func generateCommand(reg *Registry, o *jen.File, cmd *Command, generatedCmds map
 		postCall = append(postCall, jen.Return(jen.Id(mapping).Call(jen.Id(tmpRetVar))))
 	} else if cmd.ReturnType == "VkBool32" {
 		retMappedType = jen.Id("bool")
-		postCall = append(postCall, jen.Return(jen.Id("bool").Call(jen.Id(tmpRetVar))))
+		postCall = append(
+			postCall,
+			jen.If(jen.Id(tmpRetVar).Op(">").Id("0")).
+				Block(jen.Return(jen.True())).
+				Else().
+				Block(jen.Return(jen.False())),
+		)
+	} else if cmd.ReturnType == "PFN_vkVoidFunction" {
+		retMappedType = jen.Qual("unsafe", "Pointer")
+		postCall = append(postCall, jen.Return(jen.Qual("unsafe", "Pointer").Call(jen.Id(tmpRetVar))))
 	} else if fieldType, ok := reg.Types[cmd.ReturnType]; ok {
 		switch fieldType.Category {
 		case CategoryEnum:
@@ -1037,6 +1088,25 @@ func generateCommand(reg *Registry, o *jen.File, cmd *Command, generatedCmds map
 
 				return
 			}
+
+		case MemberCategoryPointer2:
+			paramsC = append(paramsC, member.Type+"** "+member.Name)
+
+			if member.Type == "void" {
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "Ref").Types(jen.Qual("unsafe", "Pointer")))
+				callBlock = append(callBlock, jen.Call(jen.Id("*unsafe.Pointer")).
+					Call(
+						jen.Id(safeName).Dot("Raw").Call(),
+					),
+				)
+
+				break
+			}
+
+			o.Commentf("%s.%s is unsupported: category %s type %s.", cmd.Name, member.Name, member.Category, member.Type)
+			o.Line()
+
+			return
 
 		default:
 			o.Commentf("%s.%s is unsupported: category %s.", cmd.Name, member.Name, member.Category)

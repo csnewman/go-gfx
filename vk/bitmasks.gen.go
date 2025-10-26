@@ -1123,6 +1123,28 @@ func (e EventCreateFlags) String() string {
 	return fmt.Sprintf("VkEventCreateFlags(%b)", e)
 }
 
+// ExportMetalObjectTypeFlagsEXT wraps the bitmask VkExportMetalObjectTypeFlagsEXT.
+type ExportMetalObjectTypeFlagsEXT int32
+
+const (
+	// EXPORT_METAL_OBJECT_TYPE_METAL_DEVICE_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_DEVICE_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_DEVICE_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 0
+	// EXPORT_METAL_OBJECT_TYPE_METAL_COMMAND_QUEUE_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_COMMAND_QUEUE_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_COMMAND_QUEUE_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 1
+	// EXPORT_METAL_OBJECT_TYPE_METAL_BUFFER_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_BUFFER_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_BUFFER_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 2
+	// EXPORT_METAL_OBJECT_TYPE_METAL_TEXTURE_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_TEXTURE_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_TEXTURE_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 3
+	// EXPORT_METAL_OBJECT_TYPE_METAL_IOSURFACE_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_IOSURFACE_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_IOSURFACE_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 4
+	// EXPORT_METAL_OBJECT_TYPE_METAL_SHARED_EVENT_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_SHARED_EVENT_BIT_EXT.
+	EXPORT_METAL_OBJECT_TYPE_METAL_SHARED_EVENT_BIT_EXT ExportMetalObjectTypeFlagsEXT = 1 << 5
+)
+
+func (e ExportMetalObjectTypeFlagsEXT) String() string {
+	return fmt.Sprintf("VkExportMetalObjectTypeFlagsEXT(%b)", e)
+}
+
 // ExternalFenceFeatureFlags wraps the bitmask VkExternalFenceFeatureFlags.
 type ExternalFenceFeatureFlags int32
 
@@ -1257,6 +1279,12 @@ const (
 	EXTERNAL_MEMORY_HANDLE_TYPE_HOST_MAPPED_FOREIGN_MEMORY_BIT_EXT ExternalMemoryHandleTypeFlags = 1 << 8
 	// EXTERNAL_MEMORY_HANDLE_TYPE_RDMA_ADDRESS_BIT_NV wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_RDMA_ADDRESS_BIT_NV.
 	EXTERNAL_MEMORY_HANDLE_TYPE_RDMA_ADDRESS_BIT_NV ExternalMemoryHandleTypeFlags = 1 << 12
+	// EXTERNAL_MEMORY_HANDLE_TYPE_MTLBUFFER_BIT_EXT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLBUFFER_BIT_EXT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_MTLBUFFER_BIT_EXT ExternalMemoryHandleTypeFlags = 1 << 16
+	// EXTERNAL_MEMORY_HANDLE_TYPE_MTLTEXTURE_BIT_EXT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLTEXTURE_BIT_EXT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_MTLTEXTURE_BIT_EXT ExternalMemoryHandleTypeFlags = 1 << 17
+	// EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT.
+	EXTERNAL_MEMORY_HANDLE_TYPE_MTLHEAP_BIT_EXT ExternalMemoryHandleTypeFlags = 1 << 18
 )
 
 func (e ExternalMemoryHandleTypeFlags) String() string {
@@ -2205,6 +2233,13 @@ const (
 
 func (e MemoryUnmapFlags) String() string {
 	return fmt.Sprintf("VkMemoryUnmapFlags(%b)", e)
+}
+
+// MetalSurfaceCreateFlagsEXT wraps the bitmask VkMetalSurfaceCreateFlagsEXT.
+type MetalSurfaceCreateFlagsEXT int32
+
+func (e MetalSurfaceCreateFlagsEXT) String() string {
+	return fmt.Sprintf("VkMetalSurfaceCreateFlagsEXT(%b)", e)
 }
 
 // MicromapCreateFlagsEXT wraps the bitmask VkMicromapCreateFlagsEXT.
@@ -4473,4 +4508,11 @@ const (
 
 func (e VideoSessionParametersCreateFlagsKHR) String() string {
 	return fmt.Sprintf("VkVideoSessionParametersCreateFlagsKHR(%b)", e)
+}
+
+// Win32SurfaceCreateFlagsKHR wraps the bitmask VkWin32SurfaceCreateFlagsKHR.
+type Win32SurfaceCreateFlagsKHR int32
+
+func (e Win32SurfaceCreateFlagsKHR) String() string {
+	return fmt.Sprintf("VkWin32SurfaceCreateFlagsKHR(%b)", e)
 }
