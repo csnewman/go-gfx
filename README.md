@@ -11,6 +11,8 @@ Cross-platform graphics framework for Go, covering both mid-level and low-level 
 The repository contains the following packages, intended for low-level access and control:
 
 - `vk` - Low-level Vulkan bindings.
+- `vkloader` - Vulkan function loader.
+- `vma` - Low-level Vulkan Memory Allocator bindings.
 
 These package are suitable for creating a custom engine from scratch.
 
