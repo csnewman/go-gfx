@@ -9,6 +9,7 @@ import (
 	"github.com/csnewman/go-gfx/ffi"
 	"github.com/csnewman/go-gfx/gfx"
 	"github.com/csnewman/go-gfx/vk"
+	"github.com/csnewman/go-gfx/vkloader"
 	"github.com/csnewman/go-gfx/vma"
 )
 
@@ -112,7 +113,7 @@ func (g *Graphics) createInstance(arena *ffi.Arena) error {
 	defer arena.Checkpoint()()
 
 	// TODO: check null
-	vk.Load(g.platform.VKInstanceProcAddr())
+	vkloader.Load(g.platform.VKInstanceProcAddr())
 
 	appInfo := vk.ApplicationInfoAlloc(arena, 1)
 	appInfo.SetSType(vk.STRUCTURE_TYPE_APPLICATION_INFO)
@@ -158,7 +159,7 @@ func (g *Graphics) createInstance(arena *ffi.Arena) error {
 
 	g.instance = instOut.Get()
 
-	vk.LoadInstance(g.instance)
+	vkloader.LoadInstance(g.instance)
 
 	vk.Logger = g.logger
 
