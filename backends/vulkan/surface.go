@@ -2,27 +2,24 @@ package vulkan
 
 import (
 	"fmt"
-	"github.com/csnewman/go-gfx/gfx"
 	"log/slog"
 	"math"
-	"runtime"
 	"unsafe"
-)
 
-/*
-#include "vulkan.h"
-*/
-import "C"
+	"github.com/csnewman/go-gfx/ffi"
+	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/vk"
+)
 
 type Surface struct {
 	graphics      *Graphics
 	logger        *slog.Logger
-	surface       C.VkSurfaceKHR
-	format        C.VkFormat
-	colorSpace    C.VkColorSpaceKHR
+	surface       vk.SurfaceKHR
+	format        vk.Format
+	colorSpace    vk.ColorSpaceKHR
 	minImageCount int
-	transform     C.VkSurfaceTransformFlagBitsKHR
-	swapchain     C.VkSwapchainKHR
+	transform     vk.SurfaceTransformFlagsKHR
+	swapchain     vk.SwapchainKHR
 	images        []*Image
 	entries       []*SurfaceEntry
 	frameCount    int
@@ -32,16 +29,19 @@ type Surface struct {
 }
 
 type SurfaceEntry struct {
-	commandPool C.VkCommandPool
-	buffers     []C.VkCommandBuffer
+	commandPool vk.CommandPool
+	buffers     []vk.CommandBuffer
 	bufferPos   int
-	imgSem      C.VkSemaphore
-	completeSem C.VkSemaphore
-	fence       C.VkFence
+	imgSem      vk.Semaphore
+	completeSem vk.Semaphore
+	fence       vk.Fence
 }
 
 func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize) (gfx.Surface, error) {
-	var surface C.VkSurfaceKHR
+	arena := ffi.NewArena()
+	defer arena.Close()
+
+	var surface vk.SurfaceKHR
 
 	switch handle.SurfaceHandleType() {
 	case gfx.VulkanSurfaceHandleType:
@@ -52,63 +52,71 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize
 			return nil, err
 		}
 
-		surface = C.VkSurfaceKHR(rawSurf)
+		surface = vk.SurfaceKHR(uintptr(rawSurf))
 	case gfx.MetalSurfaceHandleType:
 		sh := handle.(gfx.MetalSurfaceHandle)
 
-		var createInfo C.VkMetalSurfaceCreateInfoEXT
-		createInfo.sType = C.VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT
-		createInfo.pLayer = sh.MetalLayer()
+		createInfo := vk.MetalSurfaceCreateInfoEXTAlloc(arena, 1)
+		createInfo.SetSType(vk.STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT)
+		createInfo.SetPLayer(sh.MetalLayer())
 
-		if err := mapError(C.vkCreateMetalSurfaceEXT(g.instance, &createInfo, nil, &surface)); err != nil {
+		surfaceRef := ffi.RefAlloc[vk.SurfaceKHR](arena, 1)
+
+		if err := mapError(vk.CreateMetalSurfaceEXT(g.instance, createInfo, vk.AllocationCallbacksNil, surfaceRef)); err != nil {
 			return nil, err
 		}
+
+		surface = surfaceRef.Get()
 	case gfx.Win32SurfaceHandleType:
 		sh := handle.(gfx.Win32SurfaceHandle)
 
-		var createInfo C.VkWin32SurfaceCreateInfoKHR
-		createInfo.sType = C.VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR
-		createInfo.hinstance = C.HINSTANCE(sh.Win32Instance())
-		createInfo.hwnd = C.HWND(sh.Win32Handle())
+		createInfo := vk.Win32SurfaceCreateInfoKHRAlloc(arena, 1)
+		createInfo.SetSType(vk.STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR)
+		createInfo.SetHinstance(sh.Win32Instance())
+		createInfo.SetHwnd(sh.Win32Handle())
 
-		if err := mapError(C.vkCreateWin32SurfaceKHR(g.instance, &createInfo, nil, &surface)); err != nil {
+		surfaceRef := ffi.RefAlloc[vk.SurfaceKHR](arena, 1)
+
+		if err := mapError(vk.CreateWin32SurfaceKHR(g.instance, createInfo, vk.AllocationCallbacksNil, surfaceRef)); err != nil {
 			return nil, err
 		}
+
+		surface = surfaceRef.Get()
 	default:
 		return nil, fmt.Errorf("%w: %v", gfx.ErrUnsupportedSurfaceHandle, handle.SurfaceHandleType())
 	}
 
-	var capabilities C.VkSurfaceCapabilitiesKHR
+	capabilities := vk.SurfaceCapabilitiesKHRAlloc(arena, 1)
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(g.physicalDevice, surface, &capabilities)); err != nil {
+	if err := mapError(vk.GetPhysicalDeviceSurfaceCapabilitiesKHR(g.physicalDevice, surface, capabilities)); err != nil {
 		return nil, err
 	}
 
 	// TODO: min & max width height
 
-	g.logger.Debug("Surface capabilities", "capabilities", capabilities)
+	g.logger.Debug("Surface capabilities", "capabilities", capabilities.Raw())
 
-	var formatCount C.uint32_t
+	formatCountRef := ffi.RefAlloc[uint32](arena, 1)
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, nil)); err != nil {
+	if err := mapError(vk.GetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, formatCountRef, vk.SurfaceFormatKHRNil)); err != nil {
 		return nil, err
 	}
 
-	formats := make([]C.VkSurfaceFormatKHR, formatCount)
+	formats := vk.SurfaceFormatKHRAlloc(arena, int(formatCountRef.Get()))
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, &formatCount, unsafe.SliceData(formats))); err != nil {
+	if err := mapError(vk.GetPhysicalDeviceSurfaceFormatsKHR(g.physicalDevice, surface, formatCountRef, formats)); err != nil {
 		return nil, err
 	}
 
-	formats = formats[:formatCount]
-
-	var format C.VkSurfaceFormatKHR
+	var format vk.SurfaceFormatKHR
 	foundFormat := false
 
-	for _, fmt := range formats {
-		if fmt.format == C.VK_FORMAT_B8G8R8A8_UNORM {
+	for i := 0; i < int(formatCountRef.Get()); i++ {
+		entry := formats.Offset(i)
+
+		if entry.GetFormat() == vk.FORMAT_B8G8R8A8_UNORM {
 			foundFormat = true
-			format = fmt
+			format = entry
 
 			break
 		}
@@ -122,16 +130,18 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize
 		logger:        g.logger,
 		graphics:      g,
 		surface:       surface,
-		format:        format.format,
-		colorSpace:    format.colorSpace,
-		minImageCount: int(capabilities.minImageCount),
-		transform:     capabilities.currentTransform,
+		format:        format.GetFormat(),
+		colorSpace:    format.GetColorSpace(),
+		minImageCount: int(capabilities.GetMinImageCount()),
+		transform:     capabilities.GetCurrentTransform(),
 		frameCount:    3,
 	}
 
 	if size.Width == 0 && size.Height == 0 {
-		size.Width = int(capabilities.currentExtent.width)
-		size.Height = int(capabilities.currentExtent.height)
+		currentExtent := capabilities.RefCurrentExtent()
+
+		size.Width = int(currentExtent.GetWidth())
+		size.Height = int(currentExtent.GetHeight())
 	}
 
 	if err := s.Resize(size); err != nil {
@@ -139,48 +149,47 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize
 	}
 
 	for i := 0; i < s.frameCount; i++ {
-		var commandInfo C.VkCommandPoolCreateInfo
+		commandInfo := vk.CommandPoolCreateInfoAlloc(arena, 1)
+		commandInfo.SetSType(vk.STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO)
+		commandInfo.SetQueueFamilyIndex(uint32(s.graphics.graphicsFamily))
+		commandInfo.SetFlags(vk.COMMAND_POOL_CREATE_TRANSIENT_BIT)
 
-		commandInfo.sType = C.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO
-		commandInfo.queueFamilyIndex = C.uint32_t(s.graphics.graphicsFamily)
-		commandInfo.flags = C.VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+		poolRef := ffi.RefAlloc[vk.CommandPool](arena, 1)
 
-		var commandPool C.VkCommandPool
-
-		if err := mapError(C.vkCreateCommandPool(s.graphics.device, &commandInfo, nil, &commandPool)); err != nil {
+		if err := mapError(vk.CreateCommandPool(s.graphics.device, commandInfo, vk.AllocationCallbacksNil, poolRef)); err != nil {
 			return nil, err
 		}
 
-		var semInfo C.VkSemaphoreCreateInfo
-		semInfo.sType = C.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+		semInfo := vk.SemaphoreCreateInfoAlloc(arena, 1)
+		semInfo.SetSType(vk.STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO)
 
-		var imgSem C.VkSemaphore
+		imgSemRef := ffi.RefAlloc[vk.Semaphore](arena, 1)
 
-		if err := mapError(C.vkCreateSemaphore(s.graphics.device, &semInfo, nil, &imgSem)); err != nil {
+		if err := mapError(vk.CreateSemaphore(s.graphics.device, semInfo, vk.AllocationCallbacksNil, imgSemRef)); err != nil {
 			return nil, err
 		}
 
-		var completeSem C.VkSemaphore
+		completeSemRef := ffi.RefAlloc[vk.Semaphore](arena, 1)
 
-		if err := mapError(C.vkCreateSemaphore(s.graphics.device, &semInfo, nil, &completeSem)); err != nil {
+		if err := mapError(vk.CreateSemaphore(s.graphics.device, semInfo, vk.AllocationCallbacksNil, completeSemRef)); err != nil {
 			return nil, err
 		}
 
-		var fenceInfo C.VkFenceCreateInfo
-		fenceInfo.sType = C.VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
-		fenceInfo.flags = C.VK_FENCE_CREATE_SIGNALED_BIT
+		fenceInfo := vk.FenceCreateInfoAlloc(arena, 1)
+		fenceInfo.SetSType(vk.STRUCTURE_TYPE_FENCE_CREATE_INFO)
+		fenceInfo.SetFlags(vk.FENCE_CREATE_SIGNALED_BIT)
 
-		var fence C.VkFence
+		fenceRef := ffi.RefAlloc[vk.Fence](arena, 1)
 
-		if err := mapError(C.vkCreateFence(s.graphics.device, &fenceInfo, nil, &fence)); err != nil {
+		if err := mapError(vk.CreateFence(s.graphics.device, fenceInfo, vk.AllocationCallbacksNil, fenceRef)); err != nil {
 			return nil, err
 		}
 
 		s.entries = append(s.entries, &SurfaceEntry{
-			commandPool: commandPool,
-			imgSem:      imgSem,
-			completeSem: completeSem,
-			fence:       fence,
+			commandPool: poolRef.Get(),
+			imgSem:      imgSemRef.Get(),
+			completeSem: completeSemRef.Get(),
+			fence:       fenceRef.Get(),
 		})
 	}
 
@@ -189,10 +198,10 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize
 
 func (s *Surface) destroy() {
 	for _, entry := range s.entries {
-		C.vkDestroyFence(s.graphics.device, entry.fence, nil)
-		C.vkDestroySemaphore(s.graphics.device, entry.imgSem, nil)
-		C.vkDestroySemaphore(s.graphics.device, entry.completeSem, nil)
-		C.vkDestroyCommandPool(s.graphics.device, entry.commandPool, nil)
+		vk.DestroyFence(s.graphics.device, entry.fence, vk.AllocationCallbacksNil)
+		vk.DestroySemaphore(s.graphics.device, entry.imgSem, vk.AllocationCallbacksNil)
+		vk.DestroySemaphore(s.graphics.device, entry.completeSem, vk.AllocationCallbacksNil)
+		vk.DestroyCommandPool(s.graphics.device, entry.commandPool, vk.AllocationCallbacksNil)
 	}
 
 	s.entries = nil
@@ -200,66 +209,80 @@ func (s *Surface) destroy() {
 	s.destroySwapchain()
 }
 
-func (s *Surface) createSwapchain() error {
-	var createInfo C.VkSwapchainCreateInfoKHR
-	createInfo.sType = C.VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR
-	createInfo.surface = s.surface
-	createInfo.minImageCount = C.uint32_t(s.minImageCount)
-	createInfo.imageFormat = s.format
-	createInfo.imageColorSpace = s.colorSpace
-	createInfo.imageExtent.width = C.uint32_t(s.width)
-	createInfo.imageExtent.height = C.uint32_t(s.height)
-	createInfo.imageArrayLayers = 1
-	createInfo.imageUsage = C.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
-	createInfo.imageSharingMode = C.VK_SHARING_MODE_EXCLUSIVE
-	createInfo.preTransform = s.transform
-	createInfo.compositeAlpha = C.VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR
-	createInfo.presentMode = C.VK_PRESENT_MODE_FIFO_KHR
-	createInfo.clipped = C.VkBool32(1)
+func (s *Surface) createSwapchain(arena *ffi.Arena) error {
+	s.logger.Debug("Creating swapchain")
 
-	if err := mapError(C.vkCreateSwapchainKHR(s.graphics.device, &createInfo, nil, &s.swapchain)); err != nil {
+	createInfo := vk.SwapchainCreateInfoKHRAlloc(arena, 1)
+	createInfo.SetSType(vk.STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR)
+	createInfo.SetSurface(s.surface)
+	createInfo.SetMinImageCount(uint32(s.minImageCount))
+	createInfo.SetImageFormat(s.format)
+	createInfo.SetImageColorSpace(s.colorSpace)
+
+	extent := createInfo.RefImageExtent()
+	extent.SetWidth(uint32(s.width))
+	extent.SetHeight(uint32(s.height))
+
+	createInfo.SetImageArrayLayers(1)
+	createInfo.SetImageUsage(vk.IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+	createInfo.SetImageSharingMode(vk.SHARING_MODE_EXCLUSIVE)
+	createInfo.SetPreTransform(s.transform)
+	createInfo.SetCompositeAlpha(vk.COMPOSITE_ALPHA_OPAQUE_BIT_KHR)
+	createInfo.SetPresentMode(vk.PRESENT_MODE_FIFO_KHR)
+	createInfo.SetClipped(true)
+
+	swapchainRef := ffi.RefAlloc[vk.SwapchainKHR](arena, 1)
+
+	if err := mapError(vk.CreateSwapchainKHR(s.graphics.device, createInfo, vk.AllocationCallbacksNil, swapchainRef)); err != nil {
 		return err
 	}
 
-	var imageCount C.uint32_t
+	s.swapchain = swapchainRef.Get()
 
-	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, nil)); err != nil {
+	imageCountRef := ffi.RefAlloc[uint32](arena, 1)
+
+	if err := mapError(vk.GetSwapchainImagesKHR(s.graphics.device, s.swapchain, imageCountRef, ffi.RefNil[vk.Image]())); err != nil {
 		return err
 	}
 
-	images := make([]C.VkImage, imageCount)
+	images := ffi.RefAlloc[vk.Image](arena, int(imageCountRef.Get()))
 
-	if err := mapError(C.vkGetSwapchainImagesKHR(s.graphics.device, s.swapchain, &imageCount, unsafe.SliceData(images))); err != nil {
+	if err := mapError(vk.GetSwapchainImagesKHR(s.graphics.device, s.swapchain, imageCountRef, images)); err != nil {
 		return err
 	}
 
-	images = images[:imageCount]
+	for i := 0; i < int(imageCountRef.Get()); i++ {
+		image := images.Offset(i).Get()
 
-	for _, image := range images {
-		var createInfo C.VkImageViewCreateInfo
-		createInfo.sType = C.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO
-		createInfo.viewType = C.VK_IMAGE_VIEW_TYPE_2D
-		createInfo.components.r = C.VK_COMPONENT_SWIZZLE_IDENTITY
-		createInfo.components.g = C.VK_COMPONENT_SWIZZLE_IDENTITY
-		createInfo.components.b = C.VK_COMPONENT_SWIZZLE_IDENTITY
-		createInfo.components.a = C.VK_COMPONENT_SWIZZLE_IDENTITY
-		createInfo.subresourceRange.baseMipLevel = 0
-		createInfo.subresourceRange.levelCount = C.VK_REMAINING_MIP_LEVELS
-		createInfo.subresourceRange.baseArrayLayer = 0
-		createInfo.subresourceRange.layerCount = C.VK_REMAINING_ARRAY_LAYERS
-		createInfo.image = image
-		createInfo.format = s.format
-		createInfo.subresourceRange.aspectMask = C.VK_IMAGE_ASPECT_COLOR_BIT
+		createInfo := vk.ImageViewCreateInfoAlloc(arena, 1)
+		createInfo.SetSType(vk.STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO)
+		createInfo.SetViewType(vk.IMAGE_VIEW_TYPE_2D)
 
-		var view C.VkImageView
+		components := createInfo.RefComponents()
+		components.SetR(vk.COMPONENT_SWIZZLE_IDENTITY)
+		components.SetG(vk.COMPONENT_SWIZZLE_IDENTITY)
+		components.SetB(vk.COMPONENT_SWIZZLE_IDENTITY)
+		components.SetA(vk.COMPONENT_SWIZZLE_IDENTITY)
 
-		if err := mapError(C.vkCreateImageView(s.graphics.device, &createInfo, nil, &view)); err != nil {
+		subresourceRange := createInfo.RefSubresourceRange()
+		subresourceRange.SetBaseMipLevel(0)
+		subresourceRange.SetLevelCount(vk.REMAINING_MIP_LEVELS)
+		subresourceRange.SetBaseArrayLayer(0)
+		subresourceRange.SetLayerCount(vk.REMAINING_ARRAY_LAYERS)
+		subresourceRange.SetAspectMask(vk.IMAGE_ASPECT_COLOR_BIT)
+
+		createInfo.SetImage(image)
+		createInfo.SetFormat(s.format)
+
+		viewRef := ffi.RefAlloc[vk.ImageView](arena, 1)
+
+		if err := mapError(vk.CreateImageView(s.graphics.device, createInfo, vk.AllocationCallbacksNil, viewRef)); err != nil {
 			return err
 		}
 
 		s.images = append(s.images, &Image{
 			image:  image,
-			view:   view,
+			view:   viewRef.Get(),
 			width:  s.width,
 			height: s.height,
 		})
@@ -269,38 +292,45 @@ func (s *Surface) createSwapchain() error {
 }
 
 func (s *Surface) destroySwapchain() {
+	s.logger.Debug("Destroying swapchain", "dev", s.graphics.device, "swapchain", s.swapchain)
+	
 	for _, image := range s.images {
-		C.vkDestroyImageView(s.graphics.device, image.view, nil)
+		vk.DestroyImageView(s.graphics.device, image.view, vk.AllocationCallbacksNil)
 	}
 
 	s.images = nil
 
-	C.vkDestroySwapchainKHR(s.graphics.device, s.swapchain, nil)
+	if s.swapchain != vk.SwapchainKHRNil {
+		vk.DestroySwapchainKHR(s.graphics.device, s.swapchain, vk.AllocationCallbacksNil)
+	}
 }
 
 func (s *Surface) Resize(size gfx.PhysicalSize) error {
 	s.logger.Debug("Surface resize", "width", size.Width, "height", size.Height)
 
+	arena := ffi.NewArena()
+	defer arena.Close()
+
 	s.width = size.Width
 	s.height = size.Height
 
-	var capabilities C.VkSurfaceCapabilitiesKHR
+	capabilities := vk.SurfaceCapabilitiesKHRAlloc(arena, 1)
 
-	if err := mapError(C.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(s.graphics.physicalDevice, s.surface, &capabilities)); err != nil {
+	if err := mapError(vk.GetPhysicalDeviceSurfaceCapabilitiesKHR(s.graphics.physicalDevice, s.surface, capabilities)); err != nil {
 		return err
 	}
 
 	// TODO: min & max width height
 
-	s.logger.Debug("Surface capabilities", "capabilities", capabilities)
+	s.logger.Debug("Surface capabilities", "capabilities", capabilities.Raw())
 
-	if err := mapError(C.vkDeviceWaitIdle(s.graphics.device)); err != nil {
+	if err := mapError(vk.DeviceWaitIdle(s.graphics.device)); err != nil {
 		return err
 	}
 
 	s.destroySwapchain()
 
-	return s.createSwapchain()
+	return s.createSwapchain(arena)
 }
 
 func (s *Surface) Format() gfx.Format {
@@ -324,35 +354,41 @@ type SurfaceFrame struct {
 }
 
 func (s *Surface) Acquire() (gfx.SurfaceFrame, error) {
-	entry := s.entries[s.currentEntry]
+	arena := ffi.NewArena()
+	defer arena.Close()
 
-	if err := mapError(C.vkWaitForFences(
+	entry := s.entries[s.currentEntry]
+	fenceRef := ffi.RefFromValues(arena, entry.fence)
+
+	if err := mapError(vk.WaitForFences(
 		s.graphics.device,
 		1,
-		&entry.fence,
-		C.VkBool32(1),
-		C.uint64_t(math.MaxUint64),
+		fenceRef,
+		true,
+		math.MaxUint64,
 	)); err != nil {
 		return nil, err
 	}
 
-	if err := mapError(C.vkResetFences(s.graphics.device, 1, &entry.fence)); err != nil {
+	if err := mapError(vk.ResetFences(s.graphics.device, 1, fenceRef)); err != nil {
 		return nil, err
 	}
 
-	var imgIndex C.uint32_t
+	imgIndexRef := ffi.RefAlloc[uint32](arena, 1)
 
 	// TODO: handle outdated & suboptimal
-	if err := mapError(C.vkAcquireNextImageKHR(
+	if err := mapError(vk.AcquireNextImageKHR(
 		s.graphics.device,
 		s.swapchain,
-		C.uint64_t(math.MaxUint64),
+		math.MaxUint64,
 		entry.imgSem,
-		nil,
-		&imgIndex,
+		vk.FenceNil,
+		imgIndexRef,
 	)); err != nil {
 		return nil, err
 	}
+
+	imgIndex := imgIndexRef.Get()
 
 	s.currentEntry = (s.currentEntry + 1) % len(s.entries)
 
@@ -365,15 +401,15 @@ func (s *Surface) Acquire() (gfx.SurfaceFrame, error) {
 		index:    s.currentEntry,
 	}
 
-	if err := mapError(C.vkResetCommandPool(s.graphics.device, sf.entry.commandPool, 0)); err != nil {
+	if err := mapError(vk.ResetCommandPool(s.graphics.device, sf.entry.commandPool, 0)); err != nil {
 		return nil, err
 	}
 
 	sf.entry.bufferPos = 0
 
-	sf.buffer = sf.CreateCommandBuffer()
+	sf.buffer = sf.CreateCommandBuffer(arena)
 
-	sf.buffer.Barrier(Barrier{
+	sf.buffer.Barrier(arena, Barrier{
 		Images: []ImageBarrier{
 			{
 				Image:     sf.img,
@@ -407,10 +443,10 @@ func (f *SurfaceFrame) BeginRenderPass(descriptor gfx.RenderPassDescriptor) gfx.
 }
 
 func (f *SurfaceFrame) Present() error {
-	pinner := new(runtime.Pinner)
-	defer pinner.Unpin()
+	arena := ffi.NewArena()
+	defer arena.Close()
 
-	f.buffer.Barrier(Barrier{
+	f.buffer.Barrier(arena, Barrier{
 		Images: []ImageBarrier{
 			{
 				Image:     f.img,
@@ -420,30 +456,21 @@ func (f *SurfaceFrame) Present() error {
 		},
 	})
 
-	if err := f.buffer.SubmitFrame(f); err != nil {
+	if err := f.buffer.SubmitFrame(arena, f); err != nil {
 		return err
 	}
 
-	var presentInfo C.VkPresentInfoKHR
-	presentInfo.sType = C.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR
-	presentInfo.pNext = nil
-	presentInfo.swapchainCount = 1
+	presentInfo := vk.PresentInfoKHRAlloc(arena, 1)
+	presentInfo.SetSType(vk.STRUCTURE_TYPE_PRESENT_INFO_KHR)
+	presentInfo.SetSwapchainCount(1)
 
-	swapchain := f.surface.swapchain
-	presentInfo.pSwapchains = &swapchain
-	pinner.Pin(presentInfo.pSwapchains)
+	presentInfo.SetPSwapchains(ffi.RefFromValues(arena, f.surface.swapchain))
+	presentInfo.SetPImageIndices(ffi.RefFromValues[uint32](arena, uint32(f.imgIndex)))
 
-	ind := C.uint32_t(f.imgIndex)
-	presentInfo.pImageIndices = &ind
-	pinner.Pin(presentInfo.pImageIndices)
+	presentInfo.SetPWaitSemaphores(ffi.RefFromValues(arena, f.entry.completeSem))
+	presentInfo.SetWaitSemaphoreCount(1)
 
-	complete := f.entry.completeSem
-	presentInfo.pWaitSemaphores = &complete
-	pinner.Pin(presentInfo.pWaitSemaphores)
-
-	presentInfo.waitSemaphoreCount = 1
-
-	if err := mapError(C.vkQueuePresentKHR(f.graphics.graphicsQueue, &presentInfo)); err != nil {
+	if err := mapError(vk.QueuePresentKHR(f.graphics.graphicsQueue, presentInfo)); err != nil {
 		return err
 	}
 

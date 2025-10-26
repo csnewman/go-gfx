@@ -2,75 +2,79 @@ package vulkan
 
 import (
 	"errors"
-	"github.com/csnewman/go-gfx/gfx"
 	"unsafe"
-)
 
-/*
-#include "vulkan.h"
-*/
-import "C"
+	"github.com/csnewman/go-gfx/ffi"
+	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/vk"
+	"github.com/csnewman/go-gfx/vma"
+)
 
 var ErrNotMapped = errors.New("not mapped")
 
 type Buffer struct {
 	graphics   *Graphics
-	buffer     C.VkBuffer
-	allocation C.VmaAllocation
+	buffer     vk.Buffer
+	allocation vma.Allocation
 	mappedPtr  unsafe.Pointer
 	mapped     int
 	size       int
 }
 
 func (g *Graphics) CreateBuffer(des gfx.BufferDescriptor) (gfx.Buffer, error) {
-	var createInfo C.VkBufferCreateInfo
-	createInfo.sType = C.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
-	createInfo.size = C.VkDeviceSize(des.Size)
+	arena := ffi.NewArena()
+	defer arena.Close()
+
+	createInfo := vk.BufferCreateInfoAlloc(arena, 1)
+	createInfo.SetSType(vk.STRUCTURE_TYPE_BUFFER_CREATE_INFO)
+	createInfo.SetSize(vk.DeviceSize(des.Size))
 
 	// For now enable most common usage types. Supposedly does not affect performance on most hardware.
-	createInfo.usage = C.VK_BUFFER_USAGE_TRANSFER_SRC_BIT | C.VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-		C.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | C.VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
-		C.VK_BUFFER_USAGE_INDEX_BUFFER_BIT | C.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-		C.VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT
-	createInfo.sharingMode = C.VK_SHARING_MODE_EXCLUSIVE
+	createInfo.SetUsage(vk.BUFFER_USAGE_TRANSFER_SRC_BIT | vk.BUFFER_USAGE_TRANSFER_DST_BIT |
+		vk.BUFFER_USAGE_UNIFORM_BUFFER_BIT | vk.BUFFER_USAGE_STORAGE_BUFFER_BIT |
+		vk.BUFFER_USAGE_INDEX_BUFFER_BIT | vk.BUFFER_USAGE_VERTEX_BUFFER_BIT |
+		vk.BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT)
+	createInfo.SetSharingMode(vk.SHARING_MODE_EXCLUSIVE)
 
-	var allocCreateInfo C.VmaAllocationCreateInfo
-	allocCreateInfo.usage = C.VMA_MEMORY_USAGE_AUTO
+	allocCreateInfo := vma.AllocationCreateInfoAlloc(arena, 1)
+	allocCreateInfo.SetUsage(vma.MEMORY_USAGE_AUTO)
+
+	var flags vma.AllocationCreateFlags
 
 	if des.Usage&gfx.BufferUsageHostRandomAccess != 0 {
-		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT
+		flags |= vma.ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT
 	}
 
 	if des.Usage&gfx.BufferUsageHostUpload != 0 {
-		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT
+		flags |= vma.ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT
 	}
 
 	if des.Usage&gfx.BufferUsagePersistentMap != 0 {
-		allocCreateInfo.flags |= C.VMA_ALLOCATION_CREATE_MAPPED_BIT
+		flags |= vma.ALLOCATION_CREATE_MAPPED_BIT
 	}
 
-	var (
-		buffer     C.VkBuffer
-		allocation C.VmaAllocation
-		allocInfo  C.VmaAllocationInfo
-	)
+	allocCreateInfo.SetFlags(flags)
 
-	if err := mapError(C.vmaCreateBuffer(
+	bufferRef := ffi.RefAlloc[vk.Buffer](arena, 1)
+	allocationRef := ffi.RefAlloc[vma.Allocation](arena, 1)
+	allocationInfo := vma.AllocationInfoAlloc(arena, 1)
+
+	if err := mapError(vma.CreateBuffer(
 		g.memoryAllocator,
-		&createInfo,
-		&allocCreateInfo,
-		&buffer,
-		&allocation,
-		&allocInfo,
+		createInfo,
+		allocCreateInfo,
+		bufferRef,
+		allocationRef,
+		allocationInfo,
 	)); err != nil {
 		return nil, err
 	}
 
 	b := &Buffer{
 		graphics:   g,
-		buffer:     buffer,
-		allocation: allocation,
-		mappedPtr:  unsafe.Pointer(allocInfo.pMappedData),
+		buffer:     bufferRef.Get(),
+		allocation: allocationRef.Get(),
+		mappedPtr:  allocationInfo.GetPMappedData(),
 		size:       des.Size,
 	}
 
@@ -82,7 +86,7 @@ func (g *Graphics) CreateBuffer(des gfx.BufferDescriptor) (gfx.Buffer, error) {
 }
 
 func (b *Buffer) Close() {
-	C.vmaDestroyBuffer(b.graphics.memoryAllocator, b.buffer, b.allocation)
+	vma.DestroyBuffer(b.graphics.memoryAllocator, b.buffer, b.allocation)
 }
 
 func (b *Buffer) Size() int {
@@ -98,9 +102,16 @@ func (b *Buffer) Map() (unsafe.Pointer, error) {
 		return b.mappedPtr, nil
 	}
 
-	if err := mapError(C.vmaMapMemory(b.graphics.memoryAllocator, b.allocation, &b.mappedPtr)); err != nil {
+	arena := ffi.NewArena()
+	defer arena.Close()
+
+	ptrRef := ffi.RefAlloc[unsafe.Pointer](arena, 1)
+
+	if err := mapError(vma.MapMemory(b.graphics.memoryAllocator, b.allocation, ptrRef)); err != nil {
 		return nil, err
 	}
+
+	b.mappedPtr = ptrRef.Get()
 
 	b.mapped++
 
@@ -108,7 +119,7 @@ func (b *Buffer) Map() (unsafe.Pointer, error) {
 }
 
 func (b *Buffer) Flush() error {
-	if err := mapError(C.vmaFlushAllocation(b.graphics.memoryAllocator, b.allocation, 0, C.VK_WHOLE_SIZE)); err != nil {
+	if err := mapError(vma.FlushAllocation(b.graphics.memoryAllocator, b.allocation, 0, vk.DeviceSize(vk.WHOLE_SIZE))); err != nil {
 		return err
 	}
 
@@ -120,7 +131,7 @@ func (b *Buffer) Unmap() {
 		return
 	}
 
-	C.vmaUnmapMemory(b.graphics.memoryAllocator, b.allocation)
+	vma.UnmapMemory(b.graphics.memoryAllocator, b.allocation)
 
 	b.mapped--
 }

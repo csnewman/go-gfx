@@ -1,33 +1,34 @@
 package vulkan
 
 import (
-	"github.com/csnewman/go-gfx/gfx"
 	"unsafe"
+
+	"github.com/csnewman/go-gfx/ffi"
+	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/vk"
 )
 
-/*
-#include "vulkan.h"
-*/
-import "C"
-
 type Shader struct {
-	shader C.VkShaderModule
+	shader vk.ShaderModule
 }
 
 func (g *Graphics) CreateShader(cfg gfx.ShaderConfig) (gfx.Shader, error) {
-	var createInfo C.VkShaderModuleCreateInfo
-	createInfo.sType = C.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
-	createInfo.codeSize = C.size_t(len(cfg.SPIRV))
-	createInfo.pCode = (*C.uint32_t)(unsafe.Pointer(unsafe.SliceData(cfg.SPIRV)))
+	arena := ffi.NewArena()
+	defer arena.Close()
 
-	var shaderModule C.VkShaderModule
+	createInfo := vk.ShaderModuleCreateInfoAlloc(arena, 1)
+	createInfo.SetSType(vk.STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO)
+	createInfo.SetCodeSize(uintptr(len(cfg.SPIRV)))
+	createInfo.SetPCode(ffi.RefFromPtr[uint32](unsafe.Pointer(unsafe.SliceData(cfg.SPIRV))))
 
-	if err := mapError(C.vkCreateShaderModule(g.device, &createInfo, nil, &shaderModule)); err != nil {
+	moduleRef := ffi.RefAlloc[vk.ShaderModule](arena, 1)
+
+	if err := mapError(vk.CreateShaderModule(g.device, createInfo, vk.AllocationCallbacksNil, moduleRef)); err != nil {
 		return nil, err
 	}
 
 	return &Shader{
-		shader: shaderModule,
+		shader: moduleRef.Get(),
 	}, nil
 }
 

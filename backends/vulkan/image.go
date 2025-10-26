@@ -1,27 +1,24 @@
 package vulkan
 
 import (
+	"github.com/csnewman/go-gfx/ffi"
 	"github.com/csnewman/go-gfx/gfx"
-	"runtime"
+	"github.com/csnewman/go-gfx/vk"
+	"github.com/csnewman/go-gfx/vma"
 )
 
-/*
-#include "vulkan.h"
-*/
-import "C"
-
 type Image struct {
-	image      C.VkImage
+	image      vk.Image
 	viewID     uint32
-	view       C.VkImageView
-	allocation C.VmaAllocation
+	view       vk.ImageView
+	allocation vma.Allocation
 	width      int
 	height     int
 }
 
 func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
-	pinner := new(runtime.Pinner)
-	defer pinner.Unpin()
+	arena := ffi.NewArena()
+	defer arena.Close()
 
 	switch des.Type {
 	case gfx.ImageType1D:
@@ -29,95 +26,108 @@ func (g *Graphics) CreateImage(des gfx.ImageDescriptor) (gfx.Image, error) {
 		des.Depth = 1
 	case gfx.ImageType2D:
 		des.Depth = 1
+	default:
+		panic("unsupported image type")
 	}
 
 	if des.Width <= 0 || des.Height <= 0 || des.Depth <= 0 {
 		return nil, gfx.ErrInvalidDescriptor
 	}
 
-	var imgInfo C.VkImageCreateInfo
-	imgInfo.sType = C.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO
-	imgInfo.imageType = C.VkImageType(des.Type)
-	imgInfo.format = ToFormat(des.Format)
-	imgInfo.extent.width = C.uint32_t(des.Width)
-	imgInfo.extent.height = C.uint32_t(des.Height)
-	imgInfo.extent.depth = C.uint32_t(des.Depth)
-	imgInfo.mipLevels = 1
-	imgInfo.arrayLayers = 1
-	imgInfo.samples = C.VK_SAMPLE_COUNT_1_BIT
-	imgInfo.tiling = C.VK_IMAGE_TILING_OPTIMAL
+	imgInfo := vk.ImageCreateInfoAlloc(arena, 1)
+	imgInfo.SetSType(vk.STRUCTURE_TYPE_IMAGE_CREATE_INFO)
+	imgInfo.SetImageType(vk.ImageType(des.Type))
+	imgInfo.SetFormat(ToFormat(des.Format))
+
+	extent := imgInfo.RefExtent()
+	extent.SetWidth(uint32(des.Width))
+	extent.SetHeight(uint32(des.Height))
+	extent.SetDepth(uint32(des.Depth))
+
+	imgInfo.SetMipLevels(1)
+	imgInfo.SetArrayLayers(1)
+	imgInfo.SetSamples(vk.SAMPLE_COUNT_1_BIT)
+	imgInfo.SetTiling(vk.IMAGE_TILING_OPTIMAL)
+
+	var usage vk.ImageUsageFlags
 
 	if des.Usage&gfx.ImageUsageCopySrc != 0 {
-		imgInfo.usage |= C.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		usage |= vk.IMAGE_USAGE_TRANSFER_SRC_BIT
 	}
 
 	if des.Usage&gfx.ImageUsageCopyDst != 0 {
-		imgInfo.usage |= C.VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		usage |= vk.IMAGE_USAGE_TRANSFER_DST_BIT
 	}
 
 	if des.Usage&gfx.ImageUsageSampled != 0 {
-		imgInfo.usage |= C.VK_IMAGE_USAGE_SAMPLED_BIT
+		usage |= vk.IMAGE_USAGE_SAMPLED_BIT
 	}
 
 	if des.Usage&gfx.ImageUsageAttachment != 0 {
 		if des.Format.Depth() {
-			imgInfo.usage |= C.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
+			usage |= vk.IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
 		} else {
-			imgInfo.usage |= C.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+			usage |= vk.IMAGE_USAGE_COLOR_ATTACHMENT_BIT
 		}
 	}
 
-	var allocCreateInfo C.VmaAllocationCreateInfo
-	allocCreateInfo.usage = C.VMA_MEMORY_USAGE_AUTO
+	imgInfo.SetUsage(usage)
+
+	allocCreateInfo := vma.AllocationCreateInfoAlloc(arena, 1)
+	allocCreateInfo.SetUsage(vma.MEMORY_USAGE_AUTO)
 
 	// TODO: Flags
 	//allocCreateInfo.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT
 	//allocCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT
 	//allocCreateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT
 
-	var (
-		img   C.VkImage
-		alloc C.VmaAllocation
-	)
+	imgRef := ffi.RefAlloc[vk.Image](arena, 1)
+	allocRef := ffi.RefAlloc[vma.Allocation](arena, 1)
 
-	if err := mapError(C.vmaCreateImage(g.memoryAllocator, &imgInfo, &allocCreateInfo, &img, &alloc, nil)); err != nil {
+	if err := mapError(vma.CreateImage(g.memoryAllocator, imgInfo, allocCreateInfo, imgRef, allocRef, vma.AllocationInfoNil)); err != nil {
 		return nil, err
 	}
 
-	var viewInfo C.VkImageViewCreateInfo
-	viewInfo.sType = C.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO
-	viewInfo.image = img
+	img := imgRef.Get()
+	alloc := allocRef.Get()
+
+	viewInfo := vk.ImageViewCreateInfoAlloc(arena, 1)
+	viewInfo.SetSType(vk.STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO)
+	viewInfo.SetImage(img)
 
 	switch des.Type {
 	case gfx.ImageType1D:
-		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_1D
+		viewInfo.SetViewType(vk.IMAGE_VIEW_TYPE_1D)
 	case gfx.ImageType2D:
-		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_2D
+		viewInfo.SetViewType(vk.IMAGE_VIEW_TYPE_2D)
 	case gfx.ImageType3D:
-		viewInfo.viewType = C.VK_IMAGE_VIEW_TYPE_3D
+		viewInfo.SetViewType(vk.IMAGE_VIEW_TYPE_3D)
 	default:
 		panic("unexpected image type")
 	}
 
-	viewInfo.format = imgInfo.format
-	viewInfo.subresourceRange.baseMipLevel = 0
-	viewInfo.subresourceRange.levelCount = 1
-	viewInfo.subresourceRange.baseArrayLayer = 0
-	viewInfo.subresourceRange.layerCount = 1
+	viewInfo.SetFormat(imgInfo.GetFormat())
+
+	subresourceRange := viewInfo.RefSubresourceRange()
+	subresourceRange.SetBaseMipLevel(0)
+	subresourceRange.SetLevelCount(1)
+	subresourceRange.SetBaseArrayLayer(0)
+	subresourceRange.SetLayerCount(1)
 
 	if des.Format.Depth() {
-		viewInfo.subresourceRange.aspectMask |= C.VK_IMAGE_ASPECT_DEPTH_BIT
+		subresourceRange.SetAspectMask(vk.IMAGE_ASPECT_DEPTH_BIT)
 	} else {
-		viewInfo.subresourceRange.aspectMask |= C.VK_IMAGE_ASPECT_COLOR_BIT
+		subresourceRange.SetAspectMask(vk.IMAGE_ASPECT_COLOR_BIT)
 	}
 
-	var view C.VkImageView
+	viewRef := ffi.RefAlloc[vk.ImageView](arena, 1)
 
-	if err := mapError(C.vkCreateImageView(g.device, &viewInfo, nil, &view)); err != nil {
+	if err := mapError(vk.CreateImageView(g.device, viewInfo, vk.AllocationCallbacksNil, viewRef)); err != nil {
 		return nil, err
 	}
 
-	viewID := g.allocTexture(pinner, view)
+	view := viewRef.Get()
+	viewID := g.allocTexture(arena, view)
 
 	return &Image{
 		image:      img,
@@ -140,7 +150,7 @@ func (i *Image) DefaultView() gfx.ImageView {
 
 type ImageView struct {
 	id     uint32
-	view   C.VkImageView
+	view   vk.ImageView
 	width  int
 	height int
 }
@@ -157,18 +167,18 @@ func (i *ImageView) Height() int {
 	return i.height
 }
 
-func ToFormat(format gfx.Format) C.VkFormat {
+func ToFormat(format gfx.Format) vk.Format {
 	switch format {
 	case gfx.FormatBGRA8UNorm:
-		return C.VK_FORMAT_B8G8R8A8_UNORM
+		return vk.FORMAT_B8G8R8A8_UNORM
 	case gfx.FormatRGBA8UNorm:
-		return C.VK_FORMAT_R8G8B8A8_UNORM
+		return vk.FORMAT_R8G8B8A8_UNORM
 	case gfx.FormatRGBA16SFloat:
-		return C.VK_FORMAT_R16G16B16A16_SFLOAT
+		return vk.FORMAT_R16G16B16A16_SFLOAT
 	case gfx.FormatRGB32SFloat:
-		return C.VK_FORMAT_R32G32B32_SFLOAT
+		return vk.FORMAT_R32G32B32_SFLOAT
 	case gfx.FormatRG32SFloat:
-		return C.VK_FORMAT_R32G32_SFLOAT
+		return vk.FORMAT_R32G32_SFLOAT
 	default:
 		panic("unknown format")
 	}

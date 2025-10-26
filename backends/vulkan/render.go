@@ -1,220 +1,204 @@
 package vulkan
 
-/*
-#include "vulkan.h"
-*/
-import "C"
-
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
+	"github.com/csnewman/go-gfx/ffi"
 	"github.com/csnewman/go-gfx/gfx"
+	"github.com/csnewman/go-gfx/vk"
 )
 
 type RenderPipeline struct {
-	pipeline C.VkPipeline
+	pipeline vk.Pipeline
 }
 
 func (g *Graphics) CreateRenderPipeline(des gfx.RenderPipelineDescriptor) (gfx.RenderPipeline, error) {
-	pinner := new(runtime.Pinner)
-	defer pinner.Unpin()
+	arena := ffi.NewArena()
+	defer arena.Close()
 
-	var renderingInfo C.VkPipelineRenderingCreateInfoKHR
-	renderingInfo.sType = C.VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR
-
-	colorFmts := make([]C.VkFormat, len(des.ColorAttachments))
+	colorFmts := make([]vk.Format, len(des.ColorAttachments))
 
 	for i, c := range des.ColorAttachments {
 		colorFmts[i] = ToFormat(c.Format)
 	}
 
-	renderingInfo.colorAttachmentCount = C.uint32_t(len(colorFmts))
-	renderingInfo.pColorAttachmentFormats = unsafe.SliceData(colorFmts)
-	pinner.Pin(renderingInfo.pColorAttachmentFormats)
+	renderingInfo := vk.PipelineRenderingCreateInfoAlloc(arena, 1)
+	renderingInfo.SetSType(vk.STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO)
+	renderingInfo.SetColorAttachmentCount(uint32(len(colorFmts)))
+	renderingInfo.SetPColorAttachmentFormats(ffi.RefFromValues(arena, colorFmts...))
 
-	var shaderStages []C.VkPipelineShaderStageCreateInfo
+	stageCount := 0
+
+	if des.VertexFunction != nil {
+		stageCount++
+	}
+
+	if des.FragmentFunction != nil {
+		stageCount++
+	}
+
+	shaderStages := vk.PipelineShaderStageCreateInfoAlloc(arena, stageCount)
+	shaderStagesOffset := 0
 
 	if des.VertexFunction != nil {
 		vf := (des.VertexFunction).(*ShaderFunction)
 
-		var stage C.VkPipelineShaderStageCreateInfo
-		stage.sType = C.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO
-		stage.stage = C.VK_SHADER_STAGE_VERTEX_BIT
-		stage.module = vf.shader.shader
-		stage.pName = C.CString(vf.function)
-		defer C.free(unsafe.Pointer(stage.pName))
+		stage := shaderStages.Offset(shaderStagesOffset)
+		stage.SetSType(vk.STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO)
+		stage.SetStage(vk.SHADER_STAGE_VERTEX_BIT)
+		stage.SetModule(vf.shader.shader)
+		stage.SetPName(ffi.CStringAlloc(arena, vf.function))
 
-		shaderStages = append(shaderStages, stage)
+		shaderStagesOffset++
 	}
 
 	if des.FragmentFunction != nil {
 		vf := (des.FragmentFunction).(*ShaderFunction)
 
-		var stage C.VkPipelineShaderStageCreateInfo
-		stage.sType = C.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO
-		stage.stage = C.VK_SHADER_STAGE_FRAGMENT_BIT
-		stage.module = vf.shader.shader
-		stage.pName = C.CString(vf.function)
-		defer C.free(unsafe.Pointer(stage.pName))
+		stage := shaderStages.Offset(shaderStagesOffset)
+		stage.SetSType(vk.STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO)
+		stage.SetStage(vk.SHADER_STAGE_FRAGMENT_BIT)
+		stage.SetModule(vf.shader.shader)
+		stage.SetPName(ffi.CStringAlloc(arena, vf.function))
 
-		shaderStages = append(shaderStages, stage)
+		shaderStagesOffset++
 	}
 
-	var vertexInputInfo C.VkPipelineVertexInputStateCreateInfo
-	vertexInputInfo.sType = C.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
-	vertexInputInfo.vertexBindingDescriptionCount = 0
-	vertexInputInfo.vertexAttributeDescriptionCount = 0
+	vertexInputInfo := vk.PipelineVertexInputStateCreateInfoAlloc(arena, 1)
+	vertexInputInfo.SetSType(vk.STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO)
+	vertexInputInfo.SetVertexBindingDescriptionCount(0)
+	vertexInputInfo.SetVertexAttributeDescriptionCount(0)
 
 	if len(des.VertexBindings) > 0 {
-		var bindingDes []C.VkVertexInputBindingDescription
-		var attrDes []C.VkVertexInputAttributeDescription
+		attrCount := 0
 
 		for _, binding := range des.VertexBindings {
-			var des C.VkVertexInputBindingDescription
-			des.binding = C.uint32_t(binding.Binding)
-			des.stride = C.uint32_t(binding.Stride)
+			attrCount += len(binding.Attributes)
+		}
+
+		bindingDes := vk.VertexInputBindingDescriptionAlloc(arena, len(des.VertexBindings))
+		attrDes := vk.VertexInputAttributeDescriptionAlloc(arena, attrCount)
+		attrOffset := 0
+
+		for i, binding := range des.VertexBindings {
+			des := bindingDes.Offset(i)
+			des.SetBinding(uint32(binding.Binding))
+			des.SetStride(uint32(binding.Stride))
 
 			// des.inputRate TODO
 
-			bindingDes = append(bindingDes, des)
-
 			for _, attribute := range binding.Attributes {
-				var attr C.VkVertexInputAttributeDescription
+				attr := attrDes.Offset(attrOffset)
+				attr.SetBinding(uint32(binding.Binding))
+				attr.SetLocation(uint32(attribute.Location))
+				attr.SetFormat(ToFormat(attribute.Format))
+				attr.SetOffset(uint32(attribute.Offset))
 
-				attr.binding = C.uint32_t(binding.Binding)
-				attr.location = C.uint32_t(attribute.Location)
-				attr.format = ToFormat(attribute.Format)
-				attr.offset = C.uint32_t(attribute.Offset)
-
-				attrDes = append(attrDes, attr)
+				attrOffset++
 			}
 		}
 
-		vertexInputInfo.vertexBindingDescriptionCount = C.uint32_t(len(bindingDes))
-		vertexInputInfo.pVertexBindingDescriptions = unsafe.SliceData(bindingDes)
-		pinner.Pin(vertexInputInfo.pVertexBindingDescriptions)
-
-		vertexInputInfo.vertexAttributeDescriptionCount = C.uint32_t(len(attrDes))
-		vertexInputInfo.pVertexAttributeDescriptions = unsafe.SliceData(attrDes)
-		pinner.Pin(vertexInputInfo.pVertexAttributeDescriptions)
+		vertexInputInfo.SetVertexBindingDescriptionCount(uint32(len(des.VertexBindings)))
+		vertexInputInfo.SetPVertexBindingDescriptions(bindingDes)
+		vertexInputInfo.SetVertexAttributeDescriptionCount(uint32(attrCount))
+		vertexInputInfo.SetPVertexAttributeDescriptions(attrDes)
 	}
 
-	var inputAssembly C.VkPipelineInputAssemblyStateCreateInfo
-	inputAssembly.sType = C.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
-	inputAssembly.topology = C.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
-	inputAssembly.primitiveRestartEnable = C.VkBool32(0)
+	inputAssembly := vk.PipelineInputAssemblyStateCreateInfoAlloc(arena, 1)
+	inputAssembly.SetSType(vk.STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO)
+	inputAssembly.SetTopology(vk.PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+	inputAssembly.SetPrimitiveRestartEnable(false)
 
-	var rasterizer C.VkPipelineRasterizationStateCreateInfo
-	rasterizer.sType = C.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO
-	rasterizer.depthClampEnable = C.VkBool32(0)
-	rasterizer.rasterizerDiscardEnable = C.VkBool32(0)
-	rasterizer.polygonMode = C.VK_POLYGON_MODE_FILL
-	rasterizer.depthBiasEnable = C.VkBool32(0)
-	rasterizer.lineWidth = 1.0
+	rasterizer := vk.PipelineRasterizationStateCreateInfoAlloc(arena, 1)
+	rasterizer.SetSType(vk.STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO)
+	rasterizer.SetDepthClampEnable(false)
+	rasterizer.SetRasterizerDiscardEnable(false)
+	rasterizer.SetPolygonMode(vk.POLYGON_MODE_FILL)
+	rasterizer.SetDepthBiasEnable(false)
+	rasterizer.SetLineWidth(1.0)
 
 	switch des.CullMode {
 	case gfx.CullModeNone:
-		rasterizer.cullMode = C.VK_CULL_MODE_NONE
+		rasterizer.SetCullMode(vk.CULL_MODE_NONE)
 	case gfx.CullModeFront:
-		rasterizer.cullMode = C.VK_CULL_MODE_FRONT_BIT
+		rasterizer.SetCullMode(vk.CULL_MODE_FRONT_BIT)
 	case gfx.CullModeBack:
-		rasterizer.cullMode = C.VK_CULL_MODE_BACK_BIT
+		rasterizer.SetCullMode(vk.CULL_MODE_BACK_BIT)
 	default:
 		return nil, fmt.Errorf("%w: invalid cull mode %d", gfx.ErrInvalidDescriptor, des.CullMode)
 	}
 
 	if des.FrontFaceClockwise {
-		rasterizer.frontFace = C.VK_FRONT_FACE_CLOCKWISE
+		rasterizer.SetFrontFace(vk.FRONT_FACE_CLOCKWISE)
 	} else {
-		rasterizer.frontFace = C.VK_FRONT_FACE_COUNTER_CLOCKWISE
+		rasterizer.SetFrontFace(vk.FRONT_FACE_COUNTER_CLOCKWISE)
 	}
 
-	var multisampling C.VkPipelineMultisampleStateCreateInfo
-	multisampling.sType = C.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO
-	multisampling.sampleShadingEnable = C.VkBool32(0)
-	multisampling.rasterizationSamples = C.VK_SAMPLE_COUNT_1_BIT
+	multisampling := vk.PipelineMultisampleStateCreateInfoAlloc(arena, 1)
+	multisampling.SetSType(vk.STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO)
+	multisampling.SetSampleShadingEnable(false)
+	multisampling.SetRasterizationSamples(vk.SAMPLE_COUNT_1_BIT)
 
-	var colorBlendAttachment C.VkPipelineColorBlendAttachmentState
-	colorBlendAttachment.colorWriteMask = C.VK_COLOR_COMPONENT_R_BIT | C.VK_COLOR_COMPONENT_G_BIT | C.VK_COLOR_COMPONENT_B_BIT | C.VK_COLOR_COMPONENT_A_BIT
+	colorBlendAttachment := vk.PipelineColorBlendAttachmentStateAlloc(arena, 1)
+	colorBlendAttachment.SetColorWriteMask(vk.COLOR_COMPONENT_R_BIT | vk.COLOR_COMPONENT_G_BIT | vk.COLOR_COMPONENT_B_BIT | vk.COLOR_COMPONENT_A_BIT)
 	//colorBlendAttachment.blendEnable = C.VkBool32(0)
 
-	colorBlendAttachment.blendEnable = C.VK_TRUE
-	colorBlendAttachment.srcColorBlendFactor = C.VK_BLEND_FACTOR_SRC_ALPHA
-	colorBlendAttachment.dstColorBlendFactor = C.VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
-	colorBlendAttachment.colorBlendOp = C.VK_BLEND_OP_ADD
-	colorBlendAttachment.srcAlphaBlendFactor = C.VK_BLEND_FACTOR_ONE
-	colorBlendAttachment.dstAlphaBlendFactor = C.VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
-	colorBlendAttachment.alphaBlendOp = C.VK_BLEND_OP_ADD
+	colorBlendAttachment.SetBlendEnable(true)
+	colorBlendAttachment.SetSrcColorBlendFactor(vk.BLEND_FACTOR_SRC_ALPHA)
+	colorBlendAttachment.SetDstColorBlendFactor(vk.BLEND_FACTOR_ONE_MINUS_SRC_ALPHA)
+	colorBlendAttachment.SetColorBlendOp(vk.BLEND_OP_ADD)
+	colorBlendAttachment.SetSrcAlphaBlendFactor(vk.BLEND_FACTOR_ONE)
+	colorBlendAttachment.SetDstAlphaBlendFactor(vk.BLEND_FACTOR_ONE_MINUS_SRC_ALPHA)
+	colorBlendAttachment.SetAlphaBlendOp(vk.BLEND_OP_ADD)
 
-	var colorBlending C.VkPipelineColorBlendStateCreateInfo
-	colorBlending.sType = C.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO
-	colorBlending.logicOpEnable = C.VkBool32(0)
-	colorBlending.attachmentCount = 1
-	colorBlending.pAttachments = &colorBlendAttachment
-	pinner.Pin(colorBlending.pAttachments)
-	colorBlending.blendConstants[0] = 0.0
-	colorBlending.blendConstants[1] = 0.0
-	colorBlending.blendConstants[2] = 0.0
-	colorBlending.blendConstants[3] = 0.0
+	colorBlending := vk.PipelineColorBlendStateCreateInfoAlloc(arena, 1)
+	colorBlending.SetSType(vk.STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO)
+	colorBlending.SetLogicOpEnable(false)
+	colorBlending.SetAttachmentCount(1)
+	colorBlending.SetPAttachments(colorBlendAttachment)
 
-	var dynamicStates []C.VkDynamicState
+	// TODO: restore, correct by calloc for now!
+	//colorBlending.blendConstants[0] = 0.0
+	//colorBlending.blendConstants[1] = 0.0
+	//colorBlending.blendConstants[2] = 0.0
+	//colorBlending.blendConstants[3] = 0.0
 
-	dynamicStates = append(dynamicStates, C.VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT)
-	dynamicStates = append(dynamicStates, C.VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT)
+	var dynamicStates []vk.DynamicState
 
-	var dynamicState C.VkPipelineDynamicStateCreateInfo
-	dynamicState.sType = C.VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO
-	dynamicState.dynamicStateCount = C.uint32_t(len(dynamicStates))
-	dynamicState.pDynamicStates = unsafe.SliceData(dynamicStates)
-	pinner.Pin(dynamicState.pDynamicStates)
+	dynamicStates = append(dynamicStates, vk.DYNAMIC_STATE_VIEWPORT_WITH_COUNT)
+	dynamicStates = append(dynamicStates, vk.DYNAMIC_STATE_SCISSOR_WITH_COUNT)
 
-	var viewportState C.VkPipelineViewportStateCreateInfo
-	viewportState.sType = C.VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO
+	dynamicState := vk.PipelineDynamicStateCreateInfoAlloc(arena, 1)
+	dynamicState.SetSType(vk.STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO)
+	dynamicState.SetDynamicStateCount(uint32(len(dynamicStates)))
+	dynamicState.SetPDynamicStates(ffi.RefFromValues(arena, dynamicStates...))
 
-	var pipelineInfo C.VkGraphicsPipelineCreateInfo
+	viewportState := vk.PipelineViewportStateCreateInfoAlloc(arena, 1)
+	viewportState.SetSType(vk.STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO)
 
-	pipelineInfo.sType = C.VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO
+	pipelineInfo := vk.GraphicsPipelineCreateInfoAlloc(arena, 1)
+	pipelineInfo.SetSType(vk.STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO)
+	pipelineInfo.SetPNext(renderingInfo.Raw())
+	pipelineInfo.SetStageCount(uint32(stageCount))
+	pipelineInfo.SetPStages(shaderStages)
+	pipelineInfo.SetPVertexInputState(vertexInputInfo)
+	pipelineInfo.SetPInputAssemblyState(inputAssembly)
+	pipelineInfo.SetPViewportState(viewportState)
+	pipelineInfo.SetPRasterizationState(rasterizer)
+	pipelineInfo.SetPMultisampleState(multisampling)
+	pipelineInfo.SetPColorBlendState(colorBlending)
+	pipelineInfo.SetPDynamicState(dynamicState)
+	pipelineInfo.SetLayout(g.pipelineLayout)
 
-	pipelineInfo.pNext = unsafe.Pointer(&renderingInfo)
-	pinner.Pin(pipelineInfo.pNext)
+	pipelineRef := ffi.RefAlloc[vk.Pipeline](arena, 1)
 
-	pipelineInfo.stageCount = C.uint32_t(len(shaderStages))
-	pipelineInfo.pStages = unsafe.SliceData(shaderStages)
-	pinner.Pin(pipelineInfo.pStages)
-
-	pipelineInfo.pVertexInputState = &vertexInputInfo
-	pinner.Pin(pipelineInfo.pVertexInputState)
-
-	pipelineInfo.pInputAssemblyState = &inputAssembly
-	pinner.Pin(pipelineInfo.pInputAssemblyState)
-
-	pipelineInfo.pViewportState = &viewportState
-	pinner.Pin(pipelineInfo.pViewportState)
-
-	pipelineInfo.pRasterizationState = &rasterizer
-	pinner.Pin(pipelineInfo.pRasterizationState)
-
-	pipelineInfo.pMultisampleState = &multisampling
-	pinner.Pin(pipelineInfo.pMultisampleState)
-
-	pipelineInfo.pColorBlendState = &colorBlending
-	pinner.Pin(pipelineInfo.pColorBlendState)
-
-	pipelineInfo.pDynamicState = &dynamicState
-	pinner.Pin(pipelineInfo.pDynamicState)
-
-	pipelineInfo.layout = g.pipelineLayout
-
-	var pipeline C.VkPipeline
-
-	if err := mapError(C.vkCreateGraphicsPipelines(g.device, nil, 1, &pipelineInfo, nil, &pipeline)); err != nil {
+	if err := mapError(vk.CreateGraphicsPipelines(g.device, vk.PipelineCacheNil, 1, pipelineInfo, vk.AllocationCallbacksNil, pipelineRef)); err != nil {
 		return nil, err
 	}
 
 	return &RenderPipeline{
-		pipeline: pipeline,
+		pipeline: pipelineRef.Get(),
 	}, nil
 }
 
