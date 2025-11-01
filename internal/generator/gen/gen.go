@@ -20,10 +20,12 @@ type Config struct {
 	CPreamble string
 
 	Path string
+
+	Deps map[string]*repo.Repo
 }
 
 type Generator struct {
-	Repo *repo.Repo
+	Repos map[string]*repo.Repo
 
 	OEnums     *jen.File
 	OBitmasks  *jen.File
@@ -36,16 +38,22 @@ type Generator struct {
 
 func Generate(cfg *Config) {
 	g := &Generator{
-		Repo: cfg.Repo,
+		Repos: make(map[string]*repo.Repo),
 
-		OEnums:     jen.NewFile(cfg.PKGName),
-		OBitmasks:  jen.NewFile(cfg.PKGName),
-		OHandles:   jen.NewFile(cfg.PKGName),
-		OStructs:   jen.NewFile(cfg.PKGName),
-		OFunctions: jen.NewFile(cfg.PKGName),
+		OEnums:     jen.NewFilePath(cfg.PKGName),
+		OBitmasks:  jen.NewFilePath(cfg.PKGName),
+		OHandles:   jen.NewFilePath(cfg.PKGName),
+		OStructs:   jen.NewFilePath(cfg.PKGName),
+		OFunctions: jen.NewFilePath(cfg.PKGName),
 
 		StructGeneratedOffsets: make(map[string]struct{}),
 	}
+
+	if cfg.Deps != nil {
+		maps.Copy(g.Repos, cfg.Deps)
+	}
+
+	g.Repos[cfg.PKGName] = cfg.Repo
 
 	if cfg.CPreamble != "" {
 		g.OEnums.CgoPreamble(cfg.CPreamble)
@@ -120,10 +128,18 @@ func (g *Generator) generateBitmaskType(ty *repo.Type) {
 		panic(fmt.Sprintf("bitmask bit width %d", ty.BitmaskWidth))
 	}
 
+	if ty.Comment != "" {
+		g.OBitmasks.Comment(ty.Comment)
+	}
+
 	g.OBitmasks.Type().Id(ty.MappedName).Id(goType)
 
 	for _, name := range slices.Sorted(maps.Keys(ty.Aliases)) {
 		alias := ty.Aliases[name]
+
+		if alias.NoGeneration {
+			continue
+		}
 
 		g.OBitmasks.Commentf("%s wraps the bitmask %s. An alias for %s.", alias.MappedName, alias.Name, ty.MappedName)
 		g.OBitmasks.Type().Id(alias.MappedName).Op("=").Id(ty.MappedName)
@@ -135,10 +151,19 @@ func (g *Generator) generateBitmaskType(ty *repo.Type) {
 				value := ty.EnumValues[valueName]
 
 				group.Commentf("%s wraps %s.", value.MappedName, value.Name)
+
+				if value.Comment != "" {
+					group.Comment(value.Comment)
+				}
+
 				group.Id(value.MappedName).Id(ty.MappedName).Op("=").Qual("C", value.Name)
 
 				for _, aliasName := range slices.Sorted(maps.Keys(value.Aliases)) {
 					alias := value.Aliases[aliasName]
+
+					if alias.NoGeneration {
+						continue
+					}
 
 					group.Commentf("%s wraps the bitmask %s. An alias for %s.", alias.MappedName, alias.Name, ty.MappedName)
 					group.Id(alias.MappedName).Op("=").Id(value.MappedName)
@@ -168,6 +193,11 @@ func (g *Generator) generateEnumType(ty *repo.Type) {
 	slog.Info("Generating enum", "name", ty.Name)
 
 	g.OEnums.Commentf("%s wraps the enum %s.", ty.MappedName, ty.Name)
+
+	if ty.Comment != "" {
+		g.OEnums.Comment(ty.Comment)
+	}
+
 	g.OEnums.Type().Id(ty.MappedName).Id("int32")
 
 	for _, name := range slices.Sorted(maps.Keys(ty.Aliases)) {
@@ -187,6 +217,11 @@ func (g *Generator) generateEnumType(ty *repo.Type) {
 				value := ty.EnumValues[valueName]
 
 				group.Commentf("%s wraps %s.", value.MappedName, value.Name)
+
+				if value.Comment != "" {
+					group.Comment(value.Comment)
+				}
+
 				group.Id(value.MappedName).Id(ty.MappedName).Op("=").Qual("C", value.Name)
 
 				for _, aliasName := range slices.Sorted(maps.Keys(value.Aliases)) {
@@ -230,6 +265,11 @@ func (g *Generator) generateHandleType(ty *repo.Type) {
 	}
 
 	g.OHandles.Commentf("%s wraps the handle %s.", ty.MappedName, ty.Name)
+
+	if ty.Comment != "" {
+		g.OHandles.Comment(ty.Comment)
+	}
+
 	g.OHandles.Type().Id(ty.MappedName).Id(cType)
 
 	for _, name := range slices.Sorted(maps.Keys(ty.Aliases)) {
@@ -256,4 +296,15 @@ func (g *Generator) generateHandleType(ty *repo.Type) {
 		g.OHandles.Commentf("%sNil is a null pointer.", alias.MappedName)
 		g.OHandles.Var().Id(alias.MappedName + "Nil").Id(alias.MappedName)
 	}
+}
+
+func (g *Generator) LookupType(t string) (*repo.Type, string, bool) {
+	for pkg, rep := range g.Repos {
+		res, ok := rep.LookupType(t)
+		if ok {
+			return res, pkg, true
+		}
+	}
+
+	return nil, "", false
 }

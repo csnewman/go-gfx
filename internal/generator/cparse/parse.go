@@ -1,7 +1,8 @@
-package main
+package cparse
 
 import (
 	"fmt"
+	"generator/repo"
 	"log"
 	"log/slog"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 
 type Parser struct {
 	path string
-	mod  *Module
+	repo *repo.Repo
 	tu   clang.TranslationUnit
 }
 
@@ -99,10 +100,17 @@ func (p *Parser) parseTopLevel(indent string, c clang.Cursor) {
 
 			slog.Info("Found handle", "name", item)
 
-			p.mod.Handles[item] = &Handle{
-				Name:            item,
-				NonDispatchable: name == "VK_DEFINE_NON_DISPATCHABLE_HANDLE",
+			converted := &repo.Type{
+				Name:       item,
+				MappedName: convertEnumName(item),
+				Category:   repo.TypeCategoryHandle,
 			}
+
+			if name == "VK_DEFINE_NON_DISPATCHABLE_HANDLE" {
+				converted.Category = repo.TypeCategoryHandleNonDispatchable
+			}
+
+			p.repo.Types[item] = converted
 
 		default:
 			log.Println("MACRO EXPANSION", c.Spelling())
@@ -140,12 +148,15 @@ func (p *Parser) parseStruct(indent string, c clang.Cursor, typedef bool) {
 
 	comment := processComment(c.RawCommentText())
 
-	s := &Struct{
-		Name:    name,
-		Comment: comment,
+	s := &repo.Type{
+		Name:         name,
+		MappedName:   convertStructName(name),
+		Category:     repo.TypeCategoryStruct,
+		Comment:      comment,
+		StructFields: make(map[string]*repo.Field),
 	}
 
-	p.mod.Structs[name] = s
+	p.repo.Types[name] = s
 
 	c.Visit(func(cursor, parent clang.Cursor) (status clang.ChildVisitResult) {
 		if cursor.Kind() == clang.Cursor_FieldDecl {
@@ -163,12 +174,11 @@ func (p *Parser) parseStruct(indent string, c clang.Cursor, typedef bool) {
 			}
 
 			ty := p.parseType(fIndent, cursor.Type())
+			ty.Name = name
+			ty.MappedName = strings.ToUpper(name[:1]) + name[1:]
+			ty.Comment = cmt
 
-			s.Fields = append(s.Fields, &Field{
-				Name:    name,
-				Type:    ty,
-				Comment: cmt,
-			})
+			s.StructFields[name] = ty
 		}
 
 		return clang.ChildVisit_Continue
@@ -192,17 +202,34 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 
 	slog.Info("comment", "comment", comment)
 
-	if _, ok := p.mod.Enums[name]; ok {
+	enum := &repo.Type{
+		Name:       name,
+		MappedName: convertEnumName(name),
+		Category:   repo.TypeCategoryEnum,
+		Comment:    comment,
+		EnumValues: make(map[string]*repo.EnumValue),
+	}
+
+	if strings.Contains(name, "FlagBits") {
+		convName := strings.ReplaceAll(name, "FlagBits", "Flags")
+		enum.Name = convName
+		enum.MappedName = convertEnumName(convName)
+		enum.Category = repo.TypeCategoryBitmask
+		enum.BitmaskWidth = 32
+		enum.Aliases = map[string]*repo.Alias{
+			name: {
+				Name:         name,
+				MappedName:   convertBitmaskName(name),
+				NoGeneration: true,
+			},
+		}
+	}
+
+	if _, ok := p.repo.Types[enum.Name]; ok {
 		panic("duplicate enum name: " + name)
 	}
 
-	enum := &Enum{
-		Name: name,
-		//Typedefd: typedef,
-		Comment: comment,
-	}
-
-	p.mod.Enums[name] = enum
+	p.repo.Types[enum.Name] = enum
 
 	c.Visit(func(cursor, parent clang.Cursor) (status clang.ChildVisitResult) {
 		if cursor.Kind() != clang.Cursor_EnumConstantDecl {
@@ -210,16 +237,27 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 		}
 
 		comment := processComment(cursor.RawCommentText())
+		name := cursor.Spelling()
 
-		enum.Constants = append(enum.Constants, &Constant{
-			Name:    cursor.Spelling(),
-			Comment: comment,
-		})
+		enum.EnumValues[name] = &repo.EnumValue{
+			Name:       name,
+			MappedName: convertEnumItem(name),
+			Comment:    comment,
+		}
 
 		slog.Info("value", "name", cursor.Spelling(), "comment", comment)
 
 		return clang.ChildVisit_Continue
 	})
+}
+
+func convertEnumItem(in string) string {
+	name, ok := strings.CutPrefix(in, "VMA_")
+	if !ok {
+		panic(fmt.Sprintf("item does not have prefix: %s", in))
+	}
+
+	return name
 }
 
 func (p *Parser) parseFunction(indent string, c clang.Cursor) {
@@ -232,7 +270,11 @@ func (p *Parser) parseFunction(indent string, c clang.Cursor) {
 
 	result := p.parseType(fmt.Sprintf("%v[return]", indent), c.ResultType())
 
-	var params []*Param
+	if result.Category == repo.FieldCategoryDirect && result.Type == "void" {
+		result = nil
+	}
+
+	var members []*repo.Field
 
 	for i := 0; i < int(c.NumArguments()); i++ {
 		arg := c.Argument(uint32(i))
@@ -251,21 +293,31 @@ func (p *Parser) parseFunction(indent string, c clang.Cursor) {
 		aIndent := fmt.Sprintf("%v[%v]", indent, name)
 
 		ty := p.parseType(aIndent, arg.Type())
+		ty.Name = name
+		ty.MappedName = name
 
-		params = append(params, &Param{
-			Name: name,
-			Type: ty,
-		})
+		members = append(members, ty)
 	}
 
 	if c.IsVariadic() {
 		panic("variadic not supported")
 	}
 
-	p.mod.Functions[name] = &Function{
+	p.repo.Functions[name] = &repo.Function{
 		Name:       name,
-		Args:       params,
+		MappedName: convertFuncName(name),
+		Aliases:    nil,
 		ReturnType: result,
+		Members:    members,
 		Comment:    comment,
 	}
+}
+
+func convertFuncName(in string) string {
+	name, ok := strings.CutPrefix(in, "vma")
+	if !ok {
+		panic(fmt.Sprintf("cmd does not have prefix: %s", in))
+	}
+
+	return name
 }

@@ -16,6 +16,11 @@ func (g *Generator) generateStructType(ty *repo.Type) {
 	cName := "C." + ty.Name
 
 	g.OStructs.Commentf("%s wraps struct %s.", ty.MappedName, ty.Name)
+
+	if ty.Comment != "" {
+		g.OStructs.Comment(ty.Comment)
+	}
+
 	g.OStructs.Type().Id(ty.MappedName).StructFunc(func(g *jen.Group) {
 		g.Id("ptr").Id("*" + cName)
 	})
@@ -142,10 +147,6 @@ var nativeTypes = map[string]string{
 	"uint64_t": "uint64",
 	"int64_t":  "int64",
 	"float":    "float32",
-
-	"VkDeviceSize":    "DeviceSize",
-	"VkDeviceAddress": "DeviceAddress",
-	"VkSampleMask":    "SampleMask",
 }
 
 func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
@@ -213,7 +214,7 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 			break
 		}
 
-		fieldType, ok := g.Repo.LookupType(field.Type)
+		fieldType, fieldPkg, ok := g.LookupType(field.Type)
 		if !ok {
 			g.OStructs.Commentf("%s.%s is unsupported: unknown type %s.", ty.MappedName, field.Name, field.Type)
 			g.OStructs.Line()
@@ -222,12 +223,12 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 		}
 
 		switch fieldType.Category {
-		case repo.TypeCategoryEnum, repo.TypeCategoryBitmask, repo.TypeCategoryHandleNonDispatchable:
-			mappedType = jen.Id(fieldType.MappedName)
+		case repo.TypeCategoryEnum, repo.TypeCategoryBitmask, repo.TypeCategoryHandleNonDispatchable, repo.TypeCategoryDirect:
+			mappedType = jen.Qual(fieldPkg, fieldType.MappedName)
 			generateDefault = true
 
 		case repo.TypeCategoryHandle:
-			mappedType = jen.Id(fieldType.MappedName)
+			mappedType = jen.Qual(fieldPkg, fieldType.MappedName)
 
 			getBody = []jen.Code{
 				jen.Return(
@@ -243,7 +244,7 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 			}
 
 		case repo.TypeCategoryStruct:
-			mappedType = jen.Id(fieldType.MappedName)
+			mappedType = jen.Qual(fieldPkg, fieldType.MappedName)
 
 			offsetName := "offsetof_" + ty.Name + "_" + field.Name
 
@@ -259,17 +260,16 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 				Params().
 				Add(mappedType).
 				Block(
-					jen.Return(jen.Id(fieldType.MappedName).Values(
-						jen.Id("ptr").Op(":").
-							Params(jen.Id("*C." + fieldType.Name)).
-							Params(
-								jen.Qual("unsafe", "Add").
-									Call(
-										jen.Qual("unsafe", "Pointer").Call(jen.Id("p").Dot("ptr")),
-										jen.Id("uintptr").Call(jen.Qual("C", offsetName)),
-									),
-							),
-					)),
+					jen.Return(
+						jen.Qual(fieldPkg, fieldType.MappedName+"FromPtr").Params(
+							jen.
+								Qual("unsafe", "Add").
+								Call(
+									jen.Qual("unsafe", "Pointer").Call(jen.Id("p").Dot("ptr")),
+									jen.Id("uintptr").Call(jen.Qual("C", offsetName)),
+								),
+						),
+					),
 				)
 
 			return
@@ -361,7 +361,7 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 			break
 		}
 
-		fieldType, ok := g.Repo.LookupType(field.Type)
+		fieldType, fieldPkg, ok := g.LookupType(field.Type)
 		if !ok {
 			g.OStructs.Commentf("%s.%s is unsupported: category %s -> ??.", ty.MappedName, field.Name, field.Category)
 			g.OStructs.Line()
@@ -371,23 +371,27 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 
 		switch fieldType.Category {
 		case repo.TypeCategoryStruct:
-			mappedType = jen.Id(fieldType.MappedName)
+			mappedType = jen.Qual(fieldPkg, fieldType.MappedName)
 
 			getBody = []jen.Code{
-				jen.Return(jen.Id(fieldType.MappedName).Values(
-					jen.Id("ptr").Op(":").Id("p").Dot("ptr").Dot(cFieldName)),
+				jen.Return(jen.Qual(fieldPkg, fieldType.MappedName+"FromPtr").Params(
+					jen.Qual("unsafe", "Pointer").Params(jen.Id("p").Dot("ptr").Dot(cFieldName))),
 				),
 			}
 
 			setBody = []jen.Code{
-				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").Id("value").Dot("ptr"),
+				jen.Id("p").Dot("ptr").Dot(cFieldName).Op("=").
+					Call(jen.Id("*C." + field.Type)).
+					Call(
+						jen.Id("value").Dot("Raw").Call(),
+					),
 			}
-		case repo.TypeCategoryEnum, repo.TypeCategoryHandle, repo.TypeCategoryHandleNonDispatchable, repo.TypeCategoryBitmask:
-			mappedType = jen.Qual(ffiPath, "Ref").Types(jen.Id(fieldType.MappedName))
+		case repo.TypeCategoryEnum, repo.TypeCategoryHandle, repo.TypeCategoryHandleNonDispatchable, repo.TypeCategoryBitmask, repo.TypeCategoryDirect:
+			mappedType = jen.Qual(ffiPath, "Ref").Types(jen.Qual(fieldPkg, fieldType.MappedName))
 
 			getBody = []jen.Code{
 				jen.Return(
-					jen.Qual(ffiPath, "RefFromPtr").Types(jen.Id(fieldType.MappedName)).Call(
+					jen.Qual(ffiPath, "RefFromPtr").Types(jen.Qual(fieldPkg, fieldType.MappedName)).Call(
 						jen.Qual("unsafe", "Pointer").Call(
 							jen.Id("p").Dot("ptr").Dot(cFieldName),
 						),

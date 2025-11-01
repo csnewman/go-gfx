@@ -21,6 +21,7 @@ type Type struct {
 	MappedName string            `json:"mapped_name"`
 	Category   TypeCategory      `json:"category"`
 	Aliases    map[string]*Alias `json:"aliases,omitempty"`
+	Comment    string            `json:"comment,omitempty"`
 
 	// for TypeCategoryBitmask
 	BitmaskWidth int `json:"bitmask_width,omitempty"`
@@ -37,6 +38,7 @@ type EnumValueCategory string
 type EnumValue struct {
 	Name       string `json:"name"`
 	MappedName string `json:"mapped_name"`
+	Comment    string `json:"comment,omitempty"`
 
 	Aliases map[string]*Alias `json:"aliases,omitempty"`
 }
@@ -53,6 +55,7 @@ const (
 	FieldCategoryDirect      FieldCategory = "direct"
 	FieldCategoryPointer     FieldCategory = "pointer"
 	FieldCategoryPointer2    FieldCategory = "pointer2"
+	FieldCategoryArray       FieldCategory = "array"
 	FieldCategoryUnsupported FieldCategory = "unsupported"
 )
 
@@ -61,6 +64,10 @@ type Field struct {
 	MappedName string        `json:"mapped_name,omitempty"`
 	Category   FieldCategory `json:"category"`
 	Type       string        `json:"type"`
+	Comment    string        `json:"comment,omitempty"`
+
+	// For FieldCategoryArray
+	ArraySize int `json:"array_size,omitempty"`
 }
 
 type Function struct {
@@ -70,6 +77,7 @@ type Function struct {
 
 	ReturnType *Field   `jen:"return_type,omitempty"`
 	Members    []*Field `jen:"members,omitempty"`
+	Comment    string   `jen:"comment,omitempty"`
 }
 
 type Repo struct {
@@ -126,4 +134,15 @@ func (r *Repo) LookupType(name string) (*Type, bool) {
 	}
 
 	return nil, false
+}
+
+func (r *Repo) Write(path string) {
+	encRepo, err := json.MarshalIndent(r, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := os.WriteFile(path, encRepo, 0666); err != nil {
+		panic(err)
+	}
 }

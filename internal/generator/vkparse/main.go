@@ -24,6 +24,16 @@ func Parse(path string) *repo.Repo {
 				MappedName: "DeviceSize",
 				Category:   repo.TypeCategoryDirect,
 			},
+			"VkDeviceAddress": {
+				Name:       "VkDeviceAddress",
+				MappedName: "DeviceAddress",
+				Category:   repo.TypeCategoryDirect,
+			},
+			"VkSampleMask": {
+				Name:       "VkSampleMask",
+				MappedName: "SampleMask",
+				Category:   repo.TypeCategoryDirect,
+			},
 		},
 		Functions: make(map[string]*repo.Function),
 	}

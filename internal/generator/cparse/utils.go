@@ -1,7 +1,8 @@
-package main
+package cparse
 
 import (
 	"fmt"
+	"generator/repo"
 	"log"
 	"strings"
 	"unicode"
@@ -95,17 +96,15 @@ func getMacroOriginal(c clang.Cursor) []string {
 	return out
 }
 
-func (p *Parser) parseType(indent string, t clang.Type) *Type {
+func (p *Parser) parseType(indent string, t clang.Type) *repo.Field {
 	switch t.Kind() {
 	case clang.Type_Void:
 		log.Println(indent, "Parsing type", t.Spelling(), "as void")
 
-		return &Type{
-			Name:     "void",
-			Category: TypeCategoryDirect,
+		return &repo.Field{
+			Category: repo.FieldCategoryDirect,
+			Type:     "void",
 		}
-
-		return nil
 	case clang.Type_Int, clang.Type_UInt, clang.Type_Long, clang.Type_ULong, clang.Type_UChar, clang.Type_Char_S,
 		clang.Type_Float, clang.Type_Double:
 		log.Println(indent, "Parsing type", t.Spelling(), "as ident")
@@ -116,9 +115,9 @@ func (p *Parser) parseType(indent string, t clang.Type) *Type {
 			panic(name + " contains spaces")
 		}
 
-		return &Type{
-			Name:     name,
-			Category: TypeCategoryDirect,
+		return &repo.Field{
+			Category: repo.FieldCategoryDirect,
+			Type:     name,
 		}
 	case clang.Type_Pointer:
 		log.Println(indent, "Parsing type", t.Spelling(), "as pointer")
@@ -126,16 +125,15 @@ func (p *Parser) parseType(indent string, t clang.Type) *Type {
 		inner := p.parseType(indent, t.PointeeType())
 
 		switch inner.Category {
-		case TypeCategoryDirect:
-
-			return &Type{
-				Name:     inner.Name,
-				Category: TypeCategoryPointer,
+		case repo.FieldCategoryDirect:
+			return &repo.Field{
+				Category: repo.FieldCategoryPointer,
+				Type:     inner.Type,
 			}
-		case TypeCategoryPointer:
-			return &Type{
-				Name:     inner.Name,
-				Category: TypeCategoryPointer2,
+		case repo.FieldCategoryPointer:
+			return &repo.Field{
+				Category: repo.FieldCategoryPointer2,
+				Type:     inner.Type,
 			}
 		default:
 			panic("unexpected category " + string(inner.Category))
@@ -152,9 +150,9 @@ func (p *Parser) parseType(indent string, t clang.Type) *Type {
 			panic(name + " contains spaces")
 		}
 
-		return &Type{
-			Name:     name,
-			Category: TypeCategoryDirect,
+		return &repo.Field{
+			Category: repo.FieldCategoryDirect,
+			Type:     name,
 		}
 	case clang.Type_ConstantArray:
 		log.Println(indent, "Parsing type", t.Spelling(), "as const array")
@@ -162,10 +160,10 @@ func (p *Parser) parseType(indent string, t clang.Type) *Type {
 		size := t.ArraySize()
 
 		switch inner.Category {
-		case TypeCategoryDirect:
-			return &Type{
-				Name:      inner.Name,
-				Category:  TypeCategoryArray,
+		case repo.FieldCategoryDirect:
+			return &repo.Field{
+				Category:  repo.FieldCategoryArray,
+				Type:      inner.Type,
 				ArraySize: int(size),
 			}
 		default:
