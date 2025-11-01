@@ -8,9 +8,6 @@ import "C"
 // AccelerationStructureCreateFlagsKHR wraps the bitmask VkAccelerationStructureCreateFlagsKHR.
 type AccelerationStructureCreateFlagsKHR int32
 
-// AccelerationStructureCreateFlagBitsKHR wraps the bitmask VkAccelerationStructureCreateFlagBitsKHR. An alias for AccelerationStructureCreateFlagsKHR.
-type AccelerationStructureCreateFlagBitsKHR = AccelerationStructureCreateFlagsKHR
-
 const (
 	// ACCELERATION_STRUCTURE_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT wraps VK_ACCELERATION_STRUCTURE_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT.
 	ACCELERATION_STRUCTURE_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT AccelerationStructureCreateFlagsKHR = C.VK_ACCELERATION_STRUCTURE_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT
@@ -40,9 +37,6 @@ func (e AccelerationStructureMotionInstanceFlagsNV) String() string {
 
 // AccessFlags wraps the bitmask VkAccessFlags.
 type AccessFlags int32
-
-// AccessFlagBits wraps the bitmask VkAccessFlagBits. An alias for AccessFlags.
-type AccessFlagBits = AccessFlags
 
 const (
 	// ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR wraps VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR.
@@ -123,9 +117,6 @@ func (e AccessFlags) String() string {
 
 // AccessFlags2 wraps the bitmask VkAccessFlags2.
 type AccessFlags2 int64
-
-// AccessFlagBits2 wraps the bitmask VkAccessFlagBits2. An alias for AccessFlags2.
-type AccessFlagBits2 = AccessFlags2
 
 // AccessFlags2KHR wraps the bitmask VkAccessFlags2KHR. An alias for AccessFlags2.
 type AccessFlags2KHR = AccessFlags2
@@ -286,9 +277,6 @@ func (e AccessFlags2) String() string {
 // AccessFlags3KHR wraps the bitmask VkAccessFlags3KHR.
 type AccessFlags3KHR int64
 
-// AccessFlagBits3KHR wraps the bitmask VkAccessFlagBits3KHR. An alias for AccessFlags3KHR.
-type AccessFlagBits3KHR = AccessFlags3KHR
-
 const (
 	// ACCESS_3_NONE_KHR wraps VK_ACCESS_3_NONE_KHR.
 	ACCESS_3_NONE_KHR AccessFlags3KHR = C.VK_ACCESS_3_NONE_KHR
@@ -301,18 +289,12 @@ func (e AccessFlags3KHR) String() string {
 // AcquireProfilingLockFlagsKHR wraps the bitmask VkAcquireProfilingLockFlagsKHR.
 type AcquireProfilingLockFlagsKHR int32
 
-// AcquireProfilingLockFlagBitsKHR wraps the bitmask VkAcquireProfilingLockFlagBitsKHR. An alias for AcquireProfilingLockFlagsKHR.
-type AcquireProfilingLockFlagBitsKHR = AcquireProfilingLockFlagsKHR
-
 func (e AcquireProfilingLockFlagsKHR) String() string {
 	return fmt.Sprintf("VkAcquireProfilingLockFlagsKHR(%b)", e)
 }
 
 // AddressCopyFlagsKHR wraps the bitmask VkAddressCopyFlagsKHR.
 type AddressCopyFlagsKHR int32
-
-// AddressCopyFlagBitsKHR wraps the bitmask VkAddressCopyFlagBitsKHR. An alias for AddressCopyFlagsKHR.
-type AddressCopyFlagBitsKHR = AddressCopyFlagsKHR
 
 const (
 	// ADDRESS_COPY_DEVICE_LOCAL_BIT_KHR wraps VK_ADDRESS_COPY_DEVICE_LOCAL_BIT_KHR.
@@ -330,9 +312,6 @@ func (e AddressCopyFlagsKHR) String() string {
 // AttachmentDescriptionFlags wraps the bitmask VkAttachmentDescriptionFlags.
 type AttachmentDescriptionFlags int32
 
-// AttachmentDescriptionFlagBits wraps the bitmask VkAttachmentDescriptionFlagBits. An alias for AttachmentDescriptionFlags.
-type AttachmentDescriptionFlagBits = AttachmentDescriptionFlags
-
 const (
 	// ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT wraps VK_ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT.
 	ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT AttachmentDescriptionFlags = C.VK_ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT
@@ -344,9 +323,6 @@ func (e AttachmentDescriptionFlags) String() string {
 
 // BufferCreateFlags wraps the bitmask VkBufferCreateFlags.
 type BufferCreateFlags int32
-
-// BufferCreateFlagBits wraps the bitmask VkBufferCreateFlagBits. An alias for BufferCreateFlags.
-type BufferCreateFlagBits = BufferCreateFlags
 
 const (
 	// BUFFER_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT wraps VK_BUFFER_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT.
@@ -375,9 +351,6 @@ func (e BufferCreateFlags) String() string {
 
 // BufferUsageFlags wraps the bitmask VkBufferUsageFlags.
 type BufferUsageFlags int32
-
-// BufferUsageFlagBits wraps the bitmask VkBufferUsageFlagBits. An alias for BufferUsageFlags.
-type BufferUsageFlagBits = BufferUsageFlags
 
 const (
 	// BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR wraps VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR.
@@ -446,9 +419,6 @@ func (e BufferUsageFlags) String() string {
 
 // BufferUsageFlags2 wraps the bitmask VkBufferUsageFlags2.
 type BufferUsageFlags2 int64
-
-// BufferUsageFlagBits2 wraps the bitmask VkBufferUsageFlagBits2. An alias for BufferUsageFlags2.
-type BufferUsageFlagBits2 = BufferUsageFlags2
 
 // BufferUsageFlags2KHR wraps the bitmask VkBufferUsageFlags2KHR. An alias for BufferUsageFlags2.
 type BufferUsageFlags2KHR = BufferUsageFlags2
@@ -548,9 +518,6 @@ func (e BufferViewCreateFlags) String() string {
 // BuildAccelerationStructureFlagsKHR wraps the bitmask VkBuildAccelerationStructureFlagsKHR.
 type BuildAccelerationStructureFlagsKHR int32
 
-// BuildAccelerationStructureFlagBitsKHR wraps the bitmask VkBuildAccelerationStructureFlagBitsKHR. An alias for BuildAccelerationStructureFlagsKHR.
-type BuildAccelerationStructureFlagBitsKHR = BuildAccelerationStructureFlagsKHR
-
 // BuildAccelerationStructureFlagsNV wraps the bitmask VkBuildAccelerationStructureFlagsNV. An alias for BuildAccelerationStructureFlagsKHR.
 type BuildAccelerationStructureFlagsNV = BuildAccelerationStructureFlagsKHR
 
@@ -604,9 +571,6 @@ func (e BuildAccelerationStructureFlagsKHR) String() string {
 // BuildMicromapFlagsEXT wraps the bitmask VkBuildMicromapFlagsEXT.
 type BuildMicromapFlagsEXT int32
 
-// BuildMicromapFlagBitsEXT wraps the bitmask VkBuildMicromapFlagBitsEXT. An alias for BuildMicromapFlagsEXT.
-type BuildMicromapFlagBitsEXT = BuildMicromapFlagsEXT
-
 const (
 	// BUILD_MICROMAP_ALLOW_COMPACTION_BIT_EXT wraps VK_BUILD_MICROMAP_ALLOW_COMPACTION_BIT_EXT.
 	BUILD_MICROMAP_ALLOW_COMPACTION_BIT_EXT BuildMicromapFlagsEXT = C.VK_BUILD_MICROMAP_ALLOW_COMPACTION_BIT_EXT
@@ -622,9 +586,6 @@ func (e BuildMicromapFlagsEXT) String() string {
 
 // ClusterAccelerationStructureAddressResolutionFlagsNV wraps the bitmask VkClusterAccelerationStructureAddressResolutionFlagsNV.
 type ClusterAccelerationStructureAddressResolutionFlagsNV int32
-
-// ClusterAccelerationStructureAddressResolutionFlagBitsNV wraps the bitmask VkClusterAccelerationStructureAddressResolutionFlagBitsNV. An alias for ClusterAccelerationStructureAddressResolutionFlagsNV.
-type ClusterAccelerationStructureAddressResolutionFlagBitsNV = ClusterAccelerationStructureAddressResolutionFlagsNV
 
 const (
 	// CLUSTER_ACCELERATION_STRUCTURE_ADDRESS_RESOLUTION_INDIRECTED_DST_ADDRESS_ARRAY_BIT_NV wraps VK_CLUSTER_ACCELERATION_STRUCTURE_ADDRESS_RESOLUTION_INDIRECTED_DST_ADDRESS_ARRAY_BIT_NV.
@@ -650,9 +611,6 @@ func (e ClusterAccelerationStructureAddressResolutionFlagsNV) String() string {
 // ClusterAccelerationStructureClusterFlagsNV wraps the bitmask VkClusterAccelerationStructureClusterFlagsNV.
 type ClusterAccelerationStructureClusterFlagsNV int32
 
-// ClusterAccelerationStructureClusterFlagBitsNV wraps the bitmask VkClusterAccelerationStructureClusterFlagBitsNV. An alias for ClusterAccelerationStructureClusterFlagsNV.
-type ClusterAccelerationStructureClusterFlagBitsNV = ClusterAccelerationStructureClusterFlagsNV
-
 const (
 	// CLUSTER_ACCELERATION_STRUCTURE_CLUSTER_ALLOW_DISABLE_OPACITY_MICROMAPS_NV wraps VK_CLUSTER_ACCELERATION_STRUCTURE_CLUSTER_ALLOW_DISABLE_OPACITY_MICROMAPS_NV.
 	CLUSTER_ACCELERATION_STRUCTURE_CLUSTER_ALLOW_DISABLE_OPACITY_MICROMAPS_NV ClusterAccelerationStructureClusterFlagsNV = C.VK_CLUSTER_ACCELERATION_STRUCTURE_CLUSTER_ALLOW_DISABLE_OPACITY_MICROMAPS_NV
@@ -664,9 +622,6 @@ func (e ClusterAccelerationStructureClusterFlagsNV) String() string {
 
 // ClusterAccelerationStructureGeometryFlagsNV wraps the bitmask VkClusterAccelerationStructureGeometryFlagsNV.
 type ClusterAccelerationStructureGeometryFlagsNV int32
-
-// ClusterAccelerationStructureGeometryFlagBitsNV wraps the bitmask VkClusterAccelerationStructureGeometryFlagBitsNV. An alias for ClusterAccelerationStructureGeometryFlagsNV.
-type ClusterAccelerationStructureGeometryFlagBitsNV = ClusterAccelerationStructureGeometryFlagsNV
 
 const (
 	// CLUSTER_ACCELERATION_STRUCTURE_GEOMETRY_CULL_DISABLE_BIT_NV wraps VK_CLUSTER_ACCELERATION_STRUCTURE_GEOMETRY_CULL_DISABLE_BIT_NV.
@@ -684,9 +639,6 @@ func (e ClusterAccelerationStructureGeometryFlagsNV) String() string {
 // ClusterAccelerationStructureIndexFormatFlagsNV wraps the bitmask VkClusterAccelerationStructureIndexFormatFlagsNV.
 type ClusterAccelerationStructureIndexFormatFlagsNV int32
 
-// ClusterAccelerationStructureIndexFormatFlagBitsNV wraps the bitmask VkClusterAccelerationStructureIndexFormatFlagBitsNV. An alias for ClusterAccelerationStructureIndexFormatFlagsNV.
-type ClusterAccelerationStructureIndexFormatFlagBitsNV = ClusterAccelerationStructureIndexFormatFlagsNV
-
 const (
 	// CLUSTER_ACCELERATION_STRUCTURE_INDEX_FORMAT_16BIT_NV wraps VK_CLUSTER_ACCELERATION_STRUCTURE_INDEX_FORMAT_16BIT_NV.
 	CLUSTER_ACCELERATION_STRUCTURE_INDEX_FORMAT_16BIT_NV ClusterAccelerationStructureIndexFormatFlagsNV = C.VK_CLUSTER_ACCELERATION_STRUCTURE_INDEX_FORMAT_16BIT_NV
@@ -702,9 +654,6 @@ func (e ClusterAccelerationStructureIndexFormatFlagsNV) String() string {
 
 // ColorComponentFlags wraps the bitmask VkColorComponentFlags.
 type ColorComponentFlags int32
-
-// ColorComponentFlagBits wraps the bitmask VkColorComponentFlagBits. An alias for ColorComponentFlags.
-type ColorComponentFlagBits = ColorComponentFlags
 
 const (
 	// COLOR_COMPONENT_A_BIT wraps VK_COLOR_COMPONENT_A_BIT.
@@ -724,9 +673,6 @@ func (e ColorComponentFlags) String() string {
 // CommandBufferResetFlags wraps the bitmask VkCommandBufferResetFlags.
 type CommandBufferResetFlags int32
 
-// CommandBufferResetFlagBits wraps the bitmask VkCommandBufferResetFlagBits. An alias for CommandBufferResetFlags.
-type CommandBufferResetFlagBits = CommandBufferResetFlags
-
 const (
 	// COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT wraps VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT.
 	COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT CommandBufferResetFlags = C.VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT
@@ -738,9 +684,6 @@ func (e CommandBufferResetFlags) String() string {
 
 // CommandBufferUsageFlags wraps the bitmask VkCommandBufferUsageFlags.
 type CommandBufferUsageFlags int32
-
-// CommandBufferUsageFlagBits wraps the bitmask VkCommandBufferUsageFlagBits. An alias for CommandBufferUsageFlags.
-type CommandBufferUsageFlagBits = CommandBufferUsageFlags
 
 const (
 	// COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT wraps VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT.
@@ -758,9 +701,6 @@ func (e CommandBufferUsageFlags) String() string {
 // CommandPoolCreateFlags wraps the bitmask VkCommandPoolCreateFlags.
 type CommandPoolCreateFlags int32
 
-// CommandPoolCreateFlagBits wraps the bitmask VkCommandPoolCreateFlagBits. An alias for CommandPoolCreateFlags.
-type CommandPoolCreateFlagBits = CommandPoolCreateFlags
-
 const (
 	// COMMAND_POOL_CREATE_PROTECTED_BIT wraps VK_COMMAND_POOL_CREATE_PROTECTED_BIT.
 	COMMAND_POOL_CREATE_PROTECTED_BIT CommandPoolCreateFlags = C.VK_COMMAND_POOL_CREATE_PROTECTED_BIT
@@ -776,9 +716,6 @@ func (e CommandPoolCreateFlags) String() string {
 
 // CommandPoolResetFlags wraps the bitmask VkCommandPoolResetFlags.
 type CommandPoolResetFlags int32
-
-// CommandPoolResetFlagBits wraps the bitmask VkCommandPoolResetFlagBits. An alias for CommandPoolResetFlags.
-type CommandPoolResetFlagBits = CommandPoolResetFlags
 
 const (
 	// COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT wraps VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT.
@@ -802,9 +739,6 @@ func (e CommandPoolTrimFlags) String() string {
 // CompositeAlphaFlagsKHR wraps the bitmask VkCompositeAlphaFlagsKHR.
 type CompositeAlphaFlagsKHR int32
 
-// CompositeAlphaFlagBitsKHR wraps the bitmask VkCompositeAlphaFlagBitsKHR. An alias for CompositeAlphaFlagsKHR.
-type CompositeAlphaFlagBitsKHR = CompositeAlphaFlagsKHR
-
 const (
 	// COMPOSITE_ALPHA_INHERIT_BIT_KHR wraps VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR.
 	COMPOSITE_ALPHA_INHERIT_BIT_KHR CompositeAlphaFlagsKHR = C.VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR
@@ -823,9 +757,6 @@ func (e CompositeAlphaFlagsKHR) String() string {
 // ConditionalRenderingFlagsEXT wraps the bitmask VkConditionalRenderingFlagsEXT.
 type ConditionalRenderingFlagsEXT int32
 
-// ConditionalRenderingFlagBitsEXT wraps the bitmask VkConditionalRenderingFlagBitsEXT. An alias for ConditionalRenderingFlagsEXT.
-type ConditionalRenderingFlagBitsEXT = ConditionalRenderingFlagsEXT
-
 const (
 	// CONDITIONAL_RENDERING_INVERTED_BIT_EXT wraps VK_CONDITIONAL_RENDERING_INVERTED_BIT_EXT.
 	CONDITIONAL_RENDERING_INVERTED_BIT_EXT ConditionalRenderingFlagsEXT = C.VK_CONDITIONAL_RENDERING_INVERTED_BIT_EXT
@@ -837,9 +768,6 @@ func (e ConditionalRenderingFlagsEXT) String() string {
 
 // CullModeFlags wraps the bitmask VkCullModeFlags.
 type CullModeFlags int32
-
-// CullModeFlagBits wraps the bitmask VkCullModeFlagBits. An alias for CullModeFlags.
-type CullModeFlagBits = CullModeFlags
 
 const (
 	// CULL_MODE_BACK_BIT wraps VK_CULL_MODE_BACK_BIT.
@@ -859,18 +787,12 @@ func (e CullModeFlags) String() string {
 // DataGraphPipelineDispatchFlagsARM wraps the bitmask VkDataGraphPipelineDispatchFlagsARM.
 type DataGraphPipelineDispatchFlagsARM int64
 
-// DataGraphPipelineDispatchFlagBitsARM wraps the bitmask VkDataGraphPipelineDispatchFlagBitsARM. An alias for DataGraphPipelineDispatchFlagsARM.
-type DataGraphPipelineDispatchFlagBitsARM = DataGraphPipelineDispatchFlagsARM
-
 func (e DataGraphPipelineDispatchFlagsARM) String() string {
 	return fmt.Sprintf("VkDataGraphPipelineDispatchFlagsARM(%b)", e)
 }
 
 // DataGraphPipelineSessionCreateFlagsARM wraps the bitmask VkDataGraphPipelineSessionCreateFlagsARM.
 type DataGraphPipelineSessionCreateFlagsARM int64
-
-// DataGraphPipelineSessionCreateFlagBitsARM wraps the bitmask VkDataGraphPipelineSessionCreateFlagBitsARM. An alias for DataGraphPipelineSessionCreateFlagsARM.
-type DataGraphPipelineSessionCreateFlagBitsARM = DataGraphPipelineSessionCreateFlagsARM
 
 const (
 	// DATA_GRAPH_PIPELINE_SESSION_CREATE_PROTECTED_BIT_ARM wraps VK_DATA_GRAPH_PIPELINE_SESSION_CREATE_PROTECTED_BIT_ARM.
@@ -883,9 +805,6 @@ func (e DataGraphPipelineSessionCreateFlagsARM) String() string {
 
 // DebugReportFlagsEXT wraps the bitmask VkDebugReportFlagsEXT.
 type DebugReportFlagsEXT int32
-
-// DebugReportFlagBitsEXT wraps the bitmask VkDebugReportFlagBitsEXT. An alias for DebugReportFlagsEXT.
-type DebugReportFlagBitsEXT = DebugReportFlagsEXT
 
 const (
 	// DEBUG_REPORT_DEBUG_BIT_EXT wraps VK_DEBUG_REPORT_DEBUG_BIT_EXT.
@@ -907,9 +826,6 @@ func (e DebugReportFlagsEXT) String() string {
 // DebugUtilsMessageSeverityFlagsEXT wraps the bitmask VkDebugUtilsMessageSeverityFlagsEXT.
 type DebugUtilsMessageSeverityFlagsEXT int32
 
-// DebugUtilsMessageSeverityFlagBitsEXT wraps the bitmask VkDebugUtilsMessageSeverityFlagBitsEXT. An alias for DebugUtilsMessageSeverityFlagsEXT.
-type DebugUtilsMessageSeverityFlagBitsEXT = DebugUtilsMessageSeverityFlagsEXT
-
 const (
 	// DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT wraps VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT.
 	DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT DebugUtilsMessageSeverityFlagsEXT = C.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
@@ -927,9 +843,6 @@ func (e DebugUtilsMessageSeverityFlagsEXT) String() string {
 
 // DebugUtilsMessageTypeFlagsEXT wraps the bitmask VkDebugUtilsMessageTypeFlagsEXT.
 type DebugUtilsMessageTypeFlagsEXT int32
-
-// DebugUtilsMessageTypeFlagBitsEXT wraps the bitmask VkDebugUtilsMessageTypeFlagBitsEXT. An alias for DebugUtilsMessageTypeFlagsEXT.
-type DebugUtilsMessageTypeFlagBitsEXT = DebugUtilsMessageTypeFlagsEXT
 
 const (
 	// DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT wraps VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT.
@@ -963,9 +876,6 @@ func (e DebugUtilsMessengerCreateFlagsEXT) String() string {
 // DependencyFlags wraps the bitmask VkDependencyFlags.
 type DependencyFlags int32
 
-// DependencyFlagBits wraps the bitmask VkDependencyFlagBits. An alias for DependencyFlags.
-type DependencyFlagBits = DependencyFlags
-
 const (
 	// DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR wraps VK_DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR.
 	DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR DependencyFlags = C.VK_DEPENDENCY_ASYMMETRIC_EVENT_BIT_KHR
@@ -991,9 +901,6 @@ func (e DependencyFlags) String() string {
 
 // DescriptorBindingFlags wraps the bitmask VkDescriptorBindingFlags.
 type DescriptorBindingFlags int32
-
-// DescriptorBindingFlagBits wraps the bitmask VkDescriptorBindingFlagBits. An alias for DescriptorBindingFlags.
-type DescriptorBindingFlagBits = DescriptorBindingFlags
 
 // DescriptorBindingFlagsEXT wraps the bitmask VkDescriptorBindingFlagsEXT. An alias for DescriptorBindingFlags.
 type DescriptorBindingFlagsEXT = DescriptorBindingFlags
@@ -1023,9 +930,6 @@ func (e DescriptorBindingFlags) String() string {
 
 // DescriptorPoolCreateFlags wraps the bitmask VkDescriptorPoolCreateFlags.
 type DescriptorPoolCreateFlags int32
-
-// DescriptorPoolCreateFlagBits wraps the bitmask VkDescriptorPoolCreateFlagBits. An alias for DescriptorPoolCreateFlags.
-type DescriptorPoolCreateFlagBits = DescriptorPoolCreateFlags
 
 const (
 	// DESCRIPTOR_POOL_CREATE_ALLOW_OVERALLOCATION_POOLS_BIT_NV wraps VK_DESCRIPTOR_POOL_CREATE_ALLOW_OVERALLOCATION_POOLS_BIT_NV.
@@ -1057,9 +961,6 @@ func (e DescriptorPoolResetFlags) String() string {
 
 // DescriptorSetLayoutCreateFlags wraps the bitmask VkDescriptorSetLayoutCreateFlags.
 type DescriptorSetLayoutCreateFlags int32
-
-// DescriptorSetLayoutCreateFlagBits wraps the bitmask VkDescriptorSetLayoutCreateFlagBits. An alias for DescriptorSetLayoutCreateFlags.
-type DescriptorSetLayoutCreateFlagBits = DescriptorSetLayoutCreateFlags
 
 const (
 	// DESCRIPTOR_SET_LAYOUT_CREATE_DESCRIPTOR_BUFFER_BIT_EXT wraps VK_DESCRIPTOR_SET_LAYOUT_CREATE_DESCRIPTOR_BUFFER_BIT_EXT.
@@ -1101,9 +1002,6 @@ func (e DescriptorUpdateTemplateCreateFlags) String() string {
 // DeviceAddressBindingFlagsEXT wraps the bitmask VkDeviceAddressBindingFlagsEXT.
 type DeviceAddressBindingFlagsEXT int32
 
-// DeviceAddressBindingFlagBitsEXT wraps the bitmask VkDeviceAddressBindingFlagBitsEXT. An alias for DeviceAddressBindingFlagsEXT.
-type DeviceAddressBindingFlagBitsEXT = DeviceAddressBindingFlagsEXT
-
 const (
 	// DEVICE_ADDRESS_BINDING_INTERNAL_OBJECT_BIT_EXT wraps VK_DEVICE_ADDRESS_BINDING_INTERNAL_OBJECT_BIT_EXT.
 	DEVICE_ADDRESS_BINDING_INTERNAL_OBJECT_BIT_EXT DeviceAddressBindingFlagsEXT = C.VK_DEVICE_ADDRESS_BINDING_INTERNAL_OBJECT_BIT_EXT
@@ -1123,9 +1021,6 @@ func (e DeviceCreateFlags) String() string {
 // DeviceDiagnosticsConfigFlagsNV wraps the bitmask VkDeviceDiagnosticsConfigFlagsNV.
 type DeviceDiagnosticsConfigFlagsNV int32
 
-// DeviceDiagnosticsConfigFlagBitsNV wraps the bitmask VkDeviceDiagnosticsConfigFlagBitsNV. An alias for DeviceDiagnosticsConfigFlagsNV.
-type DeviceDiagnosticsConfigFlagBitsNV = DeviceDiagnosticsConfigFlagsNV
-
 const (
 	// DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV wraps VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV.
 	DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV DeviceDiagnosticsConfigFlagsNV = C.VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV
@@ -1143,9 +1038,6 @@ func (e DeviceDiagnosticsConfigFlagsNV) String() string {
 
 // DeviceGroupPresentModeFlagsKHR wraps the bitmask VkDeviceGroupPresentModeFlagsKHR.
 type DeviceGroupPresentModeFlagsKHR int32
-
-// DeviceGroupPresentModeFlagBitsKHR wraps the bitmask VkDeviceGroupPresentModeFlagBitsKHR. An alias for DeviceGroupPresentModeFlagsKHR.
-type DeviceGroupPresentModeFlagBitsKHR = DeviceGroupPresentModeFlagsKHR
 
 const (
 	// DEVICE_GROUP_PRESENT_MODE_LOCAL_BIT_KHR wraps VK_DEVICE_GROUP_PRESENT_MODE_LOCAL_BIT_KHR.
@@ -1171,9 +1063,6 @@ func (e DeviceMemoryReportFlagsEXT) String() string {
 
 // DeviceQueueCreateFlags wraps the bitmask VkDeviceQueueCreateFlags.
 type DeviceQueueCreateFlags int32
-
-// DeviceQueueCreateFlagBits wraps the bitmask VkDeviceQueueCreateFlagBits. An alias for DeviceQueueCreateFlags.
-type DeviceQueueCreateFlagBits = DeviceQueueCreateFlags
 
 const (
 	// DEVICE_QUEUE_CREATE_PROTECTED_BIT wraps VK_DEVICE_QUEUE_CREATE_PROTECTED_BIT.
@@ -1201,9 +1090,6 @@ func (e DisplayModeCreateFlagsKHR) String() string {
 // DisplayPlaneAlphaFlagsKHR wraps the bitmask VkDisplayPlaneAlphaFlagsKHR.
 type DisplayPlaneAlphaFlagsKHR int32
 
-// DisplayPlaneAlphaFlagBitsKHR wraps the bitmask VkDisplayPlaneAlphaFlagBitsKHR. An alias for DisplayPlaneAlphaFlagsKHR.
-type DisplayPlaneAlphaFlagBitsKHR = DisplayPlaneAlphaFlagsKHR
-
 const (
 	// DISPLAY_PLANE_ALPHA_GLOBAL_BIT_KHR wraps VK_DISPLAY_PLANE_ALPHA_GLOBAL_BIT_KHR.
 	DISPLAY_PLANE_ALPHA_GLOBAL_BIT_KHR DisplayPlaneAlphaFlagsKHR = C.VK_DISPLAY_PLANE_ALPHA_GLOBAL_BIT_KHR
@@ -1229,9 +1115,6 @@ func (e DisplaySurfaceCreateFlagsKHR) String() string {
 // EventCreateFlags wraps the bitmask VkEventCreateFlags.
 type EventCreateFlags int32
 
-// EventCreateFlagBits wraps the bitmask VkEventCreateFlagBits. An alias for EventCreateFlags.
-type EventCreateFlagBits = EventCreateFlags
-
 const (
 	// EVENT_CREATE_DEVICE_ONLY_BIT wraps VK_EVENT_CREATE_DEVICE_ONLY_BIT.
 	EVENT_CREATE_DEVICE_ONLY_BIT EventCreateFlags = C.VK_EVENT_CREATE_DEVICE_ONLY_BIT
@@ -1245,9 +1128,6 @@ func (e EventCreateFlags) String() string {
 
 // ExportMetalObjectTypeFlagsEXT wraps the bitmask VkExportMetalObjectTypeFlagsEXT.
 type ExportMetalObjectTypeFlagsEXT int32
-
-// ExportMetalObjectTypeFlagBitsEXT wraps the bitmask VkExportMetalObjectTypeFlagBitsEXT. An alias for ExportMetalObjectTypeFlagsEXT.
-type ExportMetalObjectTypeFlagBitsEXT = ExportMetalObjectTypeFlagsEXT
 
 const (
 	// EXPORT_METAL_OBJECT_TYPE_METAL_BUFFER_BIT_EXT wraps VK_EXPORT_METAL_OBJECT_TYPE_METAL_BUFFER_BIT_EXT.
@@ -1271,9 +1151,6 @@ func (e ExportMetalObjectTypeFlagsEXT) String() string {
 // ExternalFenceFeatureFlags wraps the bitmask VkExternalFenceFeatureFlags.
 type ExternalFenceFeatureFlags int32
 
-// ExternalFenceFeatureFlagBits wraps the bitmask VkExternalFenceFeatureFlagBits. An alias for ExternalFenceFeatureFlags.
-type ExternalFenceFeatureFlagBits = ExternalFenceFeatureFlags
-
 // ExternalFenceFeatureFlagsKHR wraps the bitmask VkExternalFenceFeatureFlagsKHR. An alias for ExternalFenceFeatureFlags.
 type ExternalFenceFeatureFlagsKHR = ExternalFenceFeatureFlags
 
@@ -1294,9 +1171,6 @@ func (e ExternalFenceFeatureFlags) String() string {
 
 // ExternalFenceHandleTypeFlags wraps the bitmask VkExternalFenceHandleTypeFlags.
 type ExternalFenceHandleTypeFlags int32
-
-// ExternalFenceHandleTypeFlagBits wraps the bitmask VkExternalFenceHandleTypeFlagBits. An alias for ExternalFenceHandleTypeFlags.
-type ExternalFenceHandleTypeFlagBits = ExternalFenceHandleTypeFlags
 
 // ExternalFenceHandleTypeFlagsKHR wraps the bitmask VkExternalFenceHandleTypeFlagsKHR. An alias for ExternalFenceHandleTypeFlags.
 type ExternalFenceHandleTypeFlagsKHR = ExternalFenceHandleTypeFlags
@@ -1327,9 +1201,6 @@ func (e ExternalFenceHandleTypeFlags) String() string {
 // ExternalMemoryFeatureFlags wraps the bitmask VkExternalMemoryFeatureFlags.
 type ExternalMemoryFeatureFlags int32
 
-// ExternalMemoryFeatureFlagBits wraps the bitmask VkExternalMemoryFeatureFlagBits. An alias for ExternalMemoryFeatureFlags.
-type ExternalMemoryFeatureFlagBits = ExternalMemoryFeatureFlags
-
 // ExternalMemoryFeatureFlagsKHR wraps the bitmask VkExternalMemoryFeatureFlagsKHR. An alias for ExternalMemoryFeatureFlags.
 type ExternalMemoryFeatureFlagsKHR = ExternalMemoryFeatureFlags
 
@@ -1355,9 +1226,6 @@ func (e ExternalMemoryFeatureFlags) String() string {
 // ExternalMemoryFeatureFlagsNV wraps the bitmask VkExternalMemoryFeatureFlagsNV.
 type ExternalMemoryFeatureFlagsNV int32
 
-// ExternalMemoryFeatureFlagBitsNV wraps the bitmask VkExternalMemoryFeatureFlagBitsNV. An alias for ExternalMemoryFeatureFlagsNV.
-type ExternalMemoryFeatureFlagBitsNV = ExternalMemoryFeatureFlagsNV
-
 const (
 	// EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT_NV wraps VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT_NV.
 	EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT_NV ExternalMemoryFeatureFlagsNV = C.VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT_NV
@@ -1373,9 +1241,6 @@ func (e ExternalMemoryFeatureFlagsNV) String() string {
 
 // ExternalMemoryHandleTypeFlags wraps the bitmask VkExternalMemoryHandleTypeFlags.
 type ExternalMemoryHandleTypeFlags int32
-
-// ExternalMemoryHandleTypeFlagBits wraps the bitmask VkExternalMemoryHandleTypeFlagBits. An alias for ExternalMemoryHandleTypeFlags.
-type ExternalMemoryHandleTypeFlagBits = ExternalMemoryHandleTypeFlags
 
 // ExternalMemoryHandleTypeFlagsKHR wraps the bitmask VkExternalMemoryHandleTypeFlagsKHR. An alias for ExternalMemoryHandleTypeFlags.
 type ExternalMemoryHandleTypeFlagsKHR = ExternalMemoryHandleTypeFlags
@@ -1432,9 +1297,6 @@ func (e ExternalMemoryHandleTypeFlags) String() string {
 // ExternalMemoryHandleTypeFlagsNV wraps the bitmask VkExternalMemoryHandleTypeFlagsNV.
 type ExternalMemoryHandleTypeFlagsNV int32
 
-// ExternalMemoryHandleTypeFlagBitsNV wraps the bitmask VkExternalMemoryHandleTypeFlagBitsNV. An alias for ExternalMemoryHandleTypeFlagsNV.
-type ExternalMemoryHandleTypeFlagBitsNV = ExternalMemoryHandleTypeFlagsNV
-
 const (
 	// EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_IMAGE_BIT_NV wraps VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_IMAGE_BIT_NV.
 	EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_IMAGE_BIT_NV ExternalMemoryHandleTypeFlagsNV = C.VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_IMAGE_BIT_NV
@@ -1452,9 +1314,6 @@ func (e ExternalMemoryHandleTypeFlagsNV) String() string {
 
 // ExternalSemaphoreFeatureFlags wraps the bitmask VkExternalSemaphoreFeatureFlags.
 type ExternalSemaphoreFeatureFlags int32
-
-// ExternalSemaphoreFeatureFlagBits wraps the bitmask VkExternalSemaphoreFeatureFlagBits. An alias for ExternalSemaphoreFeatureFlags.
-type ExternalSemaphoreFeatureFlagBits = ExternalSemaphoreFeatureFlags
 
 // ExternalSemaphoreFeatureFlagsKHR wraps the bitmask VkExternalSemaphoreFeatureFlagsKHR. An alias for ExternalSemaphoreFeatureFlags.
 type ExternalSemaphoreFeatureFlagsKHR = ExternalSemaphoreFeatureFlags
@@ -1476,9 +1335,6 @@ func (e ExternalSemaphoreFeatureFlags) String() string {
 
 // ExternalSemaphoreHandleTypeFlags wraps the bitmask VkExternalSemaphoreHandleTypeFlags.
 type ExternalSemaphoreHandleTypeFlags int32
-
-// ExternalSemaphoreHandleTypeFlagBits wraps the bitmask VkExternalSemaphoreHandleTypeFlagBits. An alias for ExternalSemaphoreHandleTypeFlags.
-type ExternalSemaphoreHandleTypeFlagBits = ExternalSemaphoreHandleTypeFlags
 
 // ExternalSemaphoreHandleTypeFlagsKHR wraps the bitmask VkExternalSemaphoreHandleTypeFlagsKHR. An alias for ExternalSemaphoreHandleTypeFlags.
 type ExternalSemaphoreHandleTypeFlagsKHR = ExternalSemaphoreHandleTypeFlags
@@ -1515,9 +1371,6 @@ func (e ExternalSemaphoreHandleTypeFlags) String() string {
 // FenceCreateFlags wraps the bitmask VkFenceCreateFlags.
 type FenceCreateFlags int32
 
-// FenceCreateFlagBits wraps the bitmask VkFenceCreateFlagBits. An alias for FenceCreateFlags.
-type FenceCreateFlagBits = FenceCreateFlags
-
 const (
 	// FENCE_CREATE_SIGNALED_BIT wraps VK_FENCE_CREATE_SIGNALED_BIT.
 	FENCE_CREATE_SIGNALED_BIT FenceCreateFlags = C.VK_FENCE_CREATE_SIGNALED_BIT
@@ -1529,9 +1382,6 @@ func (e FenceCreateFlags) String() string {
 
 // FenceImportFlags wraps the bitmask VkFenceImportFlags.
 type FenceImportFlags int32
-
-// FenceImportFlagBits wraps the bitmask VkFenceImportFlagBits. An alias for FenceImportFlags.
-type FenceImportFlagBits = FenceImportFlags
 
 // FenceImportFlagsKHR wraps the bitmask VkFenceImportFlagsKHR. An alias for FenceImportFlags.
 type FenceImportFlagsKHR = FenceImportFlags
@@ -1549,9 +1399,6 @@ func (e FenceImportFlags) String() string {
 
 // FormatFeatureFlags wraps the bitmask VkFormatFeatureFlags.
 type FormatFeatureFlags int32
-
-// FormatFeatureFlagBits wraps the bitmask VkFormatFeatureFlagBits. An alias for FormatFeatureFlags.
-type FormatFeatureFlagBits = FormatFeatureFlags
 
 const (
 	// FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR wraps VK_FORMAT_FEATURE_ACCELERATION_STRUCTURE_VERTEX_BUFFER_BIT_KHR.
@@ -1646,9 +1493,6 @@ func (e FormatFeatureFlags) String() string {
 
 // FormatFeatureFlags2 wraps the bitmask VkFormatFeatureFlags2.
 type FormatFeatureFlags2 int64
-
-// FormatFeatureFlagBits2 wraps the bitmask VkFormatFeatureFlagBits2. An alias for FormatFeatureFlags2.
-type FormatFeatureFlagBits2 = FormatFeatureFlags2
 
 // FormatFeatureFlags2KHR wraps the bitmask VkFormatFeatureFlags2KHR. An alias for FormatFeatureFlags2.
 type FormatFeatureFlags2KHR = FormatFeatureFlags2
@@ -1819,9 +1663,6 @@ func (e FormatFeatureFlags2) String() string {
 // FrameBoundaryFlagsEXT wraps the bitmask VkFrameBoundaryFlagsEXT.
 type FrameBoundaryFlagsEXT int32
 
-// FrameBoundaryFlagBitsEXT wraps the bitmask VkFrameBoundaryFlagBitsEXT. An alias for FrameBoundaryFlagsEXT.
-type FrameBoundaryFlagBitsEXT = FrameBoundaryFlagsEXT
-
 const (
 	// FRAME_BOUNDARY_FRAME_END_BIT_EXT wraps VK_FRAME_BOUNDARY_FRAME_END_BIT_EXT.
 	FRAME_BOUNDARY_FRAME_END_BIT_EXT FrameBoundaryFlagsEXT = C.VK_FRAME_BOUNDARY_FRAME_END_BIT_EXT
@@ -1833,9 +1674,6 @@ func (e FrameBoundaryFlagsEXT) String() string {
 
 // FramebufferCreateFlags wraps the bitmask VkFramebufferCreateFlags.
 type FramebufferCreateFlags int32
-
-// FramebufferCreateFlagBits wraps the bitmask VkFramebufferCreateFlagBits. An alias for FramebufferCreateFlags.
-type FramebufferCreateFlagBits = FramebufferCreateFlags
 
 const (
 	// FRAMEBUFFER_CREATE_IMAGELESS_BIT wraps VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT.
@@ -1850,9 +1688,6 @@ func (e FramebufferCreateFlags) String() string {
 
 // GeometryFlagsKHR wraps the bitmask VkGeometryFlagsKHR.
 type GeometryFlagsKHR int32
-
-// GeometryFlagBitsKHR wraps the bitmask VkGeometryFlagBitsKHR. An alias for GeometryFlagsKHR.
-type GeometryFlagBitsKHR = GeometryFlagsKHR
 
 // GeometryFlagsNV wraps the bitmask VkGeometryFlagsNV. An alias for GeometryFlagsKHR.
 type GeometryFlagsNV = GeometryFlagsKHR
@@ -1874,9 +1709,6 @@ func (e GeometryFlagsKHR) String() string {
 
 // GeometryInstanceFlagsKHR wraps the bitmask VkGeometryInstanceFlagsKHR.
 type GeometryInstanceFlagsKHR int32
-
-// GeometryInstanceFlagBitsKHR wraps the bitmask VkGeometryInstanceFlagBitsKHR. An alias for GeometryInstanceFlagsKHR.
-type GeometryInstanceFlagBitsKHR = GeometryInstanceFlagsKHR
 
 // GeometryInstanceFlagsNV wraps the bitmask VkGeometryInstanceFlagsNV. An alias for GeometryInstanceFlagsKHR.
 type GeometryInstanceFlagsNV = GeometryInstanceFlagsKHR
@@ -1917,9 +1749,6 @@ func (e GeometryInstanceFlagsKHR) String() string {
 // GraphicsPipelineLibraryFlagsEXT wraps the bitmask VkGraphicsPipelineLibraryFlagsEXT.
 type GraphicsPipelineLibraryFlagsEXT int32
 
-// GraphicsPipelineLibraryFlagBitsEXT wraps the bitmask VkGraphicsPipelineLibraryFlagBitsEXT. An alias for GraphicsPipelineLibraryFlagsEXT.
-type GraphicsPipelineLibraryFlagBitsEXT = GraphicsPipelineLibraryFlagsEXT
-
 const (
 	// GRAPHICS_PIPELINE_LIBRARY_FRAGMENT_OUTPUT_INTERFACE_BIT_EXT wraps VK_GRAPHICS_PIPELINE_LIBRARY_FRAGMENT_OUTPUT_INTERFACE_BIT_EXT.
 	GRAPHICS_PIPELINE_LIBRARY_FRAGMENT_OUTPUT_INTERFACE_BIT_EXT GraphicsPipelineLibraryFlagsEXT = C.VK_GRAPHICS_PIPELINE_LIBRARY_FRAGMENT_OUTPUT_INTERFACE_BIT_EXT
@@ -1945,9 +1774,6 @@ func (e HeadlessSurfaceCreateFlagsEXT) String() string {
 // HostImageCopyFlags wraps the bitmask VkHostImageCopyFlags.
 type HostImageCopyFlags int32
 
-// HostImageCopyFlagBits wraps the bitmask VkHostImageCopyFlagBits. An alias for HostImageCopyFlags.
-type HostImageCopyFlagBits = HostImageCopyFlags
-
 // HostImageCopyFlagsEXT wraps the bitmask VkHostImageCopyFlagsEXT. An alias for HostImageCopyFlags.
 type HostImageCopyFlagsEXT = HostImageCopyFlags
 
@@ -1968,9 +1794,6 @@ func (e HostImageCopyFlags) String() string {
 
 // ImageAspectFlags wraps the bitmask VkImageAspectFlags.
 type ImageAspectFlags int32
-
-// ImageAspectFlagBits wraps the bitmask VkImageAspectFlagBits. An alias for ImageAspectFlags.
-type ImageAspectFlagBits = ImageAspectFlags
 
 const (
 	// IMAGE_ASPECT_COLOR_BIT wraps VK_IMAGE_ASPECT_COLOR_BIT.
@@ -2013,9 +1836,6 @@ func (e ImageAspectFlags) String() string {
 
 // ImageCompressionFixedRateFlagsEXT wraps the bitmask VkImageCompressionFixedRateFlagsEXT.
 type ImageCompressionFixedRateFlagsEXT int32
-
-// ImageCompressionFixedRateFlagBitsEXT wraps the bitmask VkImageCompressionFixedRateFlagBitsEXT. An alias for ImageCompressionFixedRateFlagsEXT.
-type ImageCompressionFixedRateFlagBitsEXT = ImageCompressionFixedRateFlagsEXT
 
 const (
 	// IMAGE_COMPRESSION_FIXED_RATE_10BPC_BIT_EXT wraps VK_IMAGE_COMPRESSION_FIXED_RATE_10BPC_BIT_EXT.
@@ -2077,9 +1897,6 @@ func (e ImageCompressionFixedRateFlagsEXT) String() string {
 // ImageCompressionFlagsEXT wraps the bitmask VkImageCompressionFlagsEXT.
 type ImageCompressionFlagsEXT int32
 
-// ImageCompressionFlagBitsEXT wraps the bitmask VkImageCompressionFlagBitsEXT. An alias for ImageCompressionFlagsEXT.
-type ImageCompressionFlagBitsEXT = ImageCompressionFlagsEXT
-
 const (
 	// IMAGE_COMPRESSION_DEFAULT_EXT wraps VK_IMAGE_COMPRESSION_DEFAULT_EXT.
 	IMAGE_COMPRESSION_DEFAULT_EXT ImageCompressionFlagsEXT = C.VK_IMAGE_COMPRESSION_DEFAULT_EXT
@@ -2097,9 +1914,6 @@ func (e ImageCompressionFlagsEXT) String() string {
 
 // ImageCreateFlags wraps the bitmask VkImageCreateFlags.
 type ImageCreateFlags int32
-
-// ImageCreateFlagBits wraps the bitmask VkImageCreateFlagBits. An alias for ImageCreateFlags.
-type ImageCreateFlagBits = ImageCreateFlags
 
 const (
 	// IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT wraps VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT.
@@ -2165,9 +1979,6 @@ func (e ImageCreateFlags) String() string {
 // ImageUsageFlags wraps the bitmask VkImageUsageFlags.
 type ImageUsageFlags int32
 
-// ImageUsageFlagBits wraps the bitmask VkImageUsageFlagBits. An alias for ImageUsageFlags.
-type ImageUsageFlagBits = ImageUsageFlags
-
 const (
 	// IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT wraps VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT.
 	IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT ImageUsageFlags = C.VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT
@@ -2232,9 +2043,6 @@ func (e ImageUsageFlags) String() string {
 // ImageViewCreateFlags wraps the bitmask VkImageViewCreateFlags.
 type ImageViewCreateFlags int32
 
-// ImageViewCreateFlagBits wraps the bitmask VkImageViewCreateFlagBits. An alias for ImageViewCreateFlags.
-type ImageViewCreateFlagBits = ImageViewCreateFlags
-
 const (
 	// IMAGE_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT wraps VK_IMAGE_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT.
 	IMAGE_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT ImageViewCreateFlags = C.VK_IMAGE_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT
@@ -2251,9 +2059,6 @@ func (e ImageViewCreateFlags) String() string {
 // IndirectCommandsInputModeFlagsEXT wraps the bitmask VkIndirectCommandsInputModeFlagsEXT.
 type IndirectCommandsInputModeFlagsEXT int32
 
-// IndirectCommandsInputModeFlagBitsEXT wraps the bitmask VkIndirectCommandsInputModeFlagBitsEXT. An alias for IndirectCommandsInputModeFlagsEXT.
-type IndirectCommandsInputModeFlagBitsEXT = IndirectCommandsInputModeFlagsEXT
-
 const (
 	// INDIRECT_COMMANDS_INPUT_MODE_DXGI_INDEX_BUFFER_EXT wraps VK_INDIRECT_COMMANDS_INPUT_MODE_DXGI_INDEX_BUFFER_EXT.
 	INDIRECT_COMMANDS_INPUT_MODE_DXGI_INDEX_BUFFER_EXT IndirectCommandsInputModeFlagsEXT = C.VK_INDIRECT_COMMANDS_INPUT_MODE_DXGI_INDEX_BUFFER_EXT
@@ -2268,9 +2073,6 @@ func (e IndirectCommandsInputModeFlagsEXT) String() string {
 // IndirectCommandsLayoutUsageFlagsEXT wraps the bitmask VkIndirectCommandsLayoutUsageFlagsEXT.
 type IndirectCommandsLayoutUsageFlagsEXT int32
 
-// IndirectCommandsLayoutUsageFlagBitsEXT wraps the bitmask VkIndirectCommandsLayoutUsageFlagBitsEXT. An alias for IndirectCommandsLayoutUsageFlagsEXT.
-type IndirectCommandsLayoutUsageFlagBitsEXT = IndirectCommandsLayoutUsageFlagsEXT
-
 const (
 	// INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_EXT wraps VK_INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_EXT.
 	INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_EXT IndirectCommandsLayoutUsageFlagsEXT = C.VK_INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_EXT
@@ -2284,9 +2086,6 @@ func (e IndirectCommandsLayoutUsageFlagsEXT) String() string {
 
 // IndirectCommandsLayoutUsageFlagsNV wraps the bitmask VkIndirectCommandsLayoutUsageFlagsNV.
 type IndirectCommandsLayoutUsageFlagsNV int32
-
-// IndirectCommandsLayoutUsageFlagBitsNV wraps the bitmask VkIndirectCommandsLayoutUsageFlagBitsNV. An alias for IndirectCommandsLayoutUsageFlagsNV.
-type IndirectCommandsLayoutUsageFlagBitsNV = IndirectCommandsLayoutUsageFlagsNV
 
 const (
 	// INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_NV wraps VK_INDIRECT_COMMANDS_LAYOUT_USAGE_EXPLICIT_PREPROCESS_BIT_NV.
@@ -2304,9 +2103,6 @@ func (e IndirectCommandsLayoutUsageFlagsNV) String() string {
 // IndirectStateFlagsNV wraps the bitmask VkIndirectStateFlagsNV.
 type IndirectStateFlagsNV int32
 
-// IndirectStateFlagBitsNV wraps the bitmask VkIndirectStateFlagBitsNV. An alias for IndirectStateFlagsNV.
-type IndirectStateFlagBitsNV = IndirectStateFlagsNV
-
 const (
 	// INDIRECT_STATE_FLAG_FRONTFACE_BIT_NV wraps VK_INDIRECT_STATE_FLAG_FRONTFACE_BIT_NV.
 	INDIRECT_STATE_FLAG_FRONTFACE_BIT_NV IndirectStateFlagsNV = C.VK_INDIRECT_STATE_FLAG_FRONTFACE_BIT_NV
@@ -2319,9 +2115,6 @@ func (e IndirectStateFlagsNV) String() string {
 // InstanceCreateFlags wraps the bitmask VkInstanceCreateFlags.
 type InstanceCreateFlags int32
 
-// InstanceCreateFlagBits wraps the bitmask VkInstanceCreateFlagBits. An alias for InstanceCreateFlags.
-type InstanceCreateFlagBits = InstanceCreateFlags
-
 const (
 	// INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR wraps VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR.
 	INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR InstanceCreateFlags = C.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
@@ -2333,9 +2126,6 @@ func (e InstanceCreateFlags) String() string {
 
 // MemoryAllocateFlags wraps the bitmask VkMemoryAllocateFlags.
 type MemoryAllocateFlags int32
-
-// MemoryAllocateFlagBits wraps the bitmask VkMemoryAllocateFlagBits. An alias for MemoryAllocateFlags.
-type MemoryAllocateFlagBits = MemoryAllocateFlags
 
 // MemoryAllocateFlagsKHR wraps the bitmask VkMemoryAllocateFlagsKHR. An alias for MemoryAllocateFlags.
 type MemoryAllocateFlagsKHR = MemoryAllocateFlags
@@ -2364,9 +2154,6 @@ func (e MemoryAllocateFlags) String() string {
 // MemoryDecompressionMethodFlagsNV wraps the bitmask VkMemoryDecompressionMethodFlagsNV.
 type MemoryDecompressionMethodFlagsNV int64
 
-// MemoryDecompressionMethodFlagBitsNV wraps the bitmask VkMemoryDecompressionMethodFlagBitsNV. An alias for MemoryDecompressionMethodFlagsNV.
-type MemoryDecompressionMethodFlagBitsNV = MemoryDecompressionMethodFlagsNV
-
 const (
 	// MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV wraps VK_MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV.
 	MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV MemoryDecompressionMethodFlagsNV = C.VK_MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV
@@ -2378,9 +2165,6 @@ func (e MemoryDecompressionMethodFlagsNV) String() string {
 
 // MemoryHeapFlags wraps the bitmask VkMemoryHeapFlags.
 type MemoryHeapFlags int32
-
-// MemoryHeapFlagBits wraps the bitmask VkMemoryHeapFlagBits. An alias for MemoryHeapFlags.
-type MemoryHeapFlagBits = MemoryHeapFlags
 
 const (
 	// MEMORY_HEAP_DEVICE_LOCAL_BIT wraps VK_MEMORY_HEAP_DEVICE_LOCAL_BIT.
@@ -2400,9 +2184,6 @@ func (e MemoryHeapFlags) String() string {
 // MemoryMapFlags wraps the bitmask VkMemoryMapFlags.
 type MemoryMapFlags int32
 
-// MemoryMapFlagBits wraps the bitmask VkMemoryMapFlagBits. An alias for MemoryMapFlags.
-type MemoryMapFlagBits = MemoryMapFlags
-
 const (
 	// MEMORY_MAP_PLACED_BIT_EXT wraps VK_MEMORY_MAP_PLACED_BIT_EXT.
 	MEMORY_MAP_PLACED_BIT_EXT MemoryMapFlags = C.VK_MEMORY_MAP_PLACED_BIT_EXT
@@ -2414,9 +2195,6 @@ func (e MemoryMapFlags) String() string {
 
 // MemoryPropertyFlags wraps the bitmask VkMemoryPropertyFlags.
 type MemoryPropertyFlags int32
-
-// MemoryPropertyFlagBits wraps the bitmask VkMemoryPropertyFlagBits. An alias for MemoryPropertyFlags.
-type MemoryPropertyFlagBits = MemoryPropertyFlags
 
 const (
 	// MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD wraps VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD.
@@ -2446,9 +2224,6 @@ func (e MemoryPropertyFlags) String() string {
 // MemoryUnmapFlags wraps the bitmask VkMemoryUnmapFlags.
 type MemoryUnmapFlags int32
 
-// MemoryUnmapFlagBits wraps the bitmask VkMemoryUnmapFlagBits. An alias for MemoryUnmapFlags.
-type MemoryUnmapFlagBits = MemoryUnmapFlags
-
 // MemoryUnmapFlagsKHR wraps the bitmask VkMemoryUnmapFlagsKHR. An alias for MemoryUnmapFlags.
 type MemoryUnmapFlagsKHR = MemoryUnmapFlags
 
@@ -2471,9 +2246,6 @@ func (e MetalSurfaceCreateFlagsEXT) String() string {
 // MicromapCreateFlagsEXT wraps the bitmask VkMicromapCreateFlagsEXT.
 type MicromapCreateFlagsEXT int32
 
-// MicromapCreateFlagBitsEXT wraps the bitmask VkMicromapCreateFlagBitsEXT. An alias for MicromapCreateFlagsEXT.
-type MicromapCreateFlagBitsEXT = MicromapCreateFlagsEXT
-
 const (
 	// MICROMAP_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_EXT wraps VK_MICROMAP_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_EXT.
 	MICROMAP_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_EXT MicromapCreateFlagsEXT = C.VK_MICROMAP_CREATE_DEVICE_ADDRESS_CAPTURE_REPLAY_BIT_EXT
@@ -2486,9 +2258,6 @@ func (e MicromapCreateFlagsEXT) String() string {
 // OpticalFlowExecuteFlagsNV wraps the bitmask VkOpticalFlowExecuteFlagsNV.
 type OpticalFlowExecuteFlagsNV int32
 
-// OpticalFlowExecuteFlagBitsNV wraps the bitmask VkOpticalFlowExecuteFlagBitsNV. An alias for OpticalFlowExecuteFlagsNV.
-type OpticalFlowExecuteFlagBitsNV = OpticalFlowExecuteFlagsNV
-
 const (
 	// OPTICAL_FLOW_EXECUTE_DISABLE_TEMPORAL_HINTS_BIT_NV wraps VK_OPTICAL_FLOW_EXECUTE_DISABLE_TEMPORAL_HINTS_BIT_NV.
 	OPTICAL_FLOW_EXECUTE_DISABLE_TEMPORAL_HINTS_BIT_NV OpticalFlowExecuteFlagsNV = C.VK_OPTICAL_FLOW_EXECUTE_DISABLE_TEMPORAL_HINTS_BIT_NV
@@ -2500,9 +2269,6 @@ func (e OpticalFlowExecuteFlagsNV) String() string {
 
 // OpticalFlowGridSizeFlagsNV wraps the bitmask VkOpticalFlowGridSizeFlagsNV.
 type OpticalFlowGridSizeFlagsNV int32
-
-// OpticalFlowGridSizeFlagBitsNV wraps the bitmask VkOpticalFlowGridSizeFlagBitsNV. An alias for OpticalFlowGridSizeFlagsNV.
-type OpticalFlowGridSizeFlagBitsNV = OpticalFlowGridSizeFlagsNV
 
 const (
 	// OPTICAL_FLOW_GRID_SIZE_1X1_BIT_NV wraps VK_OPTICAL_FLOW_GRID_SIZE_1X1_BIT_NV.
@@ -2524,9 +2290,6 @@ func (e OpticalFlowGridSizeFlagsNV) String() string {
 // OpticalFlowSessionCreateFlagsNV wraps the bitmask VkOpticalFlowSessionCreateFlagsNV.
 type OpticalFlowSessionCreateFlagsNV int32
 
-// OpticalFlowSessionCreateFlagBitsNV wraps the bitmask VkOpticalFlowSessionCreateFlagBitsNV. An alias for OpticalFlowSessionCreateFlagsNV.
-type OpticalFlowSessionCreateFlagBitsNV = OpticalFlowSessionCreateFlagsNV
-
 const (
 	// OPTICAL_FLOW_SESSION_CREATE_ALLOW_REGIONS_BIT_NV wraps VK_OPTICAL_FLOW_SESSION_CREATE_ALLOW_REGIONS_BIT_NV.
 	OPTICAL_FLOW_SESSION_CREATE_ALLOW_REGIONS_BIT_NV OpticalFlowSessionCreateFlagsNV = C.VK_OPTICAL_FLOW_SESSION_CREATE_ALLOW_REGIONS_BIT_NV
@@ -2546,9 +2309,6 @@ func (e OpticalFlowSessionCreateFlagsNV) String() string {
 
 // OpticalFlowUsageFlagsNV wraps the bitmask VkOpticalFlowUsageFlagsNV.
 type OpticalFlowUsageFlagsNV int32
-
-// OpticalFlowUsageFlagBitsNV wraps the bitmask VkOpticalFlowUsageFlagBitsNV. An alias for OpticalFlowUsageFlagsNV.
-type OpticalFlowUsageFlagBitsNV = OpticalFlowUsageFlagsNV
 
 const (
 	// OPTICAL_FLOW_USAGE_COST_BIT_NV wraps VK_OPTICAL_FLOW_USAGE_COST_BIT_NV.
@@ -2572,9 +2332,6 @@ func (e OpticalFlowUsageFlagsNV) String() string {
 // PartitionedAccelerationStructureInstanceFlagsNV wraps the bitmask VkPartitionedAccelerationStructureInstanceFlagsNV.
 type PartitionedAccelerationStructureInstanceFlagsNV int32
 
-// PartitionedAccelerationStructureInstanceFlagBitsNV wraps the bitmask VkPartitionedAccelerationStructureInstanceFlagBitsNV. An alias for PartitionedAccelerationStructureInstanceFlagsNV.
-type PartitionedAccelerationStructureInstanceFlagBitsNV = PartitionedAccelerationStructureInstanceFlagsNV
-
 const (
 	// PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_ENABLE_EXPLICIT_BOUNDING_BOX_NV wraps VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_ENABLE_EXPLICIT_BOUNDING_BOX_NV.
 	PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_ENABLE_EXPLICIT_BOUNDING_BOX_NV PartitionedAccelerationStructureInstanceFlagsNV = C.VK_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCE_FLAG_ENABLE_EXPLICIT_BOUNDING_BOX_NV
@@ -2594,9 +2351,6 @@ func (e PartitionedAccelerationStructureInstanceFlagsNV) String() string {
 
 // PeerMemoryFeatureFlags wraps the bitmask VkPeerMemoryFeatureFlags.
 type PeerMemoryFeatureFlags int32
-
-// PeerMemoryFeatureFlagBits wraps the bitmask VkPeerMemoryFeatureFlagBits. An alias for PeerMemoryFeatureFlags.
-type PeerMemoryFeatureFlagBits = PeerMemoryFeatureFlags
 
 // PeerMemoryFeatureFlagsKHR wraps the bitmask VkPeerMemoryFeatureFlagsKHR. An alias for PeerMemoryFeatureFlags.
 type PeerMemoryFeatureFlagsKHR = PeerMemoryFeatureFlags
@@ -2627,9 +2381,6 @@ func (e PeerMemoryFeatureFlags) String() string {
 // PerformanceCounterDescriptionFlagsKHR wraps the bitmask VkPerformanceCounterDescriptionFlagsKHR.
 type PerformanceCounterDescriptionFlagsKHR int32
 
-// PerformanceCounterDescriptionFlagBitsKHR wraps the bitmask VkPerformanceCounterDescriptionFlagBitsKHR. An alias for PerformanceCounterDescriptionFlagsKHR.
-type PerformanceCounterDescriptionFlagBitsKHR = PerformanceCounterDescriptionFlagsKHR
-
 const (
 	// PERFORMANCE_COUNTER_DESCRIPTION_CONCURRENTLY_IMPACTED_BIT_KHR wraps VK_PERFORMANCE_COUNTER_DESCRIPTION_CONCURRENTLY_IMPACTED_BIT_KHR.
 	PERFORMANCE_COUNTER_DESCRIPTION_CONCURRENTLY_IMPACTED_BIT_KHR PerformanceCounterDescriptionFlagsKHR = C.VK_PERFORMANCE_COUNTER_DESCRIPTION_CONCURRENTLY_IMPACTED_BIT_KHR
@@ -2648,9 +2399,6 @@ func (e PerformanceCounterDescriptionFlagsKHR) String() string {
 // PhysicalDeviceSchedulingControlsFlagsARM wraps the bitmask VkPhysicalDeviceSchedulingControlsFlagsARM.
 type PhysicalDeviceSchedulingControlsFlagsARM int64
 
-// PhysicalDeviceSchedulingControlsFlagBitsARM wraps the bitmask VkPhysicalDeviceSchedulingControlsFlagBitsARM. An alias for PhysicalDeviceSchedulingControlsFlagsARM.
-type PhysicalDeviceSchedulingControlsFlagBitsARM = PhysicalDeviceSchedulingControlsFlagsARM
-
 const (
 	// PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM wraps VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM.
 	PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM PhysicalDeviceSchedulingControlsFlagsARM = C.VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM
@@ -2662,9 +2410,6 @@ func (e PhysicalDeviceSchedulingControlsFlagsARM) String() string {
 
 // PipelineCacheCreateFlags wraps the bitmask VkPipelineCacheCreateFlags.
 type PipelineCacheCreateFlags int32
-
-// PipelineCacheCreateFlagBits wraps the bitmask VkPipelineCacheCreateFlagBits. An alias for PipelineCacheCreateFlags.
-type PipelineCacheCreateFlagBits = PipelineCacheCreateFlags
 
 const (
 	// PIPELINE_CACHE_CREATE_EXTERNALLY_SYNCHRONIZED_BIT wraps VK_PIPELINE_CACHE_CREATE_EXTERNALLY_SYNCHRONIZED_BIT.
@@ -2682,9 +2427,6 @@ func (e PipelineCacheCreateFlags) String() string {
 // PipelineColorBlendStateCreateFlags wraps the bitmask VkPipelineColorBlendStateCreateFlags.
 type PipelineColorBlendStateCreateFlags int32
 
-// PipelineColorBlendStateCreateFlagBits wraps the bitmask VkPipelineColorBlendStateCreateFlagBits. An alias for PipelineColorBlendStateCreateFlags.
-type PipelineColorBlendStateCreateFlagBits = PipelineColorBlendStateCreateFlags
-
 const (
 	// PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT wraps VK_PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT.
 	PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT PipelineColorBlendStateCreateFlags = C.VK_PIPELINE_COLOR_BLEND_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_ACCESS_BIT_EXT
@@ -2698,9 +2440,6 @@ func (e PipelineColorBlendStateCreateFlags) String() string {
 
 // PipelineCompilerControlFlagsAMD wraps the bitmask VkPipelineCompilerControlFlagsAMD.
 type PipelineCompilerControlFlagsAMD int32
-
-// PipelineCompilerControlFlagBitsAMD wraps the bitmask VkPipelineCompilerControlFlagBitsAMD. An alias for PipelineCompilerControlFlagsAMD.
-type PipelineCompilerControlFlagBitsAMD = PipelineCompilerControlFlagsAMD
 
 func (e PipelineCompilerControlFlagsAMD) String() string {
 	return fmt.Sprintf("VkPipelineCompilerControlFlagsAMD(%b)", e)
@@ -2729,9 +2468,6 @@ func (e PipelineCoverageToColorStateCreateFlagsNV) String() string {
 
 // PipelineCreateFlags wraps the bitmask VkPipelineCreateFlags.
 type PipelineCreateFlags int32
-
-// PipelineCreateFlagBits wraps the bitmask VkPipelineCreateFlagBits. An alias for PipelineCreateFlags.
-type PipelineCreateFlagBits = PipelineCreateFlags
 
 const (
 	// PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT wraps VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT.
@@ -2822,9 +2558,6 @@ func (e PipelineCreateFlags) String() string {
 
 // PipelineCreateFlags2 wraps the bitmask VkPipelineCreateFlags2.
 type PipelineCreateFlags2 int64
-
-// PipelineCreateFlagBits2 wraps the bitmask VkPipelineCreateFlagBits2. An alias for PipelineCreateFlags2.
-type PipelineCreateFlagBits2 = PipelineCreateFlags2
 
 // PipelineCreateFlags2KHR wraps the bitmask VkPipelineCreateFlags2KHR. An alias for PipelineCreateFlags2.
 type PipelineCreateFlags2KHR = PipelineCreateFlags2
@@ -2933,9 +2666,6 @@ func (e PipelineCreateFlags2) String() string {
 // PipelineCreationFeedbackFlags wraps the bitmask VkPipelineCreationFeedbackFlags.
 type PipelineCreationFeedbackFlags int32
 
-// PipelineCreationFeedbackFlagBits wraps the bitmask VkPipelineCreationFeedbackFlagBits. An alias for PipelineCreationFeedbackFlags.
-type PipelineCreationFeedbackFlagBits = PipelineCreationFeedbackFlags
-
 // PipelineCreationFeedbackFlagsEXT wraps the bitmask VkPipelineCreationFeedbackFlagsEXT. An alias for PipelineCreationFeedbackFlags.
 type PipelineCreationFeedbackFlagsEXT = PipelineCreationFeedbackFlags
 
@@ -2960,9 +2690,6 @@ func (e PipelineCreationFeedbackFlags) String() string {
 
 // PipelineDepthStencilStateCreateFlags wraps the bitmask VkPipelineDepthStencilStateCreateFlags.
 type PipelineDepthStencilStateCreateFlags int32
-
-// PipelineDepthStencilStateCreateFlagBits wraps the bitmask VkPipelineDepthStencilStateCreateFlagBits. An alias for PipelineDepthStencilStateCreateFlags.
-type PipelineDepthStencilStateCreateFlagBits = PipelineDepthStencilStateCreateFlags
 
 const (
 	// PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT wraps VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT.
@@ -3002,9 +2729,6 @@ func (e PipelineInputAssemblyStateCreateFlags) String() string {
 
 // PipelineLayoutCreateFlags wraps the bitmask VkPipelineLayoutCreateFlags.
 type PipelineLayoutCreateFlags int32
-
-// PipelineLayoutCreateFlagBits wraps the bitmask VkPipelineLayoutCreateFlagBits. An alias for PipelineLayoutCreateFlags.
-type PipelineLayoutCreateFlagBits = PipelineLayoutCreateFlags
 
 const (
 	// PIPELINE_LAYOUT_CREATE_INDEPENDENT_SETS_BIT_EXT wraps VK_PIPELINE_LAYOUT_CREATE_INDEPENDENT_SETS_BIT_EXT.
@@ -3053,9 +2777,6 @@ func (e PipelineRasterizationStateStreamCreateFlagsEXT) String() string {
 // PipelineShaderStageCreateFlags wraps the bitmask VkPipelineShaderStageCreateFlags.
 type PipelineShaderStageCreateFlags int32
 
-// PipelineShaderStageCreateFlagBits wraps the bitmask VkPipelineShaderStageCreateFlagBits. An alias for PipelineShaderStageCreateFlags.
-type PipelineShaderStageCreateFlagBits = PipelineShaderStageCreateFlags
-
 const (
 	// PIPELINE_SHADER_STAGE_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT wraps VK_PIPELINE_SHADER_STAGE_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT.
 	PIPELINE_SHADER_STAGE_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT PipelineShaderStageCreateFlags = C.VK_PIPELINE_SHADER_STAGE_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT
@@ -3073,9 +2794,6 @@ func (e PipelineShaderStageCreateFlags) String() string {
 
 // PipelineStageFlags wraps the bitmask VkPipelineStageFlags.
 type PipelineStageFlags int32
-
-// PipelineStageFlagBits wraps the bitmask VkPipelineStageFlagBits. An alias for PipelineStageFlags.
-type PipelineStageFlagBits = PipelineStageFlags
 
 const (
 	// PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR wraps VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR.
@@ -3154,9 +2872,6 @@ func (e PipelineStageFlags) String() string {
 
 // PipelineStageFlags2 wraps the bitmask VkPipelineStageFlags2.
 type PipelineStageFlags2 int64
-
-// PipelineStageFlagBits2 wraps the bitmask VkPipelineStageFlagBits2. An alias for PipelineStageFlags2.
-type PipelineStageFlagBits2 = PipelineStageFlags2
 
 // PipelineStageFlags2KHR wraps the bitmask VkPipelineStageFlags2KHR. An alias for PipelineStageFlags2.
 type PipelineStageFlags2KHR = PipelineStageFlags2
@@ -3357,9 +3072,6 @@ func (e PipelineViewportSwizzleStateCreateFlagsNV) String() string {
 // PresentGravityFlagsKHR wraps the bitmask VkPresentGravityFlagsKHR.
 type PresentGravityFlagsKHR int32
 
-// PresentGravityFlagBitsKHR wraps the bitmask VkPresentGravityFlagBitsKHR. An alias for PresentGravityFlagsKHR.
-type PresentGravityFlagBitsKHR = PresentGravityFlagsKHR
-
 // PresentGravityFlagsEXT wraps the bitmask VkPresentGravityFlagsEXT. An alias for PresentGravityFlagsKHR.
 type PresentGravityFlagsEXT = PresentGravityFlagsKHR
 
@@ -3384,9 +3096,6 @@ func (e PresentGravityFlagsKHR) String() string {
 
 // PresentScalingFlagsKHR wraps the bitmask VkPresentScalingFlagsKHR.
 type PresentScalingFlagsKHR int32
-
-// PresentScalingFlagBitsKHR wraps the bitmask VkPresentScalingFlagBitsKHR. An alias for PresentScalingFlagsKHR.
-type PresentScalingFlagBitsKHR = PresentScalingFlagsKHR
 
 // PresentScalingFlagsEXT wraps the bitmask VkPresentScalingFlagsEXT. An alias for PresentScalingFlagsKHR.
 type PresentScalingFlagsEXT = PresentScalingFlagsKHR
@@ -3423,9 +3132,6 @@ func (e PrivateDataSlotCreateFlags) String() string {
 // QueryControlFlags wraps the bitmask VkQueryControlFlags.
 type QueryControlFlags int32
 
-// QueryControlFlagBits wraps the bitmask VkQueryControlFlagBits. An alias for QueryControlFlags.
-type QueryControlFlagBits = QueryControlFlags
-
 const (
 	// QUERY_CONTROL_PRECISE_BIT wraps VK_QUERY_CONTROL_PRECISE_BIT.
 	QUERY_CONTROL_PRECISE_BIT QueryControlFlags = C.VK_QUERY_CONTROL_PRECISE_BIT
@@ -3437,9 +3143,6 @@ func (e QueryControlFlags) String() string {
 
 // QueryPipelineStatisticFlags wraps the bitmask VkQueryPipelineStatisticFlags.
 type QueryPipelineStatisticFlags int32
-
-// QueryPipelineStatisticFlagBits wraps the bitmask VkQueryPipelineStatisticFlagBits. An alias for QueryPipelineStatisticFlags.
-type QueryPipelineStatisticFlagBits = QueryPipelineStatisticFlags
 
 const (
 	// QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT wraps VK_QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT.
@@ -3479,9 +3182,6 @@ func (e QueryPipelineStatisticFlags) String() string {
 // QueryPoolCreateFlags wraps the bitmask VkQueryPoolCreateFlags.
 type QueryPoolCreateFlags int32
 
-// QueryPoolCreateFlagBits wraps the bitmask VkQueryPoolCreateFlagBits. An alias for QueryPoolCreateFlags.
-type QueryPoolCreateFlagBits = QueryPoolCreateFlags
-
 const (
 	// QUERY_POOL_CREATE_RESET_BIT_KHR wraps VK_QUERY_POOL_CREATE_RESET_BIT_KHR.
 	QUERY_POOL_CREATE_RESET_BIT_KHR QueryPoolCreateFlags = C.VK_QUERY_POOL_CREATE_RESET_BIT_KHR
@@ -3493,9 +3193,6 @@ func (e QueryPoolCreateFlags) String() string {
 
 // QueryResultFlags wraps the bitmask VkQueryResultFlags.
 type QueryResultFlags int32
-
-// QueryResultFlagBits wraps the bitmask VkQueryResultFlagBits. An alias for QueryResultFlags.
-type QueryResultFlagBits = QueryResultFlags
 
 const (
 	// QUERY_RESULT_64_BIT wraps VK_QUERY_RESULT_64_BIT.
@@ -3516,9 +3213,6 @@ func (e QueryResultFlags) String() string {
 
 // QueueFlags wraps the bitmask VkQueueFlags.
 type QueueFlags int32
-
-// QueueFlagBits wraps the bitmask VkQueueFlagBits. An alias for QueueFlags.
-type QueueFlagBits = QueueFlags
 
 const (
 	// QUEUE_COMPUTE_BIT wraps VK_QUEUE_COMPUTE_BIT.
@@ -3548,9 +3242,6 @@ func (e QueueFlags) String() string {
 // RenderPassCreateFlags wraps the bitmask VkRenderPassCreateFlags.
 type RenderPassCreateFlags int32
 
-// RenderPassCreateFlagBits wraps the bitmask VkRenderPassCreateFlagBits. An alias for RenderPassCreateFlags.
-type RenderPassCreateFlagBits = RenderPassCreateFlags
-
 const (
 	// RENDER_PASS_CREATE_PER_LAYER_FRAGMENT_DENSITY_BIT_VALVE wraps VK_RENDER_PASS_CREATE_PER_LAYER_FRAGMENT_DENSITY_BIT_VALVE.
 	RENDER_PASS_CREATE_PER_LAYER_FRAGMENT_DENSITY_BIT_VALVE RenderPassCreateFlags = C.VK_RENDER_PASS_CREATE_PER_LAYER_FRAGMENT_DENSITY_BIT_VALVE
@@ -3564,9 +3255,6 @@ func (e RenderPassCreateFlags) String() string {
 
 // RenderingFlags wraps the bitmask VkRenderingFlags.
 type RenderingFlags int32
-
-// RenderingFlagBits wraps the bitmask VkRenderingFlagBits. An alias for RenderingFlags.
-type RenderingFlagBits = RenderingFlags
 
 // RenderingFlagsKHR wraps the bitmask VkRenderingFlagsKHR. An alias for RenderingFlags.
 type RenderingFlagsKHR = RenderingFlags
@@ -3601,9 +3289,6 @@ func (e RenderingFlags) String() string {
 // ResolveModeFlags wraps the bitmask VkResolveModeFlags.
 type ResolveModeFlags int32
 
-// ResolveModeFlagBits wraps the bitmask VkResolveModeFlagBits. An alias for ResolveModeFlags.
-type ResolveModeFlagBits = ResolveModeFlags
-
 // ResolveModeFlagsKHR wraps the bitmask VkResolveModeFlagsKHR. An alias for ResolveModeFlags.
 type ResolveModeFlagsKHR = ResolveModeFlags
 
@@ -3637,9 +3322,6 @@ func (e ResolveModeFlags) String() string {
 // SampleCountFlags wraps the bitmask VkSampleCountFlags.
 type SampleCountFlags int32
 
-// SampleCountFlagBits wraps the bitmask VkSampleCountFlagBits. An alias for SampleCountFlags.
-type SampleCountFlagBits = SampleCountFlags
-
 const (
 	// SAMPLE_COUNT_16_BIT wraps VK_SAMPLE_COUNT_16_BIT.
 	SAMPLE_COUNT_16_BIT SampleCountFlags = C.VK_SAMPLE_COUNT_16_BIT
@@ -3663,9 +3345,6 @@ func (e SampleCountFlags) String() string {
 
 // SamplerCreateFlags wraps the bitmask VkSamplerCreateFlags.
 type SamplerCreateFlags int32
-
-// SamplerCreateFlagBits wraps the bitmask VkSamplerCreateFlagBits. An alias for SamplerCreateFlags.
-type SamplerCreateFlagBits = SamplerCreateFlags
 
 const (
 	// SAMPLER_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT wraps VK_SAMPLER_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_EXT.
@@ -3694,9 +3373,6 @@ func (e SemaphoreCreateFlags) String() string {
 // SemaphoreImportFlags wraps the bitmask VkSemaphoreImportFlags.
 type SemaphoreImportFlags int32
 
-// SemaphoreImportFlagBits wraps the bitmask VkSemaphoreImportFlagBits. An alias for SemaphoreImportFlags.
-type SemaphoreImportFlagBits = SemaphoreImportFlags
-
 // SemaphoreImportFlagsKHR wraps the bitmask VkSemaphoreImportFlagsKHR. An alias for SemaphoreImportFlags.
 type SemaphoreImportFlagsKHR = SemaphoreImportFlags
 
@@ -3713,9 +3389,6 @@ func (e SemaphoreImportFlags) String() string {
 
 // SemaphoreWaitFlags wraps the bitmask VkSemaphoreWaitFlags.
 type SemaphoreWaitFlags int32
-
-// SemaphoreWaitFlagBits wraps the bitmask VkSemaphoreWaitFlagBits. An alias for SemaphoreWaitFlags.
-type SemaphoreWaitFlagBits = SemaphoreWaitFlags
 
 // SemaphoreWaitFlagsKHR wraps the bitmask VkSemaphoreWaitFlagsKHR. An alias for SemaphoreWaitFlags.
 type SemaphoreWaitFlagsKHR = SemaphoreWaitFlags
@@ -3734,18 +3407,12 @@ func (e SemaphoreWaitFlags) String() string {
 // ShaderCorePropertiesFlagsAMD wraps the bitmask VkShaderCorePropertiesFlagsAMD.
 type ShaderCorePropertiesFlagsAMD int32
 
-// ShaderCorePropertiesFlagBitsAMD wraps the bitmask VkShaderCorePropertiesFlagBitsAMD. An alias for ShaderCorePropertiesFlagsAMD.
-type ShaderCorePropertiesFlagBitsAMD = ShaderCorePropertiesFlagsAMD
-
 func (e ShaderCorePropertiesFlagsAMD) String() string {
 	return fmt.Sprintf("VkShaderCorePropertiesFlagsAMD(%b)", e)
 }
 
 // ShaderCreateFlagsEXT wraps the bitmask VkShaderCreateFlagsEXT.
 type ShaderCreateFlagsEXT int32
-
-// ShaderCreateFlagBitsEXT wraps the bitmask VkShaderCreateFlagBitsEXT. An alias for ShaderCreateFlagsEXT.
-type ShaderCreateFlagBitsEXT = ShaderCreateFlagsEXT
 
 const (
 	// SHADER_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT_EXT wraps VK_SHADER_CREATE_ALLOW_VARYING_SUBGROUP_SIZE_BIT_EXT.
@@ -3779,9 +3446,6 @@ func (e ShaderModuleCreateFlags) String() string {
 
 // ShaderStageFlags wraps the bitmask VkShaderStageFlags.
 type ShaderStageFlags int32
-
-// ShaderStageFlagBits wraps the bitmask VkShaderStageFlagBits. An alias for ShaderStageFlags.
-type ShaderStageFlagBits = ShaderStageFlags
 
 const (
 	// SHADER_STAGE_ALL wraps VK_SHADER_STAGE_ALL.
@@ -3845,9 +3509,6 @@ func (e ShaderStageFlags) String() string {
 // SparseImageFormatFlags wraps the bitmask VkSparseImageFormatFlags.
 type SparseImageFormatFlags int32
 
-// SparseImageFormatFlagBits wraps the bitmask VkSparseImageFormatFlagBits. An alias for SparseImageFormatFlags.
-type SparseImageFormatFlagBits = SparseImageFormatFlags
-
 const (
 	// SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT wraps VK_SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT.
 	SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT SparseImageFormatFlags = C.VK_SPARSE_IMAGE_FORMAT_ALIGNED_MIP_SIZE_BIT
@@ -3864,9 +3525,6 @@ func (e SparseImageFormatFlags) String() string {
 // SparseMemoryBindFlags wraps the bitmask VkSparseMemoryBindFlags.
 type SparseMemoryBindFlags int32
 
-// SparseMemoryBindFlagBits wraps the bitmask VkSparseMemoryBindFlagBits. An alias for SparseMemoryBindFlags.
-type SparseMemoryBindFlagBits = SparseMemoryBindFlags
-
 const (
 	// SPARSE_MEMORY_BIND_METADATA_BIT wraps VK_SPARSE_MEMORY_BIND_METADATA_BIT.
 	SPARSE_MEMORY_BIND_METADATA_BIT SparseMemoryBindFlags = C.VK_SPARSE_MEMORY_BIND_METADATA_BIT
@@ -3878,9 +3536,6 @@ func (e SparseMemoryBindFlags) String() string {
 
 // StencilFaceFlags wraps the bitmask VkStencilFaceFlags.
 type StencilFaceFlags int32
-
-// StencilFaceFlagBits wraps the bitmask VkStencilFaceFlagBits. An alias for StencilFaceFlags.
-type StencilFaceFlagBits = StencilFaceFlags
 
 const (
 	// STENCIL_FACE_BACK_BIT wraps VK_STENCIL_FACE_BACK_BIT.
@@ -3899,9 +3554,6 @@ func (e StencilFaceFlags) String() string {
 
 // SubgroupFeatureFlags wraps the bitmask VkSubgroupFeatureFlags.
 type SubgroupFeatureFlags int32
-
-// SubgroupFeatureFlagBits wraps the bitmask VkSubgroupFeatureFlagBits. An alias for SubgroupFeatureFlags.
-type SubgroupFeatureFlagBits = SubgroupFeatureFlags
 
 const (
 	// SUBGROUP_FEATURE_ARITHMETIC_BIT wraps VK_SUBGROUP_FEATURE_ARITHMETIC_BIT.
@@ -3939,9 +3591,6 @@ func (e SubgroupFeatureFlags) String() string {
 // SubmitFlags wraps the bitmask VkSubmitFlags.
 type SubmitFlags int32
 
-// SubmitFlagBits wraps the bitmask VkSubmitFlagBits. An alias for SubmitFlags.
-type SubmitFlagBits = SubmitFlags
-
 // SubmitFlagsKHR wraps the bitmask VkSubmitFlagsKHR. An alias for SubmitFlags.
 type SubmitFlagsKHR = SubmitFlags
 
@@ -3958,9 +3607,6 @@ func (e SubmitFlags) String() string {
 
 // SubpassDescriptionFlags wraps the bitmask VkSubpassDescriptionFlags.
 type SubpassDescriptionFlags int32
-
-// SubpassDescriptionFlagBits wraps the bitmask VkSubpassDescriptionFlagBits. An alias for SubpassDescriptionFlags.
-type SubpassDescriptionFlagBits = SubpassDescriptionFlags
 
 const (
 	// SUBPASS_DESCRIPTION_ENABLE_LEGACY_DITHERING_BIT_EXT wraps VK_SUBPASS_DESCRIPTION_ENABLE_LEGACY_DITHERING_BIT_EXT.
@@ -3996,9 +3642,6 @@ func (e SubpassDescriptionFlags) String() string {
 // SurfaceCounterFlagsEXT wraps the bitmask VkSurfaceCounterFlagsEXT.
 type SurfaceCounterFlagsEXT int32
 
-// SurfaceCounterFlagBitsEXT wraps the bitmask VkSurfaceCounterFlagBitsEXT. An alias for SurfaceCounterFlagsEXT.
-type SurfaceCounterFlagBitsEXT = SurfaceCounterFlagsEXT
-
 const (
 	// SURFACE_COUNTER_VBLANK_BIT_EXT wraps VK_SURFACE_COUNTER_VBLANK_BIT_EXT.
 	SURFACE_COUNTER_VBLANK_BIT_EXT SurfaceCounterFlagsEXT = C.VK_SURFACE_COUNTER_VBLANK_BIT_EXT
@@ -4012,9 +3655,6 @@ func (e SurfaceCounterFlagsEXT) String() string {
 
 // SurfaceTransformFlagsKHR wraps the bitmask VkSurfaceTransformFlagsKHR.
 type SurfaceTransformFlagsKHR int32
-
-// SurfaceTransformFlagBitsKHR wraps the bitmask VkSurfaceTransformFlagBitsKHR. An alias for SurfaceTransformFlagsKHR.
-type SurfaceTransformFlagBitsKHR = SurfaceTransformFlagsKHR
 
 const (
 	// SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR wraps VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR.
@@ -4044,9 +3684,6 @@ func (e SurfaceTransformFlagsKHR) String() string {
 // SwapchainCreateFlagsKHR wraps the bitmask VkSwapchainCreateFlagsKHR.
 type SwapchainCreateFlagsKHR int32
 
-// SwapchainCreateFlagBitsKHR wraps the bitmask VkSwapchainCreateFlagBitsKHR. An alias for SwapchainCreateFlagsKHR.
-type SwapchainCreateFlagBitsKHR = SwapchainCreateFlagsKHR
-
 const (
 	// SWAPCHAIN_CREATE_DEFERRED_MEMORY_ALLOCATION_BIT_KHR wraps VK_SWAPCHAIN_CREATE_DEFERRED_MEMORY_ALLOCATION_BIT_KHR.
 	SWAPCHAIN_CREATE_DEFERRED_MEMORY_ALLOCATION_BIT_KHR SwapchainCreateFlagsKHR = C.VK_SWAPCHAIN_CREATE_DEFERRED_MEMORY_ALLOCATION_BIT_KHR
@@ -4071,9 +3708,6 @@ func (e SwapchainCreateFlagsKHR) String() string {
 // TensorCreateFlagsARM wraps the bitmask VkTensorCreateFlagsARM.
 type TensorCreateFlagsARM int64
 
-// TensorCreateFlagBitsARM wraps the bitmask VkTensorCreateFlagBitsARM. An alias for TensorCreateFlagsARM.
-type TensorCreateFlagBitsARM = TensorCreateFlagsARM
-
 const (
 	// TENSOR_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM wraps VK_TENSOR_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM.
 	TENSOR_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM TensorCreateFlagsARM = C.VK_TENSOR_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM
@@ -4089,9 +3723,6 @@ func (e TensorCreateFlagsARM) String() string {
 
 // TensorUsageFlagsARM wraps the bitmask VkTensorUsageFlagsARM.
 type TensorUsageFlagsARM int64
-
-// TensorUsageFlagBitsARM wraps the bitmask VkTensorUsageFlagBitsARM. An alias for TensorUsageFlagsARM.
-type TensorUsageFlagBitsARM = TensorUsageFlagsARM
 
 const (
 	// TENSOR_USAGE_DATA_GRAPH_BIT_ARM wraps VK_TENSOR_USAGE_DATA_GRAPH_BIT_ARM.
@@ -4113,9 +3744,6 @@ func (e TensorUsageFlagsARM) String() string {
 // TensorViewCreateFlagsARM wraps the bitmask VkTensorViewCreateFlagsARM.
 type TensorViewCreateFlagsARM int64
 
-// TensorViewCreateFlagBitsARM wraps the bitmask VkTensorViewCreateFlagBitsARM. An alias for TensorViewCreateFlagsARM.
-type TensorViewCreateFlagBitsARM = TensorViewCreateFlagsARM
-
 const (
 	// TENSOR_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM wraps VK_TENSOR_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM.
 	TENSOR_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM TensorViewCreateFlagsARM = C.VK_TENSOR_VIEW_CREATE_DESCRIPTOR_BUFFER_CAPTURE_REPLAY_BIT_ARM
@@ -4127,9 +3755,6 @@ func (e TensorViewCreateFlagsARM) String() string {
 
 // TileShadingRenderPassFlagsQCOM wraps the bitmask VkTileShadingRenderPassFlagsQCOM.
 type TileShadingRenderPassFlagsQCOM int32
-
-// TileShadingRenderPassFlagBitsQCOM wraps the bitmask VkTileShadingRenderPassFlagBitsQCOM. An alias for TileShadingRenderPassFlagsQCOM.
-type TileShadingRenderPassFlagBitsQCOM = TileShadingRenderPassFlagsQCOM
 
 const (
 	// TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM wraps VK_TILE_SHADING_RENDER_PASS_ENABLE_BIT_QCOM.
@@ -4144,9 +3769,6 @@ func (e TileShadingRenderPassFlagsQCOM) String() string {
 
 // ToolPurposeFlags wraps the bitmask VkToolPurposeFlags.
 type ToolPurposeFlags int32
-
-// ToolPurposeFlagBits wraps the bitmask VkToolPurposeFlagBits. An alias for ToolPurposeFlags.
-type ToolPurposeFlagBits = ToolPurposeFlags
 
 // ToolPurposeFlagsEXT wraps the bitmask VkToolPurposeFlagsEXT. An alias for ToolPurposeFlags.
 type ToolPurposeFlagsEXT = ToolPurposeFlags
@@ -4199,9 +3821,6 @@ func (e VideoBeginCodingFlagsKHR) String() string {
 // VideoCapabilityFlagsKHR wraps the bitmask VkVideoCapabilityFlagsKHR.
 type VideoCapabilityFlagsKHR int32
 
-// VideoCapabilityFlagBitsKHR wraps the bitmask VkVideoCapabilityFlagBitsKHR. An alias for VideoCapabilityFlagsKHR.
-type VideoCapabilityFlagBitsKHR = VideoCapabilityFlagsKHR
-
 const (
 	// VIDEO_CAPABILITY_PROTECTED_CONTENT_BIT_KHR wraps VK_VIDEO_CAPABILITY_PROTECTED_CONTENT_BIT_KHR.
 	VIDEO_CAPABILITY_PROTECTED_CONTENT_BIT_KHR VideoCapabilityFlagsKHR = C.VK_VIDEO_CAPABILITY_PROTECTED_CONTENT_BIT_KHR
@@ -4215,9 +3834,6 @@ func (e VideoCapabilityFlagsKHR) String() string {
 
 // VideoChromaSubsamplingFlagsKHR wraps the bitmask VkVideoChromaSubsamplingFlagsKHR.
 type VideoChromaSubsamplingFlagsKHR int32
-
-// VideoChromaSubsamplingFlagBitsKHR wraps the bitmask VkVideoChromaSubsamplingFlagBitsKHR. An alias for VideoChromaSubsamplingFlagsKHR.
-type VideoChromaSubsamplingFlagBitsKHR = VideoChromaSubsamplingFlagsKHR
 
 const (
 	// VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR wraps VK_VIDEO_CHROMA_SUBSAMPLING_420_BIT_KHR.
@@ -4238,9 +3854,6 @@ func (e VideoChromaSubsamplingFlagsKHR) String() string {
 
 // VideoCodecOperationFlagsKHR wraps the bitmask VkVideoCodecOperationFlagsKHR.
 type VideoCodecOperationFlagsKHR int32
-
-// VideoCodecOperationFlagBitsKHR wraps the bitmask VkVideoCodecOperationFlagBitsKHR. An alias for VideoCodecOperationFlagsKHR.
-type VideoCodecOperationFlagBitsKHR = VideoCodecOperationFlagsKHR
 
 const (
 	// VIDEO_CODEC_OPERATION_DECODE_AV1_BIT_KHR wraps VK_VIDEO_CODEC_OPERATION_DECODE_AV1_BIT_KHR.
@@ -4268,9 +3881,6 @@ func (e VideoCodecOperationFlagsKHR) String() string {
 // VideoCodingControlFlagsKHR wraps the bitmask VkVideoCodingControlFlagsKHR.
 type VideoCodingControlFlagsKHR int32
 
-// VideoCodingControlFlagBitsKHR wraps the bitmask VkVideoCodingControlFlagBitsKHR. An alias for VideoCodingControlFlagsKHR.
-type VideoCodingControlFlagBitsKHR = VideoCodingControlFlagsKHR
-
 const (
 	// VIDEO_CODING_CONTROL_ENCODE_QUALITY_LEVEL_BIT_KHR wraps VK_VIDEO_CODING_CONTROL_ENCODE_QUALITY_LEVEL_BIT_KHR.
 	VIDEO_CODING_CONTROL_ENCODE_QUALITY_LEVEL_BIT_KHR VideoCodingControlFlagsKHR = C.VK_VIDEO_CODING_CONTROL_ENCODE_QUALITY_LEVEL_BIT_KHR
@@ -4286,9 +3896,6 @@ func (e VideoCodingControlFlagsKHR) String() string {
 
 // VideoComponentBitDepthFlagsKHR wraps the bitmask VkVideoComponentBitDepthFlagsKHR.
 type VideoComponentBitDepthFlagsKHR int32
-
-// VideoComponentBitDepthFlagBitsKHR wraps the bitmask VkVideoComponentBitDepthFlagBitsKHR. An alias for VideoComponentBitDepthFlagsKHR.
-type VideoComponentBitDepthFlagBitsKHR = VideoComponentBitDepthFlagsKHR
 
 const (
 	// VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR wraps VK_VIDEO_COMPONENT_BIT_DEPTH_10_BIT_KHR.
@@ -4307,9 +3914,6 @@ func (e VideoComponentBitDepthFlagsKHR) String() string {
 
 // VideoDecodeCapabilityFlagsKHR wraps the bitmask VkVideoDecodeCapabilityFlagsKHR.
 type VideoDecodeCapabilityFlagsKHR int32
-
-// VideoDecodeCapabilityFlagBitsKHR wraps the bitmask VkVideoDecodeCapabilityFlagBitsKHR. An alias for VideoDecodeCapabilityFlagsKHR.
-type VideoDecodeCapabilityFlagBitsKHR = VideoDecodeCapabilityFlagsKHR
 
 const (
 	// VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR wraps VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_COINCIDE_BIT_KHR.
@@ -4332,9 +3936,6 @@ func (e VideoDecodeFlagsKHR) String() string {
 // VideoDecodeH264PictureLayoutFlagsKHR wraps the bitmask VkVideoDecodeH264PictureLayoutFlagsKHR.
 type VideoDecodeH264PictureLayoutFlagsKHR int32
 
-// VideoDecodeH264PictureLayoutFlagBitsKHR wraps the bitmask VkVideoDecodeH264PictureLayoutFlagBitsKHR. An alias for VideoDecodeH264PictureLayoutFlagsKHR.
-type VideoDecodeH264PictureLayoutFlagBitsKHR = VideoDecodeH264PictureLayoutFlagsKHR
-
 const (
 	// VIDEO_DECODE_H264_PICTURE_LAYOUT_INTERLACED_INTERLEAVED_LINES_BIT_KHR wraps VK_VIDEO_DECODE_H264_PICTURE_LAYOUT_INTERLACED_INTERLEAVED_LINES_BIT_KHR.
 	VIDEO_DECODE_H264_PICTURE_LAYOUT_INTERLACED_INTERLEAVED_LINES_BIT_KHR VideoDecodeH264PictureLayoutFlagsKHR = C.VK_VIDEO_DECODE_H264_PICTURE_LAYOUT_INTERLACED_INTERLEAVED_LINES_BIT_KHR
@@ -4350,9 +3951,6 @@ func (e VideoDecodeH264PictureLayoutFlagsKHR) String() string {
 
 // VideoDecodeUsageFlagsKHR wraps the bitmask VkVideoDecodeUsageFlagsKHR.
 type VideoDecodeUsageFlagsKHR int32
-
-// VideoDecodeUsageFlagBitsKHR wraps the bitmask VkVideoDecodeUsageFlagBitsKHR. An alias for VideoDecodeUsageFlagsKHR.
-type VideoDecodeUsageFlagBitsKHR = VideoDecodeUsageFlagsKHR
 
 const (
 	// VIDEO_DECODE_USAGE_DEFAULT_KHR wraps VK_VIDEO_DECODE_USAGE_DEFAULT_KHR.
@@ -4371,9 +3969,6 @@ func (e VideoDecodeUsageFlagsKHR) String() string {
 
 // VideoEncodeAV1CapabilityFlagsKHR wraps the bitmask VkVideoEncodeAV1CapabilityFlagsKHR.
 type VideoEncodeAV1CapabilityFlagsKHR int32
-
-// VideoEncodeAV1CapabilityFlagBitsKHR wraps the bitmask VkVideoEncodeAV1CapabilityFlagBitsKHR. An alias for VideoEncodeAV1CapabilityFlagsKHR.
-type VideoEncodeAV1CapabilityFlagBitsKHR = VideoEncodeAV1CapabilityFlagsKHR
 
 const (
 	// VIDEO_ENCODE_AV1_CAPABILITY_COMPOUND_PREDICTION_INTRA_REFRESH_BIT_KHR wraps VK_VIDEO_ENCODE_AV1_CAPABILITY_COMPOUND_PREDICTION_INTRA_REFRESH_BIT_KHR.
@@ -4397,9 +3992,6 @@ func (e VideoEncodeAV1CapabilityFlagsKHR) String() string {
 // VideoEncodeAV1RateControlFlagsKHR wraps the bitmask VkVideoEncodeAV1RateControlFlagsKHR.
 type VideoEncodeAV1RateControlFlagsKHR int32
 
-// VideoEncodeAV1RateControlFlagBitsKHR wraps the bitmask VkVideoEncodeAV1RateControlFlagBitsKHR. An alias for VideoEncodeAV1RateControlFlagsKHR.
-type VideoEncodeAV1RateControlFlagBitsKHR = VideoEncodeAV1RateControlFlagsKHR
-
 const (
 	// VIDEO_ENCODE_AV1_RATE_CONTROL_REFERENCE_PATTERN_DYADIC_BIT_KHR wraps VK_VIDEO_ENCODE_AV1_RATE_CONTROL_REFERENCE_PATTERN_DYADIC_BIT_KHR.
 	VIDEO_ENCODE_AV1_RATE_CONTROL_REFERENCE_PATTERN_DYADIC_BIT_KHR VideoEncodeAV1RateControlFlagsKHR = C.VK_VIDEO_ENCODE_AV1_RATE_CONTROL_REFERENCE_PATTERN_DYADIC_BIT_KHR
@@ -4417,9 +4009,6 @@ func (e VideoEncodeAV1RateControlFlagsKHR) String() string {
 
 // VideoEncodeAV1StdFlagsKHR wraps the bitmask VkVideoEncodeAV1StdFlagsKHR.
 type VideoEncodeAV1StdFlagsKHR int32
-
-// VideoEncodeAV1StdFlagBitsKHR wraps the bitmask VkVideoEncodeAV1StdFlagBitsKHR. An alias for VideoEncodeAV1StdFlagsKHR.
-type VideoEncodeAV1StdFlagBitsKHR = VideoEncodeAV1StdFlagsKHR
 
 const (
 	// VIDEO_ENCODE_AV1_STD_DELTA_Q_BIT_KHR wraps VK_VIDEO_ENCODE_AV1_STD_DELTA_Q_BIT_KHR.
@@ -4439,9 +4028,6 @@ func (e VideoEncodeAV1StdFlagsKHR) String() string {
 // VideoEncodeAV1SuperblockSizeFlagsKHR wraps the bitmask VkVideoEncodeAV1SuperblockSizeFlagsKHR.
 type VideoEncodeAV1SuperblockSizeFlagsKHR int32
 
-// VideoEncodeAV1SuperblockSizeFlagBitsKHR wraps the bitmask VkVideoEncodeAV1SuperblockSizeFlagBitsKHR. An alias for VideoEncodeAV1SuperblockSizeFlagsKHR.
-type VideoEncodeAV1SuperblockSizeFlagBitsKHR = VideoEncodeAV1SuperblockSizeFlagsKHR
-
 const (
 	// VIDEO_ENCODE_AV1_SUPERBLOCK_SIZE_128_BIT_KHR wraps VK_VIDEO_ENCODE_AV1_SUPERBLOCK_SIZE_128_BIT_KHR.
 	VIDEO_ENCODE_AV1_SUPERBLOCK_SIZE_128_BIT_KHR VideoEncodeAV1SuperblockSizeFlagsKHR = C.VK_VIDEO_ENCODE_AV1_SUPERBLOCK_SIZE_128_BIT_KHR
@@ -4455,9 +4041,6 @@ func (e VideoEncodeAV1SuperblockSizeFlagsKHR) String() string {
 
 // VideoEncodeCapabilityFlagsKHR wraps the bitmask VkVideoEncodeCapabilityFlagsKHR.
 type VideoEncodeCapabilityFlagsKHR int32
-
-// VideoEncodeCapabilityFlagBitsKHR wraps the bitmask VkVideoEncodeCapabilityFlagBitsKHR. An alias for VideoEncodeCapabilityFlagsKHR.
-type VideoEncodeCapabilityFlagBitsKHR = VideoEncodeCapabilityFlagsKHR
 
 const (
 	// VIDEO_ENCODE_CAPABILITY_EMPHASIS_MAP_BIT_KHR wraps VK_VIDEO_ENCODE_CAPABILITY_EMPHASIS_MAP_BIT_KHR.
@@ -4477,9 +4060,6 @@ func (e VideoEncodeCapabilityFlagsKHR) String() string {
 // VideoEncodeContentFlagsKHR wraps the bitmask VkVideoEncodeContentFlagsKHR.
 type VideoEncodeContentFlagsKHR int32
 
-// VideoEncodeContentFlagBitsKHR wraps the bitmask VkVideoEncodeContentFlagBitsKHR. An alias for VideoEncodeContentFlagsKHR.
-type VideoEncodeContentFlagBitsKHR = VideoEncodeContentFlagsKHR
-
 const (
 	// VIDEO_ENCODE_CONTENT_CAMERA_BIT_KHR wraps VK_VIDEO_ENCODE_CONTENT_CAMERA_BIT_KHR.
 	VIDEO_ENCODE_CONTENT_CAMERA_BIT_KHR VideoEncodeContentFlagsKHR = C.VK_VIDEO_ENCODE_CONTENT_CAMERA_BIT_KHR
@@ -4498,9 +4078,6 @@ func (e VideoEncodeContentFlagsKHR) String() string {
 // VideoEncodeFeedbackFlagsKHR wraps the bitmask VkVideoEncodeFeedbackFlagsKHR.
 type VideoEncodeFeedbackFlagsKHR int32
 
-// VideoEncodeFeedbackFlagBitsKHR wraps the bitmask VkVideoEncodeFeedbackFlagBitsKHR. An alias for VideoEncodeFeedbackFlagsKHR.
-type VideoEncodeFeedbackFlagBitsKHR = VideoEncodeFeedbackFlagsKHR
-
 const (
 	// VIDEO_ENCODE_FEEDBACK_BITSTREAM_BUFFER_OFFSET_BIT_KHR wraps VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_BUFFER_OFFSET_BIT_KHR.
 	VIDEO_ENCODE_FEEDBACK_BITSTREAM_BUFFER_OFFSET_BIT_KHR VideoEncodeFeedbackFlagsKHR = C.VK_VIDEO_ENCODE_FEEDBACK_BITSTREAM_BUFFER_OFFSET_BIT_KHR
@@ -4517,9 +4094,6 @@ func (e VideoEncodeFeedbackFlagsKHR) String() string {
 // VideoEncodeFlagsKHR wraps the bitmask VkVideoEncodeFlagsKHR.
 type VideoEncodeFlagsKHR int32
 
-// VideoEncodeFlagBitsKHR wraps the bitmask VkVideoEncodeFlagBitsKHR. An alias for VideoEncodeFlagsKHR.
-type VideoEncodeFlagBitsKHR = VideoEncodeFlagsKHR
-
 const (
 	// VIDEO_ENCODE_INTRA_REFRESH_BIT_KHR wraps VK_VIDEO_ENCODE_INTRA_REFRESH_BIT_KHR.
 	VIDEO_ENCODE_INTRA_REFRESH_BIT_KHR VideoEncodeFlagsKHR = C.VK_VIDEO_ENCODE_INTRA_REFRESH_BIT_KHR
@@ -4535,9 +4109,6 @@ func (e VideoEncodeFlagsKHR) String() string {
 
 // VideoEncodeH264CapabilityFlagsKHR wraps the bitmask VkVideoEncodeH264CapabilityFlagsKHR.
 type VideoEncodeH264CapabilityFlagsKHR int32
-
-// VideoEncodeH264CapabilityFlagBitsKHR wraps the bitmask VkVideoEncodeH264CapabilityFlagBitsKHR. An alias for VideoEncodeH264CapabilityFlagsKHR.
-type VideoEncodeH264CapabilityFlagBitsKHR = VideoEncodeH264CapabilityFlagsKHR
 
 const (
 	// VIDEO_ENCODE_H264_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR wraps VK_VIDEO_ENCODE_H264_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR.
@@ -4571,9 +4142,6 @@ func (e VideoEncodeH264CapabilityFlagsKHR) String() string {
 // VideoEncodeH264RateControlFlagsKHR wraps the bitmask VkVideoEncodeH264RateControlFlagsKHR.
 type VideoEncodeH264RateControlFlagsKHR int32
 
-// VideoEncodeH264RateControlFlagBitsKHR wraps the bitmask VkVideoEncodeH264RateControlFlagBitsKHR. An alias for VideoEncodeH264RateControlFlagsKHR.
-type VideoEncodeH264RateControlFlagBitsKHR = VideoEncodeH264RateControlFlagsKHR
-
 const (
 	// VIDEO_ENCODE_H264_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR wraps VK_VIDEO_ENCODE_H264_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR.
 	VIDEO_ENCODE_H264_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR VideoEncodeH264RateControlFlagsKHR = C.VK_VIDEO_ENCODE_H264_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR
@@ -4593,9 +4161,6 @@ func (e VideoEncodeH264RateControlFlagsKHR) String() string {
 
 // VideoEncodeH264StdFlagsKHR wraps the bitmask VkVideoEncodeH264StdFlagsKHR.
 type VideoEncodeH264StdFlagsKHR int32
-
-// VideoEncodeH264StdFlagBitsKHR wraps the bitmask VkVideoEncodeH264StdFlagBitsKHR. An alias for VideoEncodeH264StdFlagsKHR.
-type VideoEncodeH264StdFlagBitsKHR = VideoEncodeH264StdFlagsKHR
 
 const (
 	// VIDEO_ENCODE_H264_STD_CHROMA_QP_INDEX_OFFSET_BIT_KHR wraps VK_VIDEO_ENCODE_H264_STD_CHROMA_QP_INDEX_OFFSET_BIT_KHR.
@@ -4647,9 +4212,6 @@ func (e VideoEncodeH264StdFlagsKHR) String() string {
 // VideoEncodeH265CapabilityFlagsKHR wraps the bitmask VkVideoEncodeH265CapabilityFlagsKHR.
 type VideoEncodeH265CapabilityFlagsKHR int32
 
-// VideoEncodeH265CapabilityFlagBitsKHR wraps the bitmask VkVideoEncodeH265CapabilityFlagBitsKHR. An alias for VideoEncodeH265CapabilityFlagsKHR.
-type VideoEncodeH265CapabilityFlagBitsKHR = VideoEncodeH265CapabilityFlagsKHR
-
 const (
 	// VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR wraps VK_VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR.
 	VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR VideoEncodeH265CapabilityFlagsKHR = C.VK_VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR
@@ -4684,9 +4246,6 @@ func (e VideoEncodeH265CapabilityFlagsKHR) String() string {
 // VideoEncodeH265CtbSizeFlagsKHR wraps the bitmask VkVideoEncodeH265CtbSizeFlagsKHR.
 type VideoEncodeH265CtbSizeFlagsKHR int32
 
-// VideoEncodeH265CtbSizeFlagBitsKHR wraps the bitmask VkVideoEncodeH265CtbSizeFlagBitsKHR. An alias for VideoEncodeH265CtbSizeFlagsKHR.
-type VideoEncodeH265CtbSizeFlagBitsKHR = VideoEncodeH265CtbSizeFlagsKHR
-
 const (
 	// VIDEO_ENCODE_H265_CTB_SIZE_16_BIT_KHR wraps VK_VIDEO_ENCODE_H265_CTB_SIZE_16_BIT_KHR.
 	VIDEO_ENCODE_H265_CTB_SIZE_16_BIT_KHR VideoEncodeH265CtbSizeFlagsKHR = C.VK_VIDEO_ENCODE_H265_CTB_SIZE_16_BIT_KHR
@@ -4702,9 +4261,6 @@ func (e VideoEncodeH265CtbSizeFlagsKHR) String() string {
 
 // VideoEncodeH265RateControlFlagsKHR wraps the bitmask VkVideoEncodeH265RateControlFlagsKHR.
 type VideoEncodeH265RateControlFlagsKHR int32
-
-// VideoEncodeH265RateControlFlagBitsKHR wraps the bitmask VkVideoEncodeH265RateControlFlagBitsKHR. An alias for VideoEncodeH265RateControlFlagsKHR.
-type VideoEncodeH265RateControlFlagBitsKHR = VideoEncodeH265RateControlFlagsKHR
 
 const (
 	// VIDEO_ENCODE_H265_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR wraps VK_VIDEO_ENCODE_H265_RATE_CONTROL_ATTEMPT_HRD_COMPLIANCE_BIT_KHR.
@@ -4725,9 +4281,6 @@ func (e VideoEncodeH265RateControlFlagsKHR) String() string {
 
 // VideoEncodeH265StdFlagsKHR wraps the bitmask VkVideoEncodeH265StdFlagsKHR.
 type VideoEncodeH265StdFlagsKHR int32
-
-// VideoEncodeH265StdFlagBitsKHR wraps the bitmask VkVideoEncodeH265StdFlagBitsKHR. An alias for VideoEncodeH265StdFlagsKHR.
-type VideoEncodeH265StdFlagBitsKHR = VideoEncodeH265StdFlagsKHR
 
 const (
 	// VIDEO_ENCODE_H265_STD_CONSTRAINED_INTRA_PRED_FLAG_SET_BIT_KHR wraps VK_VIDEO_ENCODE_H265_STD_CONSTRAINED_INTRA_PRED_FLAG_SET_BIT_KHR.
@@ -4781,9 +4334,6 @@ func (e VideoEncodeH265StdFlagsKHR) String() string {
 // VideoEncodeH265TransformBlockSizeFlagsKHR wraps the bitmask VkVideoEncodeH265TransformBlockSizeFlagsKHR.
 type VideoEncodeH265TransformBlockSizeFlagsKHR int32
 
-// VideoEncodeH265TransformBlockSizeFlagBitsKHR wraps the bitmask VkVideoEncodeH265TransformBlockSizeFlagBitsKHR. An alias for VideoEncodeH265TransformBlockSizeFlagsKHR.
-type VideoEncodeH265TransformBlockSizeFlagBitsKHR = VideoEncodeH265TransformBlockSizeFlagsKHR
-
 const (
 	// VIDEO_ENCODE_H265_TRANSFORM_BLOCK_SIZE_16_BIT_KHR wraps VK_VIDEO_ENCODE_H265_TRANSFORM_BLOCK_SIZE_16_BIT_KHR.
 	VIDEO_ENCODE_H265_TRANSFORM_BLOCK_SIZE_16_BIT_KHR VideoEncodeH265TransformBlockSizeFlagsKHR = C.VK_VIDEO_ENCODE_H265_TRANSFORM_BLOCK_SIZE_16_BIT_KHR
@@ -4801,9 +4351,6 @@ func (e VideoEncodeH265TransformBlockSizeFlagsKHR) String() string {
 
 // VideoEncodeIntraRefreshModeFlagsKHR wraps the bitmask VkVideoEncodeIntraRefreshModeFlagsKHR.
 type VideoEncodeIntraRefreshModeFlagsKHR int32
-
-// VideoEncodeIntraRefreshModeFlagBitsKHR wraps the bitmask VkVideoEncodeIntraRefreshModeFlagBitsKHR. An alias for VideoEncodeIntraRefreshModeFlagsKHR.
-type VideoEncodeIntraRefreshModeFlagBitsKHR = VideoEncodeIntraRefreshModeFlagsKHR
 
 const (
 	// VIDEO_ENCODE_INTRA_REFRESH_MODE_BLOCK_BASED_BIT_KHR wraps VK_VIDEO_ENCODE_INTRA_REFRESH_MODE_BLOCK_BASED_BIT_KHR.
@@ -4832,9 +4379,6 @@ func (e VideoEncodeRateControlFlagsKHR) String() string {
 // VideoEncodeRateControlModeFlagsKHR wraps the bitmask VkVideoEncodeRateControlModeFlagsKHR.
 type VideoEncodeRateControlModeFlagsKHR int32
 
-// VideoEncodeRateControlModeFlagBitsKHR wraps the bitmask VkVideoEncodeRateControlModeFlagBitsKHR. An alias for VideoEncodeRateControlModeFlagsKHR.
-type VideoEncodeRateControlModeFlagBitsKHR = VideoEncodeRateControlModeFlagsKHR
-
 const (
 	// VIDEO_ENCODE_RATE_CONTROL_MODE_CBR_BIT_KHR wraps VK_VIDEO_ENCODE_RATE_CONTROL_MODE_CBR_BIT_KHR.
 	VIDEO_ENCODE_RATE_CONTROL_MODE_CBR_BIT_KHR VideoEncodeRateControlModeFlagsKHR = C.VK_VIDEO_ENCODE_RATE_CONTROL_MODE_CBR_BIT_KHR
@@ -4853,9 +4397,6 @@ func (e VideoEncodeRateControlModeFlagsKHR) String() string {
 // VideoEncodeRgbChromaOffsetFlagsVALVE wraps the bitmask VkVideoEncodeRgbChromaOffsetFlagsVALVE.
 type VideoEncodeRgbChromaOffsetFlagsVALVE int32
 
-// VideoEncodeRgbChromaOffsetFlagBitsVALVE wraps the bitmask VkVideoEncodeRgbChromaOffsetFlagBitsVALVE. An alias for VideoEncodeRgbChromaOffsetFlagsVALVE.
-type VideoEncodeRgbChromaOffsetFlagBitsVALVE = VideoEncodeRgbChromaOffsetFlagsVALVE
-
 const (
 	// VIDEO_ENCODE_RGB_CHROMA_OFFSET_COSITED_EVEN_BIT_VALVE wraps VK_VIDEO_ENCODE_RGB_CHROMA_OFFSET_COSITED_EVEN_BIT_VALVE.
 	VIDEO_ENCODE_RGB_CHROMA_OFFSET_COSITED_EVEN_BIT_VALVE VideoEncodeRgbChromaOffsetFlagsVALVE = C.VK_VIDEO_ENCODE_RGB_CHROMA_OFFSET_COSITED_EVEN_BIT_VALVE
@@ -4869,9 +4410,6 @@ func (e VideoEncodeRgbChromaOffsetFlagsVALVE) String() string {
 
 // VideoEncodeRgbModelConversionFlagsVALVE wraps the bitmask VkVideoEncodeRgbModelConversionFlagsVALVE.
 type VideoEncodeRgbModelConversionFlagsVALVE int32
-
-// VideoEncodeRgbModelConversionFlagBitsVALVE wraps the bitmask VkVideoEncodeRgbModelConversionFlagBitsVALVE. An alias for VideoEncodeRgbModelConversionFlagsVALVE.
-type VideoEncodeRgbModelConversionFlagBitsVALVE = VideoEncodeRgbModelConversionFlagsVALVE
 
 const (
 	// VIDEO_ENCODE_RGB_MODEL_CONVERSION_RGB_IDENTITY_BIT_VALVE wraps VK_VIDEO_ENCODE_RGB_MODEL_CONVERSION_RGB_IDENTITY_BIT_VALVE.
@@ -4893,9 +4431,6 @@ func (e VideoEncodeRgbModelConversionFlagsVALVE) String() string {
 // VideoEncodeRgbRangeCompressionFlagsVALVE wraps the bitmask VkVideoEncodeRgbRangeCompressionFlagsVALVE.
 type VideoEncodeRgbRangeCompressionFlagsVALVE int32
 
-// VideoEncodeRgbRangeCompressionFlagBitsVALVE wraps the bitmask VkVideoEncodeRgbRangeCompressionFlagBitsVALVE. An alias for VideoEncodeRgbRangeCompressionFlagsVALVE.
-type VideoEncodeRgbRangeCompressionFlagBitsVALVE = VideoEncodeRgbRangeCompressionFlagsVALVE
-
 const (
 	// VIDEO_ENCODE_RGB_RANGE_COMPRESSION_FULL_RANGE_BIT_VALVE wraps VK_VIDEO_ENCODE_RGB_RANGE_COMPRESSION_FULL_RANGE_BIT_VALVE.
 	VIDEO_ENCODE_RGB_RANGE_COMPRESSION_FULL_RANGE_BIT_VALVE VideoEncodeRgbRangeCompressionFlagsVALVE = C.VK_VIDEO_ENCODE_RGB_RANGE_COMPRESSION_FULL_RANGE_BIT_VALVE
@@ -4909,9 +4444,6 @@ func (e VideoEncodeRgbRangeCompressionFlagsVALVE) String() string {
 
 // VideoEncodeUsageFlagsKHR wraps the bitmask VkVideoEncodeUsageFlagsKHR.
 type VideoEncodeUsageFlagsKHR int32
-
-// VideoEncodeUsageFlagBitsKHR wraps the bitmask VkVideoEncodeUsageFlagBitsKHR. An alias for VideoEncodeUsageFlagsKHR.
-type VideoEncodeUsageFlagBitsKHR = VideoEncodeUsageFlagsKHR
 
 const (
 	// VIDEO_ENCODE_USAGE_CONFERENCING_BIT_KHR wraps VK_VIDEO_ENCODE_USAGE_CONFERENCING_BIT_KHR.
@@ -4940,9 +4472,6 @@ func (e VideoEndCodingFlagsKHR) String() string {
 // VideoSessionCreateFlagsKHR wraps the bitmask VkVideoSessionCreateFlagsKHR.
 type VideoSessionCreateFlagsKHR int32
 
-// VideoSessionCreateFlagBitsKHR wraps the bitmask VkVideoSessionCreateFlagBitsKHR. An alias for VideoSessionCreateFlagsKHR.
-type VideoSessionCreateFlagBitsKHR = VideoSessionCreateFlagsKHR
-
 const (
 	// VIDEO_SESSION_CREATE_ALLOW_ENCODE_EMPHASIS_MAP_BIT_KHR wraps VK_VIDEO_SESSION_CREATE_ALLOW_ENCODE_EMPHASIS_MAP_BIT_KHR.
 	VIDEO_SESSION_CREATE_ALLOW_ENCODE_EMPHASIS_MAP_BIT_KHR VideoSessionCreateFlagsKHR = C.VK_VIDEO_SESSION_CREATE_ALLOW_ENCODE_EMPHASIS_MAP_BIT_KHR
@@ -4964,9 +4493,6 @@ func (e VideoSessionCreateFlagsKHR) String() string {
 
 // VideoSessionParametersCreateFlagsKHR wraps the bitmask VkVideoSessionParametersCreateFlagsKHR.
 type VideoSessionParametersCreateFlagsKHR int32
-
-// VideoSessionParametersCreateFlagBitsKHR wraps the bitmask VkVideoSessionParametersCreateFlagBitsKHR. An alias for VideoSessionParametersCreateFlagsKHR.
-type VideoSessionParametersCreateFlagBitsKHR = VideoSessionParametersCreateFlagsKHR
 
 const (
 	// VIDEO_SESSION_PARAMETERS_CREATE_QUANTIZATION_MAP_COMPATIBLE_BIT_KHR wraps VK_VIDEO_SESSION_PARAMETERS_CREATE_QUANTIZATION_MAP_COMPATIBLE_BIT_KHR.
