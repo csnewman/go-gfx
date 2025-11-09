@@ -271,7 +271,7 @@ func (g *Graphics) considerDevice(arena *ffi.Arena, device vk.PhysicalDevice) (*
 
 	feat2 := vk.PhysicalDeviceFeatures2Alloc(arena, 1)
 	feat2.SetSType(vk.STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2)
-	feat2.SetPNext(features12.Raw())
+	feat2.SetPNext(uintptr(features12))
 
 	vk.GetPhysicalDeviceFeatures2(device, feat2)
 
@@ -370,7 +370,7 @@ func (g *Graphics) createDevice(arena *ffi.Arena, sel *selectedDevice) error {
 
 	features12 := vk.PhysicalDeviceVulkan12FeaturesAlloc(arena, 1)
 	features12.SetSType(vk.STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES)
-	features12.SetPNext(features13.Raw())
+	features12.SetPNext(uintptr(features13))
 	features12.SetBufferDeviceAddress(true)
 	features12.SetDescriptorIndexing(true)
 	//VkBool32           shaderInputAttachmentArrayDynamicIndexing;
@@ -405,7 +405,7 @@ func (g *Graphics) createDevice(arena *ffi.Arena, sel *selectedDevice) error {
 
 	createInfo := vk.DeviceCreateInfoAlloc(arena, 1)
 	createInfo.SetSType(vk.STRUCTURE_TYPE_DEVICE_CREATE_INFO)
-	createInfo.SetPNext(features12.Raw())
+	createInfo.SetPNext(uintptr(features12))
 	createInfo.SetQueueCreateInfoCount(1)
 	createInfo.SetPQueueCreateInfos(queueCreateInfo)
 

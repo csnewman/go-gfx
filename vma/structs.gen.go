@@ -19,9 +19,7 @@ import "C"
 
   To be used with functions like vmaCreateBuffer(), vmaCreateImage(), and many others.
 */
-type AllocationCreateInfo struct {
-	ptr *C.VmaAllocationCreateInfo
-}
+type AllocationCreateInfo uintptr
 
 // AllocationCreateInfoNil is a null pointer.
 var AllocationCreateInfoNil AllocationCreateInfo
@@ -29,106 +27,111 @@ var AllocationCreateInfoNil AllocationCreateInfo
 // AllocationCreateInfoSizeOf is the byte size of VmaAllocationCreateInfo.
 const AllocationCreateInfoSizeOf = int(C.sizeof_VmaAllocationCreateInfo)
 
-// AllocationCreateInfoFromPtr converts a raw pointer to a AllocationCreateInfo.
-func AllocationCreateInfoFromPtr(ptr unsafe.Pointer) AllocationCreateInfo {
-	return AllocationCreateInfo{ptr: (*C.VmaAllocationCreateInfo)(ptr)}
-}
-
 // AllocationCreateInfoAlloc allocates a continuous block of AllocationCreateInfo.
 func AllocationCreateInfoAlloc(alloc ffi.Allocator, count int) AllocationCreateInfo {
 	ptr := alloc.Allocate(AllocationCreateInfoSizeOf * count)
-	return AllocationCreateInfo{ptr: (*C.VmaAllocationCreateInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p AllocationCreateInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return AllocationCreateInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p AllocationCreateInfo) Offset(offset int) AllocationCreateInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*AllocationCreateInfoSizeOf)
-	return AllocationCreateInfo{ptr: (*C.VmaAllocationCreateInfo)(ptr)}
+	return p + AllocationCreateInfo(offset*AllocationCreateInfoSizeOf)
 }
 
 // GetFlags returns the value in flags.
 func (p AllocationCreateInfo) GetFlags() AllocationCreateFlags {
-	return AllocationCreateFlags(p.ptr.flags)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return AllocationCreateFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p AllocationCreateInfo) SetFlags(value AllocationCreateFlags) {
-	p.ptr.flags = (C.VmaAllocationCreateFlags)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaAllocationCreateFlags)(value)
 }
 
 // GetMemoryTypeBits returns the value in memoryTypeBits.
 func (p AllocationCreateInfo) GetMemoryTypeBits() uint32 {
-	return uint32(p.ptr.memoryTypeBits)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return uint32(ptr.memoryTypeBits)
 }
 
 // SetMemoryTypeBits sets the value in memoryTypeBits.
 func (p AllocationCreateInfo) SetMemoryTypeBits(value uint32) {
-	p.ptr.memoryTypeBits = (C.uint32_t)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.memoryTypeBits = (C.uint32_t)(value)
 }
 
 // GetPUserData returns the value in pUserData.
-func (p AllocationCreateInfo) GetPUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pUserData)
+func (p AllocationCreateInfo) GetPUserData() uintptr {
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pUserData))
 }
 
 // SetPUserData sets the value in pUserData.
-func (p AllocationCreateInfo) SetPUserData(value unsafe.Pointer) {
-	p.ptr.pUserData = value
+func (p AllocationCreateInfo) SetPUserData(value uintptr) {
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.pUserData = unsafe.Pointer(value)
 }
 
 // GetPool returns the value in pool.
 func (p AllocationCreateInfo) GetPool() Pool {
-	return Pool(unsafe.Pointer(p.ptr.pool))
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return Pool(unsafe.Pointer(ptr.pool))
 }
 
 // SetPool sets the value in pool.
 func (p AllocationCreateInfo) SetPool(value Pool) {
-	p.ptr.pool = (C.VmaPool)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.pool = (C.VmaPool)(unsafe.Pointer(value))
 }
 
 // GetPreferredFlags returns the value in preferredFlags.
 func (p AllocationCreateInfo) GetPreferredFlags() vk.MemoryPropertyFlags {
-	return vk.MemoryPropertyFlags(p.ptr.preferredFlags)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return vk.MemoryPropertyFlags(ptr.preferredFlags)
 }
 
 // SetPreferredFlags sets the value in preferredFlags.
 func (p AllocationCreateInfo) SetPreferredFlags(value vk.MemoryPropertyFlags) {
-	p.ptr.preferredFlags = (C.VkMemoryPropertyFlags)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.preferredFlags = (C.VkMemoryPropertyFlags)(value)
 }
 
 // GetPriority returns the value in priority.
 func (p AllocationCreateInfo) GetPriority() float32 {
-	return float32(p.ptr.priority)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return float32(ptr.priority)
 }
 
 // SetPriority sets the value in priority.
 func (p AllocationCreateInfo) SetPriority(value float32) {
-	p.ptr.priority = (C.float)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.priority = (C.float)(value)
 }
 
 // GetRequiredFlags returns the value in requiredFlags.
 func (p AllocationCreateInfo) GetRequiredFlags() vk.MemoryPropertyFlags {
-	return vk.MemoryPropertyFlags(p.ptr.requiredFlags)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return vk.MemoryPropertyFlags(ptr.requiredFlags)
 }
 
 // SetRequiredFlags sets the value in requiredFlags.
 func (p AllocationCreateInfo) SetRequiredFlags(value vk.MemoryPropertyFlags) {
-	p.ptr.requiredFlags = (C.VkMemoryPropertyFlags)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.requiredFlags = (C.VkMemoryPropertyFlags)(value)
 }
 
 // GetUsage returns the value in usage.
 func (p AllocationCreateInfo) GetUsage() MemoryUsage {
-	return MemoryUsage(p.ptr.usage)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	return MemoryUsage(ptr.usage)
 }
 
 // SetUsage sets the value in usage.
 func (p AllocationCreateInfo) SetUsage(value MemoryUsage) {
-	p.ptr.usage = (C.VmaMemoryUsage)(value)
+	ptr := (*C.VmaAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.usage = (C.VmaMemoryUsage)(value)
 }
 
 // AllocationInfo wraps struct VmaAllocationInfo.
@@ -137,9 +140,7 @@ func (p AllocationCreateInfo) SetUsage(value MemoryUsage) {
 
   There is also an extended version of this structure that carries additional parameters: #VmaAllocationInfo2.
 */
-type AllocationInfo struct {
-	ptr *C.VmaAllocationInfo
-}
+type AllocationInfo uintptr
 
 // AllocationInfoNil is a null pointer.
 var AllocationInfoNil AllocationInfo
@@ -147,104 +148,105 @@ var AllocationInfoNil AllocationInfo
 // AllocationInfoSizeOf is the byte size of VmaAllocationInfo.
 const AllocationInfoSizeOf = int(C.sizeof_VmaAllocationInfo)
 
-// AllocationInfoFromPtr converts a raw pointer to a AllocationInfo.
-func AllocationInfoFromPtr(ptr unsafe.Pointer) AllocationInfo {
-	return AllocationInfo{ptr: (*C.VmaAllocationInfo)(ptr)}
-}
-
 // AllocationInfoAlloc allocates a continuous block of AllocationInfo.
 func AllocationInfoAlloc(alloc ffi.Allocator, count int) AllocationInfo {
 	ptr := alloc.Allocate(AllocationInfoSizeOf * count)
-	return AllocationInfo{ptr: (*C.VmaAllocationInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p AllocationInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return AllocationInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p AllocationInfo) Offset(offset int) AllocationInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*AllocationInfoSizeOf)
-	return AllocationInfo{ptr: (*C.VmaAllocationInfo)(ptr)}
+	return p + AllocationInfo(offset*AllocationInfoSizeOf)
 }
 
 // GetDeviceMemory returns the value in deviceMemory.
 func (p AllocationInfo) GetDeviceMemory() vk.DeviceMemory {
-	return vk.DeviceMemory(p.ptr.deviceMemory)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return vk.DeviceMemory(ptr.deviceMemory)
 }
 
 // SetDeviceMemory sets the value in deviceMemory.
 func (p AllocationInfo) SetDeviceMemory(value vk.DeviceMemory) {
-	p.ptr.deviceMemory = (C.VkDeviceMemory)(value)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.deviceMemory = (C.VkDeviceMemory)(value)
 }
 
 // GetMemoryType returns the value in memoryType.
 func (p AllocationInfo) GetMemoryType() uint32 {
-	return uint32(p.ptr.memoryType)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return uint32(ptr.memoryType)
 }
 
 // SetMemoryType sets the value in memoryType.
 func (p AllocationInfo) SetMemoryType(value uint32) {
-	p.ptr.memoryType = (C.uint32_t)(value)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.memoryType = (C.uint32_t)(value)
 }
 
 // GetOffset returns the value in offset.
 func (p AllocationInfo) GetOffset() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.offset)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.offset)
 }
 
 // SetOffset sets the value in offset.
 func (p AllocationInfo) SetOffset(value vk.DeviceSize) {
-	p.ptr.offset = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.offset = (C.VkDeviceSize)(value)
 }
 
 // GetPMappedData returns the value in pMappedData.
-func (p AllocationInfo) GetPMappedData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pMappedData)
+func (p AllocationInfo) GetPMappedData() uintptr {
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pMappedData))
 }
 
 // SetPMappedData sets the value in pMappedData.
-func (p AllocationInfo) SetPMappedData(value unsafe.Pointer) {
-	p.ptr.pMappedData = value
+func (p AllocationInfo) SetPMappedData(value uintptr) {
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.pMappedData = unsafe.Pointer(value)
 }
 
 // GetPName returns the value in pName.
 func (p AllocationInfo) GetPName() ffi.CString {
-	return ffi.CStringFromPtr((unsafe.Pointer)(p.ptr.pName))
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return ffi.CStringFromPtr((unsafe.Pointer)(ptr.pName))
 }
 
 // SetPName sets the value in pName.
 func (p AllocationInfo) SetPName(value ffi.CString) {
-	p.ptr.pName = (*C.char)(value.Raw())
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.pName = (*C.char)(value.Raw())
 }
 
 // GetPUserData returns the value in pUserData.
-func (p AllocationInfo) GetPUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pUserData)
+func (p AllocationInfo) GetPUserData() uintptr {
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pUserData))
 }
 
 // SetPUserData sets the value in pUserData.
-func (p AllocationInfo) SetPUserData(value unsafe.Pointer) {
-	p.ptr.pUserData = value
+func (p AllocationInfo) SetPUserData(value uintptr) {
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.pUserData = unsafe.Pointer(value)
 }
 
 // GetSize returns the value in size.
 func (p AllocationInfo) GetSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.size)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.size)
 }
 
 // SetSize sets the value in size.
 func (p AllocationInfo) SetSize(value vk.DeviceSize) {
-	p.ptr.size = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaAllocationInfo)(unsafe.Pointer(p))
+	ptr.size = (C.VkDeviceSize)(value)
 }
 
 // AllocationInfo2 wraps struct VmaAllocationInfo2.
 //
 //	Extended parameters of a #VmaAllocation object that can be retrieved using function vmaGetAllocationInfo2().
-type AllocationInfo2 struct {
-	ptr *C.VmaAllocationInfo2
-}
+type AllocationInfo2 uintptr
 
 // AllocationInfo2Nil is a null pointer.
 var AllocationInfo2Nil AllocationInfo2
@@ -252,63 +254,54 @@ var AllocationInfo2Nil AllocationInfo2
 // AllocationInfo2SizeOf is the byte size of VmaAllocationInfo2.
 const AllocationInfo2SizeOf = int(C.sizeof_VmaAllocationInfo2)
 
-// AllocationInfo2FromPtr converts a raw pointer to a AllocationInfo2.
-func AllocationInfo2FromPtr(ptr unsafe.Pointer) AllocationInfo2 {
-	return AllocationInfo2{ptr: (*C.VmaAllocationInfo2)(ptr)}
-}
-
 // AllocationInfo2Alloc allocates a continuous block of AllocationInfo2.
 func AllocationInfo2Alloc(alloc ffi.Allocator, count int) AllocationInfo2 {
 	ptr := alloc.Allocate(AllocationInfo2SizeOf * count)
-	return AllocationInfo2{ptr: (*C.VmaAllocationInfo2)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p AllocationInfo2) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return AllocationInfo2(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p AllocationInfo2) Offset(offset int) AllocationInfo2 {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*AllocationInfo2SizeOf)
-	return AllocationInfo2{ptr: (*C.VmaAllocationInfo2)(ptr)}
+	return p + AllocationInfo2(offset*AllocationInfo2SizeOf)
 }
 
 // RefAllocationInfo returns pointer to the allocationInfo field.
 func (p AllocationInfo2) RefAllocationInfo() AllocationInfo {
-	return AllocationInfoFromPtr(unsafe.Add(unsafe.Pointer(p.ptr), uintptr(C.offsetof_VmaAllocationInfo2_allocationInfo)))
+	return AllocationInfo(p + AllocationInfo2(C.offsetof_VmaAllocationInfo2_allocationInfo))
 }
 
 // GetBlockSize returns the value in blockSize.
 func (p AllocationInfo2) GetBlockSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.blockSize)
+	ptr := (*C.VmaAllocationInfo2)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.blockSize)
 }
 
 // SetBlockSize sets the value in blockSize.
 func (p AllocationInfo2) SetBlockSize(value vk.DeviceSize) {
-	p.ptr.blockSize = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaAllocationInfo2)(unsafe.Pointer(p))
+	ptr.blockSize = (C.VkDeviceSize)(value)
 }
 
 // GetDedicatedMemory returns the value in dedicatedMemory.
 func (p AllocationInfo2) GetDedicatedMemory() bool {
-	return p.ptr.dedicatedMemory != 0
+	ptr := (*C.VmaAllocationInfo2)(unsafe.Pointer(p))
+	return ptr.dedicatedMemory != 0
 }
 
 // SetDedicatedMemory sets the value in dedicatedMemory.
 func (p AllocationInfo2) SetDedicatedMemory(value bool) {
+	ptr := (*C.VmaAllocationInfo2)(unsafe.Pointer(p))
 	if value {
-		p.ptr.dedicatedMemory = C.VkBool32(1)
+		ptr.dedicatedMemory = C.VkBool32(1)
 	} else {
-		p.ptr.dedicatedMemory = C.VkBool32(0)
+		ptr.dedicatedMemory = C.VkBool32(0)
 	}
 }
 
 // AllocatorCreateInfo wraps struct VmaAllocatorCreateInfo.
 //
 //	Description of a Allocator to be created.
-type AllocatorCreateInfo struct {
-	ptr *C.VmaAllocatorCreateInfo
-}
+type AllocatorCreateInfo uintptr
 
 // AllocatorCreateInfoNil is a null pointer.
 var AllocatorCreateInfoNil AllocatorCreateInfo
@@ -316,144 +309,153 @@ var AllocatorCreateInfoNil AllocatorCreateInfo
 // AllocatorCreateInfoSizeOf is the byte size of VmaAllocatorCreateInfo.
 const AllocatorCreateInfoSizeOf = int(C.sizeof_VmaAllocatorCreateInfo)
 
-// AllocatorCreateInfoFromPtr converts a raw pointer to a AllocatorCreateInfo.
-func AllocatorCreateInfoFromPtr(ptr unsafe.Pointer) AllocatorCreateInfo {
-	return AllocatorCreateInfo{ptr: (*C.VmaAllocatorCreateInfo)(ptr)}
-}
-
 // AllocatorCreateInfoAlloc allocates a continuous block of AllocatorCreateInfo.
 func AllocatorCreateInfoAlloc(alloc ffi.Allocator, count int) AllocatorCreateInfo {
 	ptr := alloc.Allocate(AllocatorCreateInfoSizeOf * count)
-	return AllocatorCreateInfo{ptr: (*C.VmaAllocatorCreateInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p AllocatorCreateInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return AllocatorCreateInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p AllocatorCreateInfo) Offset(offset int) AllocatorCreateInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*AllocatorCreateInfoSizeOf)
-	return AllocatorCreateInfo{ptr: (*C.VmaAllocatorCreateInfo)(ptr)}
+	return p + AllocatorCreateInfo(offset*AllocatorCreateInfoSizeOf)
 }
 
 // GetDevice returns the value in device.
 func (p AllocatorCreateInfo) GetDevice() vk.Device {
-	return vk.Device(unsafe.Pointer(p.ptr.device))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return vk.Device(unsafe.Pointer(ptr.device))
 }
 
 // SetDevice sets the value in device.
 func (p AllocatorCreateInfo) SetDevice(value vk.Device) {
-	p.ptr.device = (C.VkDevice)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.device = (C.VkDevice)(unsafe.Pointer(value))
 }
 
 // GetFlags returns the value in flags.
 func (p AllocatorCreateInfo) GetFlags() AllocatorCreateFlags {
-	return AllocatorCreateFlags(p.ptr.flags)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return AllocatorCreateFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p AllocatorCreateInfo) SetFlags(value AllocatorCreateFlags) {
-	p.ptr.flags = (C.VmaAllocatorCreateFlags)(value)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaAllocatorCreateFlags)(value)
 }
 
 // GetInstance returns the value in instance.
 func (p AllocatorCreateInfo) GetInstance() vk.Instance {
-	return vk.Instance(unsafe.Pointer(p.ptr.instance))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return vk.Instance(unsafe.Pointer(ptr.instance))
 }
 
 // SetInstance sets the value in instance.
 func (p AllocatorCreateInfo) SetInstance(value vk.Instance) {
-	p.ptr.instance = (C.VkInstance)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.instance = (C.VkInstance)(unsafe.Pointer(value))
 }
 
 // GetPAllocationCallbacks returns the value in pAllocationCallbacks.
 func (p AllocatorCreateInfo) GetPAllocationCallbacks() vk.AllocationCallbacks {
-	return vk.AllocationCallbacksFromPtr(unsafe.Pointer(p.ptr.pAllocationCallbacks))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return vk.AllocationCallbacks(unsafe.Pointer(ptr.pAllocationCallbacks))
 }
 
 // SetPAllocationCallbacks sets the value in pAllocationCallbacks.
 func (p AllocatorCreateInfo) SetPAllocationCallbacks(value vk.AllocationCallbacks) {
-	p.ptr.pAllocationCallbacks = (*C.VkAllocationCallbacks)(value.Raw())
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.pAllocationCallbacks = (*C.VkAllocationCallbacks)(unsafe.Pointer(value))
 }
 
 // GetPDeviceMemoryCallbacks returns the value in pDeviceMemoryCallbacks.
 func (p AllocatorCreateInfo) GetPDeviceMemoryCallbacks() DeviceMemoryCallbacks {
-	return DeviceMemoryCallbacksFromPtr(unsafe.Pointer(p.ptr.pDeviceMemoryCallbacks))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return DeviceMemoryCallbacks(unsafe.Pointer(ptr.pDeviceMemoryCallbacks))
 }
 
 // SetPDeviceMemoryCallbacks sets the value in pDeviceMemoryCallbacks.
 func (p AllocatorCreateInfo) SetPDeviceMemoryCallbacks(value DeviceMemoryCallbacks) {
-	p.ptr.pDeviceMemoryCallbacks = (*C.VmaDeviceMemoryCallbacks)(value.Raw())
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.pDeviceMemoryCallbacks = (*C.VmaDeviceMemoryCallbacks)(unsafe.Pointer(value))
 }
 
 // GetPHeapSizeLimit returns the value in pHeapSizeLimit.
 func (p AllocatorCreateInfo) GetPHeapSizeLimit() ffi.Ref[vk.DeviceSize] {
-	return ffi.RefFromPtr[vk.DeviceSize](unsafe.Pointer(p.ptr.pHeapSizeLimit))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return ffi.RefFromPtr[vk.DeviceSize](unsafe.Pointer(ptr.pHeapSizeLimit))
 }
 
 // SetPHeapSizeLimit sets the value in pHeapSizeLimit.
 func (p AllocatorCreateInfo) SetPHeapSizeLimit(value ffi.Ref[vk.DeviceSize]) {
-	p.ptr.pHeapSizeLimit = (*C.VkDeviceSize)(value.Raw())
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.pHeapSizeLimit = (*C.VkDeviceSize)(value.Raw())
 }
 
 // GetPTypeExternalMemoryHandleTypes returns the value in pTypeExternalMemoryHandleTypes.
 func (p AllocatorCreateInfo) GetPTypeExternalMemoryHandleTypes() ffi.Ref[vk.ExternalMemoryHandleTypeFlags] {
-	return ffi.RefFromPtr[vk.ExternalMemoryHandleTypeFlags](unsafe.Pointer(p.ptr.pTypeExternalMemoryHandleTypes))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return ffi.RefFromPtr[vk.ExternalMemoryHandleTypeFlags](unsafe.Pointer(ptr.pTypeExternalMemoryHandleTypes))
 }
 
 // SetPTypeExternalMemoryHandleTypes sets the value in pTypeExternalMemoryHandleTypes.
 func (p AllocatorCreateInfo) SetPTypeExternalMemoryHandleTypes(value ffi.Ref[vk.ExternalMemoryHandleTypeFlags]) {
-	p.ptr.pTypeExternalMemoryHandleTypes = (*C.VkExternalMemoryHandleTypeFlagsKHR)(value.Raw())
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.pTypeExternalMemoryHandleTypes = (*C.VkExternalMemoryHandleTypeFlagsKHR)(value.Raw())
 }
 
 // GetPVulkanFunctions returns the value in pVulkanFunctions.
 func (p AllocatorCreateInfo) GetPVulkanFunctions() VulkanFunctions {
-	return VulkanFunctionsFromPtr(unsafe.Pointer(p.ptr.pVulkanFunctions))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return VulkanFunctions(unsafe.Pointer(ptr.pVulkanFunctions))
 }
 
 // SetPVulkanFunctions sets the value in pVulkanFunctions.
 func (p AllocatorCreateInfo) SetPVulkanFunctions(value VulkanFunctions) {
-	p.ptr.pVulkanFunctions = (*C.VmaVulkanFunctions)(value.Raw())
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.pVulkanFunctions = (*C.VmaVulkanFunctions)(unsafe.Pointer(value))
 }
 
 // GetPhysicalDevice returns the value in physicalDevice.
 func (p AllocatorCreateInfo) GetPhysicalDevice() vk.PhysicalDevice {
-	return vk.PhysicalDevice(unsafe.Pointer(p.ptr.physicalDevice))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return vk.PhysicalDevice(unsafe.Pointer(ptr.physicalDevice))
 }
 
 // SetPhysicalDevice sets the value in physicalDevice.
 func (p AllocatorCreateInfo) SetPhysicalDevice(value vk.PhysicalDevice) {
-	p.ptr.physicalDevice = (C.VkPhysicalDevice)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.physicalDevice = (C.VkPhysicalDevice)(unsafe.Pointer(value))
 }
 
 // GetPreferredLargeHeapBlockSize returns the value in preferredLargeHeapBlockSize.
 func (p AllocatorCreateInfo) GetPreferredLargeHeapBlockSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.preferredLargeHeapBlockSize)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.preferredLargeHeapBlockSize)
 }
 
 // SetPreferredLargeHeapBlockSize sets the value in preferredLargeHeapBlockSize.
 func (p AllocatorCreateInfo) SetPreferredLargeHeapBlockSize(value vk.DeviceSize) {
-	p.ptr.preferredLargeHeapBlockSize = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.preferredLargeHeapBlockSize = (C.VkDeviceSize)(value)
 }
 
 // GetVulkanApiVersion returns the value in vulkanApiVersion.
 func (p AllocatorCreateInfo) GetVulkanApiVersion() uint32 {
-	return uint32(p.ptr.vulkanApiVersion)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	return uint32(ptr.vulkanApiVersion)
 }
 
 // SetVulkanApiVersion sets the value in vulkanApiVersion.
 func (p AllocatorCreateInfo) SetVulkanApiVersion(value uint32) {
-	p.ptr.vulkanApiVersion = (C.uint32_t)(value)
+	ptr := (*C.VmaAllocatorCreateInfo)(unsafe.Pointer(p))
+	ptr.vulkanApiVersion = (C.uint32_t)(value)
 }
 
 // AllocatorInfo wraps struct VmaAllocatorInfo.
 //
 //	Information about existing #VmaAllocator object.
-type AllocatorInfo struct {
-	ptr *C.VmaAllocatorInfo
-}
+type AllocatorInfo uintptr
 
 // AllocatorInfoNil is a null pointer.
 var AllocatorInfoNil AllocatorInfo
@@ -461,56 +463,51 @@ var AllocatorInfoNil AllocatorInfo
 // AllocatorInfoSizeOf is the byte size of VmaAllocatorInfo.
 const AllocatorInfoSizeOf = int(C.sizeof_VmaAllocatorInfo)
 
-// AllocatorInfoFromPtr converts a raw pointer to a AllocatorInfo.
-func AllocatorInfoFromPtr(ptr unsafe.Pointer) AllocatorInfo {
-	return AllocatorInfo{ptr: (*C.VmaAllocatorInfo)(ptr)}
-}
-
 // AllocatorInfoAlloc allocates a continuous block of AllocatorInfo.
 func AllocatorInfoAlloc(alloc ffi.Allocator, count int) AllocatorInfo {
 	ptr := alloc.Allocate(AllocatorInfoSizeOf * count)
-	return AllocatorInfo{ptr: (*C.VmaAllocatorInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p AllocatorInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return AllocatorInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p AllocatorInfo) Offset(offset int) AllocatorInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*AllocatorInfoSizeOf)
-	return AllocatorInfo{ptr: (*C.VmaAllocatorInfo)(ptr)}
+	return p + AllocatorInfo(offset*AllocatorInfoSizeOf)
 }
 
 // GetDevice returns the value in device.
 func (p AllocatorInfo) GetDevice() vk.Device {
-	return vk.Device(unsafe.Pointer(p.ptr.device))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	return vk.Device(unsafe.Pointer(ptr.device))
 }
 
 // SetDevice sets the value in device.
 func (p AllocatorInfo) SetDevice(value vk.Device) {
-	p.ptr.device = (C.VkDevice)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	ptr.device = (C.VkDevice)(unsafe.Pointer(value))
 }
 
 // GetInstance returns the value in instance.
 func (p AllocatorInfo) GetInstance() vk.Instance {
-	return vk.Instance(unsafe.Pointer(p.ptr.instance))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	return vk.Instance(unsafe.Pointer(ptr.instance))
 }
 
 // SetInstance sets the value in instance.
 func (p AllocatorInfo) SetInstance(value vk.Instance) {
-	p.ptr.instance = (C.VkInstance)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	ptr.instance = (C.VkInstance)(unsafe.Pointer(value))
 }
 
 // GetPhysicalDevice returns the value in physicalDevice.
 func (p AllocatorInfo) GetPhysicalDevice() vk.PhysicalDevice {
-	return vk.PhysicalDevice(unsafe.Pointer(p.ptr.physicalDevice))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	return vk.PhysicalDevice(unsafe.Pointer(ptr.physicalDevice))
 }
 
 // SetPhysicalDevice sets the value in physicalDevice.
 func (p AllocatorInfo) SetPhysicalDevice(value vk.PhysicalDevice) {
-	p.ptr.physicalDevice = (C.VkPhysicalDevice)(unsafe.Pointer(value))
+	ptr := (*C.VmaAllocatorInfo)(unsafe.Pointer(p))
+	ptr.physicalDevice = (C.VkPhysicalDevice)(unsafe.Pointer(value))
 }
 
 // Budget wraps struct VmaBudget.
@@ -520,9 +517,7 @@ func (p AllocatorInfo) SetPhysicalDevice(value vk.PhysicalDevice) {
   These are fast to calculate.
   See function vmaGetHeapBudgets().
 */
-type Budget struct {
-	ptr *C.VmaBudget
-}
+type Budget uintptr
 
 // BudgetNil is a null pointer.
 var BudgetNil Budget
@@ -530,51 +525,44 @@ var BudgetNil Budget
 // BudgetSizeOf is the byte size of VmaBudget.
 const BudgetSizeOf = int(C.sizeof_VmaBudget)
 
-// BudgetFromPtr converts a raw pointer to a Budget.
-func BudgetFromPtr(ptr unsafe.Pointer) Budget {
-	return Budget{ptr: (*C.VmaBudget)(ptr)}
-}
-
 // BudgetAlloc allocates a continuous block of Budget.
 func BudgetAlloc(alloc ffi.Allocator, count int) Budget {
 	ptr := alloc.Allocate(BudgetSizeOf * count)
-	return Budget{ptr: (*C.VmaBudget)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p Budget) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return Budget(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p Budget) Offset(offset int) Budget {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*BudgetSizeOf)
-	return Budget{ptr: (*C.VmaBudget)(ptr)}
+	return p + Budget(offset*BudgetSizeOf)
 }
 
 // GetBudget returns the value in budget.
 func (p Budget) GetBudget() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.budget)
+	ptr := (*C.VmaBudget)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.budget)
 }
 
 // SetBudget sets the value in budget.
 func (p Budget) SetBudget(value vk.DeviceSize) {
-	p.ptr.budget = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaBudget)(unsafe.Pointer(p))
+	ptr.budget = (C.VkDeviceSize)(value)
 }
 
 // RefStatistics returns pointer to the statistics field.
 func (p Budget) RefStatistics() Statistics {
-	return StatisticsFromPtr(unsafe.Add(unsafe.Pointer(p.ptr), uintptr(C.offsetof_VmaBudget_statistics)))
+	return Statistics(p + Budget(C.offsetof_VmaBudget_statistics))
 }
 
 // GetUsage returns the value in usage.
 func (p Budget) GetUsage() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.usage)
+	ptr := (*C.VmaBudget)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.usage)
 }
 
 // SetUsage sets the value in usage.
 func (p Budget) SetUsage(value vk.DeviceSize) {
-	p.ptr.usage = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaBudget)(unsafe.Pointer(p))
+	ptr.usage = (C.VkDeviceSize)(value)
 }
 
 // DefragmentationInfo wraps struct VmaDefragmentationInfo.
@@ -583,9 +571,7 @@ func (p Budget) SetUsage(value vk.DeviceSize) {
 
   To be used with function vmaBeginDefragmentation().
 */
-type DefragmentationInfo struct {
-	ptr *C.VmaDefragmentationInfo
-}
+type DefragmentationInfo uintptr
 
 // DefragmentationInfoNil is a null pointer.
 var DefragmentationInfoNil DefragmentationInfo
@@ -593,86 +579,83 @@ var DefragmentationInfoNil DefragmentationInfo
 // DefragmentationInfoSizeOf is the byte size of VmaDefragmentationInfo.
 const DefragmentationInfoSizeOf = int(C.sizeof_VmaDefragmentationInfo)
 
-// DefragmentationInfoFromPtr converts a raw pointer to a DefragmentationInfo.
-func DefragmentationInfoFromPtr(ptr unsafe.Pointer) DefragmentationInfo {
-	return DefragmentationInfo{ptr: (*C.VmaDefragmentationInfo)(ptr)}
-}
-
 // DefragmentationInfoAlloc allocates a continuous block of DefragmentationInfo.
 func DefragmentationInfoAlloc(alloc ffi.Allocator, count int) DefragmentationInfo {
 	ptr := alloc.Allocate(DefragmentationInfoSizeOf * count)
-	return DefragmentationInfo{ptr: (*C.VmaDefragmentationInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DefragmentationInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DefragmentationInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DefragmentationInfo) Offset(offset int) DefragmentationInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DefragmentationInfoSizeOf)
-	return DefragmentationInfo{ptr: (*C.VmaDefragmentationInfo)(ptr)}
+	return p + DefragmentationInfo(offset*DefragmentationInfoSizeOf)
 }
 
 // GetFlags returns the value in flags.
 func (p DefragmentationInfo) GetFlags() DefragmentationFlags {
-	return DefragmentationFlags(p.ptr.flags)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	return DefragmentationFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p DefragmentationInfo) SetFlags(value DefragmentationFlags) {
-	p.ptr.flags = (C.VmaDefragmentationFlags)(value)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaDefragmentationFlags)(value)
 }
 
 // GetMaxAllocationsPerPass returns the value in maxAllocationsPerPass.
 func (p DefragmentationInfo) GetMaxAllocationsPerPass() uint32 {
-	return uint32(p.ptr.maxAllocationsPerPass)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	return uint32(ptr.maxAllocationsPerPass)
 }
 
 // SetMaxAllocationsPerPass sets the value in maxAllocationsPerPass.
 func (p DefragmentationInfo) SetMaxAllocationsPerPass(value uint32) {
-	p.ptr.maxAllocationsPerPass = (C.uint32_t)(value)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	ptr.maxAllocationsPerPass = (C.uint32_t)(value)
 }
 
 // GetMaxBytesPerPass returns the value in maxBytesPerPass.
 func (p DefragmentationInfo) GetMaxBytesPerPass() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.maxBytesPerPass)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.maxBytesPerPass)
 }
 
 // SetMaxBytesPerPass sets the value in maxBytesPerPass.
 func (p DefragmentationInfo) SetMaxBytesPerPass(value vk.DeviceSize) {
-	p.ptr.maxBytesPerPass = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	ptr.maxBytesPerPass = (C.VkDeviceSize)(value)
 }
 
 // GetPBreakCallbackUserData returns the value in pBreakCallbackUserData.
-func (p DefragmentationInfo) GetPBreakCallbackUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pBreakCallbackUserData)
+func (p DefragmentationInfo) GetPBreakCallbackUserData() uintptr {
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pBreakCallbackUserData))
 }
 
 // SetPBreakCallbackUserData sets the value in pBreakCallbackUserData.
-func (p DefragmentationInfo) SetPBreakCallbackUserData(value unsafe.Pointer) {
-	p.ptr.pBreakCallbackUserData = value
+func (p DefragmentationInfo) SetPBreakCallbackUserData(value uintptr) {
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	ptr.pBreakCallbackUserData = unsafe.Pointer(value)
 }
 
 // DefragmentationInfo.pfnBreakCallback is unsupported: unknown type PFN_vmaCheckDefragmentationBreakFunction.
 
 // GetPool returns the value in pool.
 func (p DefragmentationInfo) GetPool() Pool {
-	return Pool(unsafe.Pointer(p.ptr.pool))
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	return Pool(unsafe.Pointer(ptr.pool))
 }
 
 // SetPool sets the value in pool.
 func (p DefragmentationInfo) SetPool(value Pool) {
-	p.ptr.pool = (C.VmaPool)(unsafe.Pointer(value))
+	ptr := (*C.VmaDefragmentationInfo)(unsafe.Pointer(p))
+	ptr.pool = (C.VmaPool)(unsafe.Pointer(value))
 }
 
 // DefragmentationMove wraps struct VmaDefragmentationMove.
 //
 //	Single move of an allocation to be done for defragmentation.
-type DefragmentationMove struct {
-	ptr *C.VmaDefragmentationMove
-}
+type DefragmentationMove uintptr
 
 // DefragmentationMoveNil is a null pointer.
 var DefragmentationMoveNil DefragmentationMove
@@ -680,56 +663,51 @@ var DefragmentationMoveNil DefragmentationMove
 // DefragmentationMoveSizeOf is the byte size of VmaDefragmentationMove.
 const DefragmentationMoveSizeOf = int(C.sizeof_VmaDefragmentationMove)
 
-// DefragmentationMoveFromPtr converts a raw pointer to a DefragmentationMove.
-func DefragmentationMoveFromPtr(ptr unsafe.Pointer) DefragmentationMove {
-	return DefragmentationMove{ptr: (*C.VmaDefragmentationMove)(ptr)}
-}
-
 // DefragmentationMoveAlloc allocates a continuous block of DefragmentationMove.
 func DefragmentationMoveAlloc(alloc ffi.Allocator, count int) DefragmentationMove {
 	ptr := alloc.Allocate(DefragmentationMoveSizeOf * count)
-	return DefragmentationMove{ptr: (*C.VmaDefragmentationMove)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DefragmentationMove) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DefragmentationMove(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DefragmentationMove) Offset(offset int) DefragmentationMove {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DefragmentationMoveSizeOf)
-	return DefragmentationMove{ptr: (*C.VmaDefragmentationMove)(ptr)}
+	return p + DefragmentationMove(offset*DefragmentationMoveSizeOf)
 }
 
 // GetDstTmpAllocation returns the value in dstTmpAllocation.
 func (p DefragmentationMove) GetDstTmpAllocation() Allocation {
-	return Allocation(unsafe.Pointer(p.ptr.dstTmpAllocation))
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	return Allocation(unsafe.Pointer(ptr.dstTmpAllocation))
 }
 
 // SetDstTmpAllocation sets the value in dstTmpAllocation.
 func (p DefragmentationMove) SetDstTmpAllocation(value Allocation) {
-	p.ptr.dstTmpAllocation = (C.VmaAllocation)(unsafe.Pointer(value))
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	ptr.dstTmpAllocation = (C.VmaAllocation)(unsafe.Pointer(value))
 }
 
 // GetOperation returns the value in operation.
 func (p DefragmentationMove) GetOperation() DefragmentationMoveOperation {
-	return DefragmentationMoveOperation(p.ptr.operation)
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	return DefragmentationMoveOperation(ptr.operation)
 }
 
 // SetOperation sets the value in operation.
 func (p DefragmentationMove) SetOperation(value DefragmentationMoveOperation) {
-	p.ptr.operation = (C.VmaDefragmentationMoveOperation)(value)
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	ptr.operation = (C.VmaDefragmentationMoveOperation)(value)
 }
 
 // GetSrcAllocation returns the value in srcAllocation.
 func (p DefragmentationMove) GetSrcAllocation() Allocation {
-	return Allocation(unsafe.Pointer(p.ptr.srcAllocation))
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	return Allocation(unsafe.Pointer(ptr.srcAllocation))
 }
 
 // SetSrcAllocation sets the value in srcAllocation.
 func (p DefragmentationMove) SetSrcAllocation(value Allocation) {
-	p.ptr.srcAllocation = (C.VmaAllocation)(unsafe.Pointer(value))
+	ptr := (*C.VmaDefragmentationMove)(unsafe.Pointer(p))
+	ptr.srcAllocation = (C.VmaAllocation)(unsafe.Pointer(value))
 }
 
 // DefragmentationPassMoveInfo wraps struct VmaDefragmentationPassMoveInfo.
@@ -738,9 +716,7 @@ func (p DefragmentationMove) SetSrcAllocation(value Allocation) {
 
   To be used with function vmaBeginDefragmentationPass().
 */
-type DefragmentationPassMoveInfo struct {
-	ptr *C.VmaDefragmentationPassMoveInfo
-}
+type DefragmentationPassMoveInfo uintptr
 
 // DefragmentationPassMoveInfoNil is a null pointer.
 var DefragmentationPassMoveInfoNil DefragmentationPassMoveInfo
@@ -748,54 +724,45 @@ var DefragmentationPassMoveInfoNil DefragmentationPassMoveInfo
 // DefragmentationPassMoveInfoSizeOf is the byte size of VmaDefragmentationPassMoveInfo.
 const DefragmentationPassMoveInfoSizeOf = int(C.sizeof_VmaDefragmentationPassMoveInfo)
 
-// DefragmentationPassMoveInfoFromPtr converts a raw pointer to a DefragmentationPassMoveInfo.
-func DefragmentationPassMoveInfoFromPtr(ptr unsafe.Pointer) DefragmentationPassMoveInfo {
-	return DefragmentationPassMoveInfo{ptr: (*C.VmaDefragmentationPassMoveInfo)(ptr)}
-}
-
 // DefragmentationPassMoveInfoAlloc allocates a continuous block of DefragmentationPassMoveInfo.
 func DefragmentationPassMoveInfoAlloc(alloc ffi.Allocator, count int) DefragmentationPassMoveInfo {
 	ptr := alloc.Allocate(DefragmentationPassMoveInfoSizeOf * count)
-	return DefragmentationPassMoveInfo{ptr: (*C.VmaDefragmentationPassMoveInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DefragmentationPassMoveInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DefragmentationPassMoveInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DefragmentationPassMoveInfo) Offset(offset int) DefragmentationPassMoveInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DefragmentationPassMoveInfoSizeOf)
-	return DefragmentationPassMoveInfo{ptr: (*C.VmaDefragmentationPassMoveInfo)(ptr)}
+	return p + DefragmentationPassMoveInfo(offset*DefragmentationPassMoveInfoSizeOf)
 }
 
 // GetMoveCount returns the value in moveCount.
 func (p DefragmentationPassMoveInfo) GetMoveCount() uint32 {
-	return uint32(p.ptr.moveCount)
+	ptr := (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(p))
+	return uint32(ptr.moveCount)
 }
 
 // SetMoveCount sets the value in moveCount.
 func (p DefragmentationPassMoveInfo) SetMoveCount(value uint32) {
-	p.ptr.moveCount = (C.uint32_t)(value)
+	ptr := (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(p))
+	ptr.moveCount = (C.uint32_t)(value)
 }
 
 // GetPMoves returns the value in pMoves.
 func (p DefragmentationPassMoveInfo) GetPMoves() DefragmentationMove {
-	return DefragmentationMoveFromPtr(unsafe.Pointer(p.ptr.pMoves))
+	ptr := (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(p))
+	return DefragmentationMove(unsafe.Pointer(ptr.pMoves))
 }
 
 // SetPMoves sets the value in pMoves.
 func (p DefragmentationPassMoveInfo) SetPMoves(value DefragmentationMove) {
-	p.ptr.pMoves = (*C.VmaDefragmentationMove)(value.Raw())
+	ptr := (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(p))
+	ptr.pMoves = (*C.VmaDefragmentationMove)(unsafe.Pointer(value))
 }
 
 // DefragmentationStats wraps struct VmaDefragmentationStats.
 //
 //	Statistics returned for defragmentation process in function vmaEndDefragmentation().
-type DefragmentationStats struct {
-	ptr *C.VmaDefragmentationStats
-}
+type DefragmentationStats uintptr
 
 // DefragmentationStatsNil is a null pointer.
 var DefragmentationStatsNil DefragmentationStats
@@ -803,66 +770,63 @@ var DefragmentationStatsNil DefragmentationStats
 // DefragmentationStatsSizeOf is the byte size of VmaDefragmentationStats.
 const DefragmentationStatsSizeOf = int(C.sizeof_VmaDefragmentationStats)
 
-// DefragmentationStatsFromPtr converts a raw pointer to a DefragmentationStats.
-func DefragmentationStatsFromPtr(ptr unsafe.Pointer) DefragmentationStats {
-	return DefragmentationStats{ptr: (*C.VmaDefragmentationStats)(ptr)}
-}
-
 // DefragmentationStatsAlloc allocates a continuous block of DefragmentationStats.
 func DefragmentationStatsAlloc(alloc ffi.Allocator, count int) DefragmentationStats {
 	ptr := alloc.Allocate(DefragmentationStatsSizeOf * count)
-	return DefragmentationStats{ptr: (*C.VmaDefragmentationStats)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DefragmentationStats) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DefragmentationStats(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DefragmentationStats) Offset(offset int) DefragmentationStats {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DefragmentationStatsSizeOf)
-	return DefragmentationStats{ptr: (*C.VmaDefragmentationStats)(ptr)}
+	return p + DefragmentationStats(offset*DefragmentationStatsSizeOf)
 }
 
 // GetAllocationsMoved returns the value in allocationsMoved.
 func (p DefragmentationStats) GetAllocationsMoved() uint32 {
-	return uint32(p.ptr.allocationsMoved)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	return uint32(ptr.allocationsMoved)
 }
 
 // SetAllocationsMoved sets the value in allocationsMoved.
 func (p DefragmentationStats) SetAllocationsMoved(value uint32) {
-	p.ptr.allocationsMoved = (C.uint32_t)(value)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	ptr.allocationsMoved = (C.uint32_t)(value)
 }
 
 // GetBytesFreed returns the value in bytesFreed.
 func (p DefragmentationStats) GetBytesFreed() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.bytesFreed)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.bytesFreed)
 }
 
 // SetBytesFreed sets the value in bytesFreed.
 func (p DefragmentationStats) SetBytesFreed(value vk.DeviceSize) {
-	p.ptr.bytesFreed = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	ptr.bytesFreed = (C.VkDeviceSize)(value)
 }
 
 // GetBytesMoved returns the value in bytesMoved.
 func (p DefragmentationStats) GetBytesMoved() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.bytesMoved)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.bytesMoved)
 }
 
 // SetBytesMoved sets the value in bytesMoved.
 func (p DefragmentationStats) SetBytesMoved(value vk.DeviceSize) {
-	p.ptr.bytesMoved = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	ptr.bytesMoved = (C.VkDeviceSize)(value)
 }
 
 // GetDeviceMemoryBlocksFreed returns the value in deviceMemoryBlocksFreed.
 func (p DefragmentationStats) GetDeviceMemoryBlocksFreed() uint32 {
-	return uint32(p.ptr.deviceMemoryBlocksFreed)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	return uint32(ptr.deviceMemoryBlocksFreed)
 }
 
 // SetDeviceMemoryBlocksFreed sets the value in deviceMemoryBlocksFreed.
 func (p DefragmentationStats) SetDeviceMemoryBlocksFreed(value uint32) {
-	p.ptr.deviceMemoryBlocksFreed = (C.uint32_t)(value)
+	ptr := (*C.VmaDefragmentationStats)(unsafe.Pointer(p))
+	ptr.deviceMemoryBlocksFreed = (C.uint32_t)(value)
 }
 
 // DetailedStatistics wraps struct VmaDetailedStatistics.
@@ -881,9 +845,7 @@ func (p DefragmentationStats) SetDeviceMemoryBlocksFreed(value uint32) {
   VkDeviceSize unusedRangeSizeAvg = unusedBytes / detailedStats.unusedRangeCount;
   \endcode
 */
-type DetailedStatistics struct {
-	ptr *C.VmaDetailedStatistics
-}
+type DetailedStatistics uintptr
 
 // DetailedStatisticsNil is a null pointer.
 var DetailedStatisticsNil DetailedStatistics
@@ -891,81 +853,80 @@ var DetailedStatisticsNil DetailedStatistics
 // DetailedStatisticsSizeOf is the byte size of VmaDetailedStatistics.
 const DetailedStatisticsSizeOf = int(C.sizeof_VmaDetailedStatistics)
 
-// DetailedStatisticsFromPtr converts a raw pointer to a DetailedStatistics.
-func DetailedStatisticsFromPtr(ptr unsafe.Pointer) DetailedStatistics {
-	return DetailedStatistics{ptr: (*C.VmaDetailedStatistics)(ptr)}
-}
-
 // DetailedStatisticsAlloc allocates a continuous block of DetailedStatistics.
 func DetailedStatisticsAlloc(alloc ffi.Allocator, count int) DetailedStatistics {
 	ptr := alloc.Allocate(DetailedStatisticsSizeOf * count)
-	return DetailedStatistics{ptr: (*C.VmaDetailedStatistics)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DetailedStatistics) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DetailedStatistics(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DetailedStatistics) Offset(offset int) DetailedStatistics {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DetailedStatisticsSizeOf)
-	return DetailedStatistics{ptr: (*C.VmaDetailedStatistics)(ptr)}
+	return p + DetailedStatistics(offset*DetailedStatisticsSizeOf)
 }
 
 // GetAllocationSizeMax returns the value in allocationSizeMax.
 func (p DetailedStatistics) GetAllocationSizeMax() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.allocationSizeMax)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.allocationSizeMax)
 }
 
 // SetAllocationSizeMax sets the value in allocationSizeMax.
 func (p DetailedStatistics) SetAllocationSizeMax(value vk.DeviceSize) {
-	p.ptr.allocationSizeMax = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	ptr.allocationSizeMax = (C.VkDeviceSize)(value)
 }
 
 // GetAllocationSizeMin returns the value in allocationSizeMin.
 func (p DetailedStatistics) GetAllocationSizeMin() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.allocationSizeMin)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.allocationSizeMin)
 }
 
 // SetAllocationSizeMin sets the value in allocationSizeMin.
 func (p DetailedStatistics) SetAllocationSizeMin(value vk.DeviceSize) {
-	p.ptr.allocationSizeMin = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	ptr.allocationSizeMin = (C.VkDeviceSize)(value)
 }
 
 // RefStatistics returns pointer to the statistics field.
 func (p DetailedStatistics) RefStatistics() Statistics {
-	return StatisticsFromPtr(unsafe.Add(unsafe.Pointer(p.ptr), uintptr(C.offsetof_VmaDetailedStatistics_statistics)))
+	return Statistics(p + DetailedStatistics(C.offsetof_VmaDetailedStatistics_statistics))
 }
 
 // GetUnusedRangeCount returns the value in unusedRangeCount.
 func (p DetailedStatistics) GetUnusedRangeCount() uint32 {
-	return uint32(p.ptr.unusedRangeCount)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	return uint32(ptr.unusedRangeCount)
 }
 
 // SetUnusedRangeCount sets the value in unusedRangeCount.
 func (p DetailedStatistics) SetUnusedRangeCount(value uint32) {
-	p.ptr.unusedRangeCount = (C.uint32_t)(value)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	ptr.unusedRangeCount = (C.uint32_t)(value)
 }
 
 // GetUnusedRangeSizeMax returns the value in unusedRangeSizeMax.
 func (p DetailedStatistics) GetUnusedRangeSizeMax() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.unusedRangeSizeMax)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.unusedRangeSizeMax)
 }
 
 // SetUnusedRangeSizeMax sets the value in unusedRangeSizeMax.
 func (p DetailedStatistics) SetUnusedRangeSizeMax(value vk.DeviceSize) {
-	p.ptr.unusedRangeSizeMax = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	ptr.unusedRangeSizeMax = (C.VkDeviceSize)(value)
 }
 
 // GetUnusedRangeSizeMin returns the value in unusedRangeSizeMin.
 func (p DetailedStatistics) GetUnusedRangeSizeMin() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.unusedRangeSizeMin)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.unusedRangeSizeMin)
 }
 
 // SetUnusedRangeSizeMin sets the value in unusedRangeSizeMin.
 func (p DetailedStatistics) SetUnusedRangeSizeMin(value vk.DeviceSize) {
-	p.ptr.unusedRangeSizeMin = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaDetailedStatistics)(unsafe.Pointer(p))
+	ptr.unusedRangeSizeMin = (C.VkDeviceSize)(value)
 }
 
 // DeviceMemoryCallbacks wraps struct VmaDeviceMemoryCallbacks.
@@ -977,9 +938,7 @@ func (p DetailedStatistics) SetUnusedRangeSizeMin(value vk.DeviceSize) {
 
   Used in VmaAllocatorCreateInfo::pDeviceMemoryCallbacks.
 */
-type DeviceMemoryCallbacks struct {
-	ptr *C.VmaDeviceMemoryCallbacks
-}
+type DeviceMemoryCallbacks uintptr
 
 // DeviceMemoryCallbacksNil is a null pointer.
 var DeviceMemoryCallbacksNil DeviceMemoryCallbacks
@@ -987,36 +946,27 @@ var DeviceMemoryCallbacksNil DeviceMemoryCallbacks
 // DeviceMemoryCallbacksSizeOf is the byte size of VmaDeviceMemoryCallbacks.
 const DeviceMemoryCallbacksSizeOf = int(C.sizeof_VmaDeviceMemoryCallbacks)
 
-// DeviceMemoryCallbacksFromPtr converts a raw pointer to a DeviceMemoryCallbacks.
-func DeviceMemoryCallbacksFromPtr(ptr unsafe.Pointer) DeviceMemoryCallbacks {
-	return DeviceMemoryCallbacks{ptr: (*C.VmaDeviceMemoryCallbacks)(ptr)}
-}
-
 // DeviceMemoryCallbacksAlloc allocates a continuous block of DeviceMemoryCallbacks.
 func DeviceMemoryCallbacksAlloc(alloc ffi.Allocator, count int) DeviceMemoryCallbacks {
 	ptr := alloc.Allocate(DeviceMemoryCallbacksSizeOf * count)
-	return DeviceMemoryCallbacks{ptr: (*C.VmaDeviceMemoryCallbacks)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p DeviceMemoryCallbacks) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return DeviceMemoryCallbacks(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p DeviceMemoryCallbacks) Offset(offset int) DeviceMemoryCallbacks {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*DeviceMemoryCallbacksSizeOf)
-	return DeviceMemoryCallbacks{ptr: (*C.VmaDeviceMemoryCallbacks)(ptr)}
+	return p + DeviceMemoryCallbacks(offset*DeviceMemoryCallbacksSizeOf)
 }
 
 // GetPUserData returns the value in pUserData.
-func (p DeviceMemoryCallbacks) GetPUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pUserData)
+func (p DeviceMemoryCallbacks) GetPUserData() uintptr {
+	ptr := (*C.VmaDeviceMemoryCallbacks)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pUserData))
 }
 
 // SetPUserData sets the value in pUserData.
-func (p DeviceMemoryCallbacks) SetPUserData(value unsafe.Pointer) {
-	p.ptr.pUserData = value
+func (p DeviceMemoryCallbacks) SetPUserData(value uintptr) {
+	ptr := (*C.VmaDeviceMemoryCallbacks)(unsafe.Pointer(p))
+	ptr.pUserData = unsafe.Pointer(value)
 }
 
 // DeviceMemoryCallbacks.pfnAllocate is unsupported: unknown type PFN_vmaAllocateDeviceMemoryFunction.
@@ -1026,9 +976,7 @@ func (p DeviceMemoryCallbacks) SetPUserData(value unsafe.Pointer) {
 // PoolCreateInfo wraps struct VmaPoolCreateInfo.
 //
 //	Describes parameter of created #VmaPool.
-type PoolCreateInfo struct {
-	ptr *C.VmaPoolCreateInfo
-}
+type PoolCreateInfo uintptr
 
 // PoolCreateInfoNil is a null pointer.
 var PoolCreateInfoNil PoolCreateInfo
@@ -1036,106 +984,111 @@ var PoolCreateInfoNil PoolCreateInfo
 // PoolCreateInfoSizeOf is the byte size of VmaPoolCreateInfo.
 const PoolCreateInfoSizeOf = int(C.sizeof_VmaPoolCreateInfo)
 
-// PoolCreateInfoFromPtr converts a raw pointer to a PoolCreateInfo.
-func PoolCreateInfoFromPtr(ptr unsafe.Pointer) PoolCreateInfo {
-	return PoolCreateInfo{ptr: (*C.VmaPoolCreateInfo)(ptr)}
-}
-
 // PoolCreateInfoAlloc allocates a continuous block of PoolCreateInfo.
 func PoolCreateInfoAlloc(alloc ffi.Allocator, count int) PoolCreateInfo {
 	ptr := alloc.Allocate(PoolCreateInfoSizeOf * count)
-	return PoolCreateInfo{ptr: (*C.VmaPoolCreateInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p PoolCreateInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return PoolCreateInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p PoolCreateInfo) Offset(offset int) PoolCreateInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*PoolCreateInfoSizeOf)
-	return PoolCreateInfo{ptr: (*C.VmaPoolCreateInfo)(ptr)}
+	return p + PoolCreateInfo(offset*PoolCreateInfoSizeOf)
 }
 
 // GetBlockSize returns the value in blockSize.
 func (p PoolCreateInfo) GetBlockSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.blockSize)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.blockSize)
 }
 
 // SetBlockSize sets the value in blockSize.
 func (p PoolCreateInfo) SetBlockSize(value vk.DeviceSize) {
-	p.ptr.blockSize = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.blockSize = (C.VkDeviceSize)(value)
 }
 
 // GetFlags returns the value in flags.
 func (p PoolCreateInfo) GetFlags() PoolCreateFlags {
-	return PoolCreateFlags(p.ptr.flags)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return PoolCreateFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p PoolCreateInfo) SetFlags(value PoolCreateFlags) {
-	p.ptr.flags = (C.VmaPoolCreateFlags)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaPoolCreateFlags)(value)
 }
 
 // GetMaxBlockCount returns the value in maxBlockCount.
 func (p PoolCreateInfo) GetMaxBlockCount() uintptr {
-	return uintptr(p.ptr.maxBlockCount)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return uintptr(ptr.maxBlockCount)
 }
 
 // SetMaxBlockCount sets the value in maxBlockCount.
 func (p PoolCreateInfo) SetMaxBlockCount(value uintptr) {
-	p.ptr.maxBlockCount = (C.size_t)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.maxBlockCount = (C.size_t)(value)
 }
 
 // GetMemoryTypeIndex returns the value in memoryTypeIndex.
 func (p PoolCreateInfo) GetMemoryTypeIndex() uint32 {
-	return uint32(p.ptr.memoryTypeIndex)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return uint32(ptr.memoryTypeIndex)
 }
 
 // SetMemoryTypeIndex sets the value in memoryTypeIndex.
 func (p PoolCreateInfo) SetMemoryTypeIndex(value uint32) {
-	p.ptr.memoryTypeIndex = (C.uint32_t)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.memoryTypeIndex = (C.uint32_t)(value)
 }
 
 // GetMinAllocationAlignment returns the value in minAllocationAlignment.
 func (p PoolCreateInfo) GetMinAllocationAlignment() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.minAllocationAlignment)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.minAllocationAlignment)
 }
 
 // SetMinAllocationAlignment sets the value in minAllocationAlignment.
 func (p PoolCreateInfo) SetMinAllocationAlignment(value vk.DeviceSize) {
-	p.ptr.minAllocationAlignment = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.minAllocationAlignment = (C.VkDeviceSize)(value)
 }
 
 // GetMinBlockCount returns the value in minBlockCount.
 func (p PoolCreateInfo) GetMinBlockCount() uintptr {
-	return uintptr(p.ptr.minBlockCount)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return uintptr(ptr.minBlockCount)
 }
 
 // SetMinBlockCount sets the value in minBlockCount.
 func (p PoolCreateInfo) SetMinBlockCount(value uintptr) {
-	p.ptr.minBlockCount = (C.size_t)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.minBlockCount = (C.size_t)(value)
 }
 
 // GetPMemoryAllocateNext returns the value in pMemoryAllocateNext.
-func (p PoolCreateInfo) GetPMemoryAllocateNext() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pMemoryAllocateNext)
+func (p PoolCreateInfo) GetPMemoryAllocateNext() uintptr {
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pMemoryAllocateNext))
 }
 
 // SetPMemoryAllocateNext sets the value in pMemoryAllocateNext.
-func (p PoolCreateInfo) SetPMemoryAllocateNext(value unsafe.Pointer) {
-	p.ptr.pMemoryAllocateNext = value
+func (p PoolCreateInfo) SetPMemoryAllocateNext(value uintptr) {
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.pMemoryAllocateNext = unsafe.Pointer(value)
 }
 
 // GetPriority returns the value in priority.
 func (p PoolCreateInfo) GetPriority() float32 {
-	return float32(p.ptr.priority)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	return float32(ptr.priority)
 }
 
 // SetPriority sets the value in priority.
 func (p PoolCreateInfo) SetPriority(value float32) {
-	p.ptr.priority = (C.float)(value)
+	ptr := (*C.VmaPoolCreateInfo)(unsafe.Pointer(p))
+	ptr.priority = (C.float)(value)
 }
 
 // Statistics wraps struct VmaStatistics.
@@ -1145,9 +1098,7 @@ func (p PoolCreateInfo) SetPriority(value float32) {
   These are fast to calculate.
   See functions: vmaGetHeapBudgets(), vmaGetPoolStatistics().
 */
-type Statistics struct {
-	ptr *C.VmaStatistics
-}
+type Statistics uintptr
 
 // StatisticsNil is a null pointer.
 var StatisticsNil Statistics
@@ -1155,66 +1106,63 @@ var StatisticsNil Statistics
 // StatisticsSizeOf is the byte size of VmaStatistics.
 const StatisticsSizeOf = int(C.sizeof_VmaStatistics)
 
-// StatisticsFromPtr converts a raw pointer to a Statistics.
-func StatisticsFromPtr(ptr unsafe.Pointer) Statistics {
-	return Statistics{ptr: (*C.VmaStatistics)(ptr)}
-}
-
 // StatisticsAlloc allocates a continuous block of Statistics.
 func StatisticsAlloc(alloc ffi.Allocator, count int) Statistics {
 	ptr := alloc.Allocate(StatisticsSizeOf * count)
-	return Statistics{ptr: (*C.VmaStatistics)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p Statistics) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return Statistics(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p Statistics) Offset(offset int) Statistics {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*StatisticsSizeOf)
-	return Statistics{ptr: (*C.VmaStatistics)(ptr)}
+	return p + Statistics(offset*StatisticsSizeOf)
 }
 
 // GetAllocationBytes returns the value in allocationBytes.
 func (p Statistics) GetAllocationBytes() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.allocationBytes)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.allocationBytes)
 }
 
 // SetAllocationBytes sets the value in allocationBytes.
 func (p Statistics) SetAllocationBytes(value vk.DeviceSize) {
-	p.ptr.allocationBytes = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	ptr.allocationBytes = (C.VkDeviceSize)(value)
 }
 
 // GetAllocationCount returns the value in allocationCount.
 func (p Statistics) GetAllocationCount() uint32 {
-	return uint32(p.ptr.allocationCount)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	return uint32(ptr.allocationCount)
 }
 
 // SetAllocationCount sets the value in allocationCount.
 func (p Statistics) SetAllocationCount(value uint32) {
-	p.ptr.allocationCount = (C.uint32_t)(value)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	ptr.allocationCount = (C.uint32_t)(value)
 }
 
 // GetBlockBytes returns the value in blockBytes.
 func (p Statistics) GetBlockBytes() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.blockBytes)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.blockBytes)
 }
 
 // SetBlockBytes sets the value in blockBytes.
 func (p Statistics) SetBlockBytes(value vk.DeviceSize) {
-	p.ptr.blockBytes = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	ptr.blockBytes = (C.VkDeviceSize)(value)
 }
 
 // GetBlockCount returns the value in blockCount.
 func (p Statistics) GetBlockCount() uint32 {
-	return uint32(p.ptr.blockCount)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	return uint32(ptr.blockCount)
 }
 
 // SetBlockCount sets the value in blockCount.
 func (p Statistics) SetBlockCount(value uint32) {
-	p.ptr.blockCount = (C.uint32_t)(value)
+	ptr := (*C.VmaStatistics)(unsafe.Pointer(p))
+	ptr.blockCount = (C.uint32_t)(value)
 }
 
 // TotalStatistics wraps struct VmaTotalStatistics.
@@ -1225,9 +1173,7 @@ func (p Statistics) SetBlockCount(value uint32) {
   These are slower to calculate. Use for debugging purposes.
   See function vmaCalculateStatistics().
 */
-type TotalStatistics struct {
-	ptr *C.VmaTotalStatistics
-}
+type TotalStatistics uintptr
 
 // TotalStatisticsNil is a null pointer.
 var TotalStatisticsNil TotalStatistics
@@ -1235,26 +1181,15 @@ var TotalStatisticsNil TotalStatistics
 // TotalStatisticsSizeOf is the byte size of VmaTotalStatistics.
 const TotalStatisticsSizeOf = int(C.sizeof_VmaTotalStatistics)
 
-// TotalStatisticsFromPtr converts a raw pointer to a TotalStatistics.
-func TotalStatisticsFromPtr(ptr unsafe.Pointer) TotalStatistics {
-	return TotalStatistics{ptr: (*C.VmaTotalStatistics)(ptr)}
-}
-
 // TotalStatisticsAlloc allocates a continuous block of TotalStatistics.
 func TotalStatisticsAlloc(alloc ffi.Allocator, count int) TotalStatistics {
 	ptr := alloc.Allocate(TotalStatisticsSizeOf * count)
-	return TotalStatistics{ptr: (*C.VmaTotalStatistics)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p TotalStatistics) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return TotalStatistics(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p TotalStatistics) Offset(offset int) TotalStatistics {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*TotalStatisticsSizeOf)
-	return TotalStatistics{ptr: (*C.VmaTotalStatistics)(ptr)}
+	return p + TotalStatistics(offset*TotalStatisticsSizeOf)
 }
 
 // TotalStatistics.memoryHeap is unsupported: category array.
@@ -1263,15 +1198,13 @@ func (p TotalStatistics) Offset(offset int) TotalStatistics {
 
 // RefTotal returns pointer to the total field.
 func (p TotalStatistics) RefTotal() DetailedStatistics {
-	return DetailedStatisticsFromPtr(unsafe.Add(unsafe.Pointer(p.ptr), uintptr(C.offsetof_VmaTotalStatistics_total)))
+	return DetailedStatistics(p + TotalStatistics(C.offsetof_VmaTotalStatistics_total))
 }
 
 // VirtualAllocationCreateInfo wraps struct VmaVirtualAllocationCreateInfo.
 //
 //	Parameters of created virtual allocation to be passed to vmaVirtualAllocate().
-type VirtualAllocationCreateInfo struct {
-	ptr *C.VmaVirtualAllocationCreateInfo
-}
+type VirtualAllocationCreateInfo uintptr
 
 // VirtualAllocationCreateInfoNil is a null pointer.
 var VirtualAllocationCreateInfoNil VirtualAllocationCreateInfo
@@ -1279,74 +1212,69 @@ var VirtualAllocationCreateInfoNil VirtualAllocationCreateInfo
 // VirtualAllocationCreateInfoSizeOf is the byte size of VmaVirtualAllocationCreateInfo.
 const VirtualAllocationCreateInfoSizeOf = int(C.sizeof_VmaVirtualAllocationCreateInfo)
 
-// VirtualAllocationCreateInfoFromPtr converts a raw pointer to a VirtualAllocationCreateInfo.
-func VirtualAllocationCreateInfoFromPtr(ptr unsafe.Pointer) VirtualAllocationCreateInfo {
-	return VirtualAllocationCreateInfo{ptr: (*C.VmaVirtualAllocationCreateInfo)(ptr)}
-}
-
 // VirtualAllocationCreateInfoAlloc allocates a continuous block of VirtualAllocationCreateInfo.
 func VirtualAllocationCreateInfoAlloc(alloc ffi.Allocator, count int) VirtualAllocationCreateInfo {
 	ptr := alloc.Allocate(VirtualAllocationCreateInfoSizeOf * count)
-	return VirtualAllocationCreateInfo{ptr: (*C.VmaVirtualAllocationCreateInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p VirtualAllocationCreateInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return VirtualAllocationCreateInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p VirtualAllocationCreateInfo) Offset(offset int) VirtualAllocationCreateInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*VirtualAllocationCreateInfoSizeOf)
-	return VirtualAllocationCreateInfo{ptr: (*C.VmaVirtualAllocationCreateInfo)(ptr)}
+	return p + VirtualAllocationCreateInfo(offset*VirtualAllocationCreateInfoSizeOf)
 }
 
 // GetAlignment returns the value in alignment.
 func (p VirtualAllocationCreateInfo) GetAlignment() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.alignment)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.alignment)
 }
 
 // SetAlignment sets the value in alignment.
 func (p VirtualAllocationCreateInfo) SetAlignment(value vk.DeviceSize) {
-	p.ptr.alignment = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.alignment = (C.VkDeviceSize)(value)
 }
 
 // GetFlags returns the value in flags.
 func (p VirtualAllocationCreateInfo) GetFlags() VirtualAllocationCreateFlags {
-	return VirtualAllocationCreateFlags(p.ptr.flags)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	return VirtualAllocationCreateFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p VirtualAllocationCreateInfo) SetFlags(value VirtualAllocationCreateFlags) {
-	p.ptr.flags = (C.VmaVirtualAllocationCreateFlags)(value)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaVirtualAllocationCreateFlags)(value)
 }
 
 // GetPUserData returns the value in pUserData.
-func (p VirtualAllocationCreateInfo) GetPUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pUserData)
+func (p VirtualAllocationCreateInfo) GetPUserData() uintptr {
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pUserData))
 }
 
 // SetPUserData sets the value in pUserData.
-func (p VirtualAllocationCreateInfo) SetPUserData(value unsafe.Pointer) {
-	p.ptr.pUserData = value
+func (p VirtualAllocationCreateInfo) SetPUserData(value uintptr) {
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.pUserData = unsafe.Pointer(value)
 }
 
 // GetSize returns the value in size.
 func (p VirtualAllocationCreateInfo) GetSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.size)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.size)
 }
 
 // SetSize sets the value in size.
 func (p VirtualAllocationCreateInfo) SetSize(value vk.DeviceSize) {
-	p.ptr.size = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(p))
+	ptr.size = (C.VkDeviceSize)(value)
 }
 
 // VirtualAllocationInfo wraps struct VmaVirtualAllocationInfo.
 //
 //	Parameters of an existing virtual allocation, returned by vmaGetVirtualAllocationInfo().
-type VirtualAllocationInfo struct {
-	ptr *C.VmaVirtualAllocationInfo
-}
+type VirtualAllocationInfo uintptr
 
 // VirtualAllocationInfoNil is a null pointer.
 var VirtualAllocationInfoNil VirtualAllocationInfo
@@ -1354,64 +1282,57 @@ var VirtualAllocationInfoNil VirtualAllocationInfo
 // VirtualAllocationInfoSizeOf is the byte size of VmaVirtualAllocationInfo.
 const VirtualAllocationInfoSizeOf = int(C.sizeof_VmaVirtualAllocationInfo)
 
-// VirtualAllocationInfoFromPtr converts a raw pointer to a VirtualAllocationInfo.
-func VirtualAllocationInfoFromPtr(ptr unsafe.Pointer) VirtualAllocationInfo {
-	return VirtualAllocationInfo{ptr: (*C.VmaVirtualAllocationInfo)(ptr)}
-}
-
 // VirtualAllocationInfoAlloc allocates a continuous block of VirtualAllocationInfo.
 func VirtualAllocationInfoAlloc(alloc ffi.Allocator, count int) VirtualAllocationInfo {
 	ptr := alloc.Allocate(VirtualAllocationInfoSizeOf * count)
-	return VirtualAllocationInfo{ptr: (*C.VmaVirtualAllocationInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p VirtualAllocationInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return VirtualAllocationInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p VirtualAllocationInfo) Offset(offset int) VirtualAllocationInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*VirtualAllocationInfoSizeOf)
-	return VirtualAllocationInfo{ptr: (*C.VmaVirtualAllocationInfo)(ptr)}
+	return p + VirtualAllocationInfo(offset*VirtualAllocationInfoSizeOf)
 }
 
 // GetOffset returns the value in offset.
 func (p VirtualAllocationInfo) GetOffset() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.offset)
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.offset)
 }
 
 // SetOffset sets the value in offset.
 func (p VirtualAllocationInfo) SetOffset(value vk.DeviceSize) {
-	p.ptr.offset = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	ptr.offset = (C.VkDeviceSize)(value)
 }
 
 // GetPUserData returns the value in pUserData.
-func (p VirtualAllocationInfo) GetPUserData() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.pUserData)
+func (p VirtualAllocationInfo) GetPUserData() uintptr {
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.pUserData))
 }
 
 // SetPUserData sets the value in pUserData.
-func (p VirtualAllocationInfo) SetPUserData(value unsafe.Pointer) {
-	p.ptr.pUserData = value
+func (p VirtualAllocationInfo) SetPUserData(value uintptr) {
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	ptr.pUserData = unsafe.Pointer(value)
 }
 
 // GetSize returns the value in size.
 func (p VirtualAllocationInfo) GetSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.size)
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.size)
 }
 
 // SetSize sets the value in size.
 func (p VirtualAllocationInfo) SetSize(value vk.DeviceSize) {
-	p.ptr.size = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(p))
+	ptr.size = (C.VkDeviceSize)(value)
 }
 
 // VirtualBlockCreateInfo wraps struct VmaVirtualBlockCreateInfo.
 //
 //	Parameters of created #VmaVirtualBlock object to be passed to vmaCreateVirtualBlock().
-type VirtualBlockCreateInfo struct {
-	ptr *C.VmaVirtualBlockCreateInfo
-}
+type VirtualBlockCreateInfo uintptr
 
 // VirtualBlockCreateInfoNil is a null pointer.
 var VirtualBlockCreateInfoNil VirtualBlockCreateInfo
@@ -1419,56 +1340,51 @@ var VirtualBlockCreateInfoNil VirtualBlockCreateInfo
 // VirtualBlockCreateInfoSizeOf is the byte size of VmaVirtualBlockCreateInfo.
 const VirtualBlockCreateInfoSizeOf = int(C.sizeof_VmaVirtualBlockCreateInfo)
 
-// VirtualBlockCreateInfoFromPtr converts a raw pointer to a VirtualBlockCreateInfo.
-func VirtualBlockCreateInfoFromPtr(ptr unsafe.Pointer) VirtualBlockCreateInfo {
-	return VirtualBlockCreateInfo{ptr: (*C.VmaVirtualBlockCreateInfo)(ptr)}
-}
-
 // VirtualBlockCreateInfoAlloc allocates a continuous block of VirtualBlockCreateInfo.
 func VirtualBlockCreateInfoAlloc(alloc ffi.Allocator, count int) VirtualBlockCreateInfo {
 	ptr := alloc.Allocate(VirtualBlockCreateInfoSizeOf * count)
-	return VirtualBlockCreateInfo{ptr: (*C.VmaVirtualBlockCreateInfo)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p VirtualBlockCreateInfo) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return VirtualBlockCreateInfo(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p VirtualBlockCreateInfo) Offset(offset int) VirtualBlockCreateInfo {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*VirtualBlockCreateInfoSizeOf)
-	return VirtualBlockCreateInfo{ptr: (*C.VmaVirtualBlockCreateInfo)(ptr)}
+	return p + VirtualBlockCreateInfo(offset*VirtualBlockCreateInfoSizeOf)
 }
 
 // GetFlags returns the value in flags.
 func (p VirtualBlockCreateInfo) GetFlags() VirtualBlockCreateFlags {
-	return VirtualBlockCreateFlags(p.ptr.flags)
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	return VirtualBlockCreateFlags(ptr.flags)
 }
 
 // SetFlags sets the value in flags.
 func (p VirtualBlockCreateInfo) SetFlags(value VirtualBlockCreateFlags) {
-	p.ptr.flags = (C.VmaVirtualBlockCreateFlags)(value)
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	ptr.flags = (C.VmaVirtualBlockCreateFlags)(value)
 }
 
 // GetPAllocationCallbacks returns the value in pAllocationCallbacks.
 func (p VirtualBlockCreateInfo) GetPAllocationCallbacks() vk.AllocationCallbacks {
-	return vk.AllocationCallbacksFromPtr(unsafe.Pointer(p.ptr.pAllocationCallbacks))
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	return vk.AllocationCallbacks(unsafe.Pointer(ptr.pAllocationCallbacks))
 }
 
 // SetPAllocationCallbacks sets the value in pAllocationCallbacks.
 func (p VirtualBlockCreateInfo) SetPAllocationCallbacks(value vk.AllocationCallbacks) {
-	p.ptr.pAllocationCallbacks = (*C.VkAllocationCallbacks)(value.Raw())
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	ptr.pAllocationCallbacks = (*C.VkAllocationCallbacks)(unsafe.Pointer(value))
 }
 
 // GetSize returns the value in size.
 func (p VirtualBlockCreateInfo) GetSize() vk.DeviceSize {
-	return vk.DeviceSize(p.ptr.size)
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	return vk.DeviceSize(ptr.size)
 }
 
 // SetSize sets the value in size.
 func (p VirtualBlockCreateInfo) SetSize(value vk.DeviceSize) {
-	p.ptr.size = (C.VkDeviceSize)(value)
+	ptr := (*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(p))
+	ptr.size = (C.VkDeviceSize)(value)
 }
 
 // VulkanFunctions wraps struct VmaVulkanFunctions.
@@ -1477,9 +1393,7 @@ func (p VirtualBlockCreateInfo) SetSize(value vk.DeviceSize) {
 
   Used in VmaAllocatorCreateInfo::pVulkanFunctions.
 */
-type VulkanFunctions struct {
-	ptr *C.VmaVulkanFunctions
-}
+type VulkanFunctions uintptr
 
 // VulkanFunctionsNil is a null pointer.
 var VulkanFunctionsNil VulkanFunctions
@@ -1487,26 +1401,15 @@ var VulkanFunctionsNil VulkanFunctions
 // VulkanFunctionsSizeOf is the byte size of VmaVulkanFunctions.
 const VulkanFunctionsSizeOf = int(C.sizeof_VmaVulkanFunctions)
 
-// VulkanFunctionsFromPtr converts a raw pointer to a VulkanFunctions.
-func VulkanFunctionsFromPtr(ptr unsafe.Pointer) VulkanFunctions {
-	return VulkanFunctions{ptr: (*C.VmaVulkanFunctions)(ptr)}
-}
-
 // VulkanFunctionsAlloc allocates a continuous block of VulkanFunctions.
 func VulkanFunctionsAlloc(alloc ffi.Allocator, count int) VulkanFunctions {
 	ptr := alloc.Allocate(VulkanFunctionsSizeOf * count)
-	return VulkanFunctions{ptr: (*C.VmaVulkanFunctions)(ptr)}
-}
-
-// Raw returns a raw pointer to the struct.
-func (p VulkanFunctions) Raw() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr)
+	return VulkanFunctions(ptr)
 }
 
 // Offset returns an offset pointer by the size of the struct and the provided multiple.
 func (p VulkanFunctions) Offset(offset int) VulkanFunctions {
-	ptr := unsafe.Add(unsafe.Pointer(p.ptr), offset*VulkanFunctionsSizeOf)
-	return VulkanFunctions{ptr: (*C.VmaVulkanFunctions)(ptr)}
+	return p + VulkanFunctions(offset*VulkanFunctionsSizeOf)
 }
 
 // VulkanFunctions.vkAllocateMemory is unsupported: unknown type PFN_vkAllocateMemory.
@@ -1550,13 +1453,15 @@ func (p VulkanFunctions) Offset(offset int) VulkanFunctions {
 // VulkanFunctions.vkGetInstanceProcAddr is unsupported: unknown type PFN_vkGetInstanceProcAddr.
 
 // GetVkGetMemoryWin32HandleKHR returns the value in vkGetMemoryWin32HandleKHR.
-func (p VulkanFunctions) GetVkGetMemoryWin32HandleKHR() unsafe.Pointer {
-	return unsafe.Pointer(p.ptr.vkGetMemoryWin32HandleKHR)
+func (p VulkanFunctions) GetVkGetMemoryWin32HandleKHR() uintptr {
+	ptr := (*C.VmaVulkanFunctions)(unsafe.Pointer(p))
+	return uintptr(unsafe.Pointer(ptr.vkGetMemoryWin32HandleKHR))
 }
 
 // SetVkGetMemoryWin32HandleKHR sets the value in vkGetMemoryWin32HandleKHR.
-func (p VulkanFunctions) SetVkGetMemoryWin32HandleKHR(value unsafe.Pointer) {
-	p.ptr.vkGetMemoryWin32HandleKHR = value
+func (p VulkanFunctions) SetVkGetMemoryWin32HandleKHR(value uintptr) {
+	ptr := (*C.VmaVulkanFunctions)(unsafe.Pointer(p))
+	ptr.vkGetMemoryWin32HandleKHR = unsafe.Pointer(value)
 }
 
 // VulkanFunctions.vkGetPhysicalDeviceMemoryProperties is unsupported: unknown type PFN_vkGetPhysicalDeviceMemoryProperties.

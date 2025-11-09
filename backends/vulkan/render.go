@@ -179,7 +179,7 @@ func (g *Graphics) CreateRenderPipeline(des gfx.RenderPipelineDescriptor) (gfx.R
 
 	pipelineInfo := vk.GraphicsPipelineCreateInfoAlloc(arena, 1)
 	pipelineInfo.SetSType(vk.STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO)
-	pipelineInfo.SetPNext(renderingInfo.Raw())
+	pipelineInfo.SetPNext(uintptr(renderingInfo))
 	pipelineInfo.SetStageCount(uint32(stageCount))
 	pipelineInfo.SetPStages(shaderStages)
 	pipelineInfo.SetPVertexInputState(vertexInputInfo)

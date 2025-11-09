@@ -305,7 +305,7 @@ func (c *CommandBuffer) SetPushConstants(offset int, size int, data unsafe.Point
 		vk.SHADER_STAGE_VERTEX_BIT|vk.SHADER_STAGE_FRAGMENT_BIT,
 		uint32(offset),
 		uint32(size),
-		data,
+		uintptr(data),
 	)
 }
 

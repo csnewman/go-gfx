@@ -45,23 +45,33 @@ const APIVersion_1_4 = ((uint32(1)) << 22) | ((uint32(4)) << 12)
 const APIVersion_1_3 = ((uint32(1)) << 22) | ((uint32(3)) << 12)
 
 func (p ExtensionProperties) GetExtensionName() [256]byte {
-	return *(*[256]byte)(unsafe.Pointer(&p.ptr.extensionName))
+	ptr := (*C.VkExtensionProperties)(unsafe.Pointer(p))
+
+	return *(*[256]byte)(unsafe.Pointer(&ptr.extensionName))
 }
 
 func (p ExtensionProperties) GetExtensionNameString() string {
-	return C.GoString(&p.ptr.extensionName[0])
+	ptr := (*C.VkExtensionProperties)(unsafe.Pointer(p))
+
+	return C.GoString(&ptr.extensionName[0])
 }
 
 func (p PhysicalDeviceProperties) GetDeviceNameString() string {
-	return C.GoString(&p.ptr.deviceName[0])
+	ptr := (*C.VkPhysicalDeviceProperties)(unsafe.Pointer(p))
+
+	return C.GoString(&ptr.deviceName[0])
 }
 
 func (p DebugUtilsMessengerCreateInfoEXT) TempSetCallback() {
-	p.ptr.pfnUserCallback = C.PFN_vkDebugUtilsMessengerCallbackEXT(C.gfx_vk_debug_callback)
+	ptr := (*C.VkDebugUtilsMessengerCreateInfoEXT)(unsafe.Pointer(p))
+
+	ptr.pfnUserCallback = C.PFN_vkDebugUtilsMessengerCallbackEXT(C.gfx_vk_debug_callback)
 }
 
 func (p RenderingAttachmentInfo) TempSetClearValue(r float32, g float32, b float32, a float32) {
-	p.ptr.clearValue = C.gfx_vk_clear_color(
+	ptr := (*C.VkRenderingAttachmentInfo)(unsafe.Pointer(p))
+
+	ptr.clearValue = C.gfx_vk_clear_color(
 		C.float(r),
 		C.float(g),
 		C.float(b),

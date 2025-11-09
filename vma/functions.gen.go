@@ -19,8 +19,8 @@ import "C"
   which can be used to attach `pNext` chain to the `VkMemoryAllocateInfo` structure.
   It can be useful for importing external memory. For more information, see \ref other_api_interop.
 */
-func AllocateDedicatedMemory(allocator Allocator, pVkMemoryRequirements vk.MemoryRequirements, pCreateInfo AllocationCreateInfo, pMemoryAllocateNext unsafe.Pointer, pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaAllocateDedicatedMemory(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(pVkMemoryRequirements.Raw()), (*C.VmaAllocationCreateInfo)(pCreateInfo.Raw()), pMemoryAllocateNext, (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+func AllocateDedicatedMemory(allocator Allocator, pVkMemoryRequirements vk.MemoryRequirements, pCreateInfo AllocationCreateInfo, pMemoryAllocateNext uintptr, pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
+	ret := C.vmaAllocateDedicatedMemory(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(unsafe.Pointer(pVkMemoryRequirements)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), unsafe.Pointer(pMemoryAllocateNext), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -50,7 +50,7 @@ func AllocateDedicatedMemory(allocator Allocator, pVkMemoryRequirements vk.Memor
   that offers additional parameter `pMemoryAllocateNext`.
 */
 func AllocateMemory(allocator Allocator, pVkMemoryRequirements vk.MemoryRequirements, pCreateInfo AllocationCreateInfo, pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaAllocateMemory(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(pVkMemoryRequirements.Raw()), (*C.VmaAllocationCreateInfo)(pCreateInfo.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaAllocateMemory(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(unsafe.Pointer(pVkMemoryRequirements)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -72,7 +72,7 @@ func AllocateMemory(allocator Allocator, pVkMemoryRequirements vk.MemoryRequirem
   You must free the allocation using vmaFreeMemory() when no longer needed.
 */
 func AllocateMemoryForBuffer(allocator Allocator, buffer vk.Buffer, pCreateInfo AllocationCreateInfo, pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaAllocateMemoryForBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), C.VkBuffer(buffer), (*C.VmaAllocationCreateInfo)(pCreateInfo.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaAllocateMemoryForBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), C.VkBuffer(buffer), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -94,7 +94,7 @@ func AllocateMemoryForBuffer(allocator Allocator, buffer vk.Buffer, pCreateInfo 
   You must free the allocation using vmaFreeMemory() when no longer needed.
 */
 func AllocateMemoryForImage(allocator Allocator, image vk.Image, pCreateInfo AllocationCreateInfo, pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaAllocateMemoryForImage(C.VmaAllocator(unsafe.Pointer(allocator)), C.VkImage(image), (*C.VmaAllocationCreateInfo)(pCreateInfo.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaAllocateMemoryForImage(C.VmaAllocator(unsafe.Pointer(allocator)), C.VkImage(image), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -121,7 +121,7 @@ func AllocateMemoryForImage(allocator Allocator, image vk.Image, pCreateInfo All
   returned result is not `VK_SUCCESS`, `pAllocation` array is always entirely filled with `VK_NULL_HANDLE`.
 */
 func AllocateMemoryPages(allocator Allocator, pVkMemoryRequirements vk.MemoryRequirements, pCreateInfo AllocationCreateInfo, allocationCount uintptr, pAllocations ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaAllocateMemoryPages(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(pVkMemoryRequirements.Raw()), (*C.VmaAllocationCreateInfo)(pCreateInfo.Raw()), C.size_t(allocationCount), (*C.VmaAllocation)(pAllocations.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaAllocateMemoryPages(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkMemoryRequirements)(unsafe.Pointer(pVkMemoryRequirements)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), C.size_t(allocationCount), (*C.VmaAllocation)(pAllocations.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -141,7 +141,7 @@ func AllocateMemoryPages(allocator Allocator, pVkMemoryRequirements vk.MemoryReq
   [Defragmentation](@ref defragmentation).
 */
 func BeginDefragmentation(allocator Allocator, pInfo DefragmentationInfo, pContext ffi.Ref[DefragmentationContext]) vk.Result {
-	ret := C.vmaBeginDefragmentation(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaDefragmentationInfo)(pInfo.Raw()), (*C.VmaDefragmentationContext)(pContext.Raw()))
+	ret := C.vmaBeginDefragmentation(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaDefragmentationInfo)(unsafe.Pointer(pInfo)), (*C.VmaDefragmentationContext)(pContext.Raw()))
 
 	return vk.Result(ret)
 }
@@ -159,7 +159,7 @@ func BeginDefragmentation(allocator Allocator, pInfo DefragmentationInfo, pConte
   and then preferably try another pass with vmaBeginDefragmentationPass().
 */
 func BeginDefragmentationPass(allocator Allocator, context DefragmentationContext, pPassInfo DefragmentationPassMoveInfo) vk.Result {
-	ret := C.vmaBeginDefragmentationPass(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationPassMoveInfo)(pPassInfo.Raw()))
+	ret := C.vmaBeginDefragmentationPass(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(pPassInfo)))
 
 	return vk.Result(ret)
 }
@@ -199,8 +199,8 @@ func BindBufferMemory(allocator Allocator, allocation Allocation, buffer vk.Buff
   If `pNext` is not null, #VmaAllocator object must have been created with #VMA_ALLOCATOR_CREATE_KHR_BIND_MEMORY2_BIT flag
   or with VmaAllocatorCreateInfo::vulkanApiVersion `>= VK_API_VERSION_1_1`. Otherwise the call fails.
 */
-func BindBufferMemory2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, buffer vk.Buffer, pNext unsafe.Pointer) vk.Result {
-	ret := C.vmaBindBufferMemory2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), C.VkBuffer(buffer), pNext)
+func BindBufferMemory2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, buffer vk.Buffer, pNext uintptr) vk.Result {
+	ret := C.vmaBindBufferMemory2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), C.VkBuffer(buffer), unsafe.Pointer(pNext))
 
 	return vk.Result(ret)
 }
@@ -240,8 +240,8 @@ func BindImageMemory(allocator Allocator, allocation Allocation, image vk.Image)
   If `pNext` is not null, #VmaAllocator object must have been created with #VMA_ALLOCATOR_CREATE_KHR_BIND_MEMORY2_BIT flag
   or with VmaAllocatorCreateInfo::vulkanApiVersion `>= VK_API_VERSION_1_1`. Otherwise the call fails.
 */
-func BindImageMemory2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, image vk.Image, pNext unsafe.Pointer) vk.Result {
-	ret := C.vmaBindImageMemory2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), C.VkImage(image), pNext)
+func BindImageMemory2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, image vk.Image, pNext uintptr) vk.Result {
+	ret := C.vmaBindImageMemory2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), C.VkImage(image), unsafe.Pointer(pNext))
 
 	return vk.Result(ret)
 }
@@ -291,7 +291,7 @@ func BuildVirtualBlockStatsString(virtualBlock VirtualBlock, ppStatsString ffi.R
   \param[out] pPoolStats Statistics of specified pool.
 */
 func CalculatePoolStatistics(allocator Allocator, pool Pool, pPoolStats DetailedStatistics) {
-	C.vmaCalculatePoolStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaPool(unsafe.Pointer(pool)), (*C.VmaDetailedStatistics)(pPoolStats.Raw()))
+	C.vmaCalculatePoolStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaPool(unsafe.Pointer(pool)), (*C.VmaDetailedStatistics)(unsafe.Pointer(pPoolStats)))
 }
 
 // CalculateStatistics wraps vmaCalculateStatistics.
@@ -307,7 +307,7 @@ func CalculatePoolStatistics(allocator Allocator, pool Pool, pPoolStats Detailed
   become outdated.
 */
 func CalculateStatistics(allocator Allocator, pStats TotalStatistics) {
-	C.vmaCalculateStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaTotalStatistics)(pStats.Raw()))
+	C.vmaCalculateStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaTotalStatistics)(unsafe.Pointer(pStats)))
 }
 
 // CalculateVirtualBlockStatistics wraps vmaCalculateVirtualBlockStatistics.
@@ -318,7 +318,7 @@ func CalculateStatistics(allocator Allocator, pStats TotalStatistics) {
   For less detailed statistics, see vmaGetVirtualBlockStatistics().
 */
 func CalculateVirtualBlockStatistics(virtualBlock VirtualBlock, pStats DetailedStatistics) {
-	C.vmaCalculateVirtualBlockStatistics(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaDetailedStatistics)(pStats.Raw()))
+	C.vmaCalculateVirtualBlockStatistics(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaDetailedStatistics)(unsafe.Pointer(pStats)))
 }
 
 // CheckCorruption wraps vmaCheckCorruption.
@@ -405,8 +405,8 @@ func ClearVirtualBlock(virtualBlock VirtualBlock) {
   If you mean whole allocation, you should pass 0.
   Do not pass allocation's offset within device memory block as this parameter!
 */
-func CopyAllocationToMemory(allocator Allocator, srcAllocation Allocation, srcAllocationLocalOffset vk.DeviceSize, pDstHostPointer unsafe.Pointer, size vk.DeviceSize) vk.Result {
-	ret := C.vmaCopyAllocationToMemory(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(srcAllocation)), C.VkDeviceSize(srcAllocationLocalOffset), pDstHostPointer, C.VkDeviceSize(size))
+func CopyAllocationToMemory(allocator Allocator, srcAllocation Allocation, srcAllocationLocalOffset vk.DeviceSize, pDstHostPointer uintptr, size vk.DeviceSize) vk.Result {
+	ret := C.vmaCopyAllocationToMemory(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(srcAllocation)), C.VkDeviceSize(srcAllocationLocalOffset), unsafe.Pointer(pDstHostPointer), C.VkDeviceSize(size))
 
 	return vk.Result(ret)
 }
@@ -433,8 +433,8 @@ func CopyAllocationToMemory(allocator Allocator, srcAllocation Allocation, srcAl
   If you mean whole allocation, you should pass 0.
   Do not pass allocation's offset within device memory block this parameter!
 */
-func CopyMemoryToAllocation(allocator Allocator, pSrcHostPointer unsafe.Pointer, dstAllocation Allocation, dstAllocationLocalOffset vk.DeviceSize, size vk.DeviceSize) vk.Result {
-	ret := C.vmaCopyMemoryToAllocation(C.VmaAllocator(unsafe.Pointer(allocator)), pSrcHostPointer, C.VmaAllocation(unsafe.Pointer(dstAllocation)), C.VkDeviceSize(dstAllocationLocalOffset), C.VkDeviceSize(size))
+func CopyMemoryToAllocation(allocator Allocator, pSrcHostPointer uintptr, dstAllocation Allocation, dstAllocationLocalOffset vk.DeviceSize, size vk.DeviceSize) vk.Result {
+	ret := C.vmaCopyMemoryToAllocation(C.VmaAllocator(unsafe.Pointer(allocator)), unsafe.Pointer(pSrcHostPointer), C.VmaAllocation(unsafe.Pointer(dstAllocation)), C.VkDeviceSize(dstAllocationLocalOffset), C.VkDeviceSize(size))
 
 	return vk.Result(ret)
 }
@@ -463,7 +463,7 @@ func CopyMemoryToAllocation(allocator Allocator, pSrcHostPointer unsafe.Pointer,
   \note There is a new version of this function augmented with parameter `allocationLocalOffset` - see vmaCreateAliasingBuffer2().
 */
 func CreateAliasingBuffer(allocator Allocator, allocation Allocation, pBufferCreateInfo vk.BufferCreateInfo, pBuffer ffi.Ref[vk.Buffer]) vk.Result {
-	ret := C.vmaCreateAliasingBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VkBuffer)(pBuffer.Raw()))
+	ret := C.vmaCreateAliasingBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VkBuffer)(pBuffer.Raw()))
 
 	return vk.Result(ret)
 }
@@ -493,7 +493,7 @@ func CreateAliasingBuffer(allocator Allocator, allocation Allocation, pBufferCre
   \note This is a new version of the function augmented with parameter `allocationLocalOffset`.
 */
 func CreateAliasingBuffer2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, pBufferCreateInfo vk.BufferCreateInfo, pBuffer ffi.Ref[vk.Buffer]) vk.Result {
-	ret := C.vmaCreateAliasingBuffer2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VkBuffer)(pBuffer.Raw()))
+	ret := C.vmaCreateAliasingBuffer2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VkBuffer)(pBuffer.Raw()))
 
 	return vk.Result(ret)
 }
@@ -502,7 +502,7 @@ func CreateAliasingBuffer2(allocator Allocator, allocation Allocation, allocatio
 //
 //	Function similar to vmaCreateAliasingBuffer() but for images.
 func CreateAliasingImage(allocator Allocator, allocation Allocation, pImageCreateInfo vk.ImageCreateInfo, pImage ffi.Ref[vk.Image]) vk.Result {
-	ret := C.vmaCreateAliasingImage(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VkImageCreateInfo)(pImageCreateInfo.Raw()), (*C.VkImage)(pImage.Raw()))
+	ret := C.vmaCreateAliasingImage(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VkImageCreateInfo)(unsafe.Pointer(pImageCreateInfo)), (*C.VkImage)(pImage.Raw()))
 
 	return vk.Result(ret)
 }
@@ -511,7 +511,7 @@ func CreateAliasingImage(allocator Allocator, allocation Allocation, pImageCreat
 //
 //	Function similar to vmaCreateAliasingBuffer2() but for images.
 func CreateAliasingImage2(allocator Allocator, allocation Allocation, allocationLocalOffset vk.DeviceSize, pImageCreateInfo vk.ImageCreateInfo, pImage ffi.Ref[vk.Image]) vk.Result {
-	ret := C.vmaCreateAliasingImage2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), (*C.VkImageCreateInfo)(pImageCreateInfo.Raw()), (*C.VkImage)(pImage.Raw()))
+	ret := C.vmaCreateAliasingImage2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), C.VkDeviceSize(allocationLocalOffset), (*C.VkImageCreateInfo)(unsafe.Pointer(pImageCreateInfo)), (*C.VkImage)(pImage.Raw()))
 
 	return vk.Result(ret)
 }
@@ -520,7 +520,7 @@ func CreateAliasingImage2(allocator Allocator, allocation Allocation, allocation
 //
 //	Creates #VmaAllocator object.
 func CreateAllocator(pCreateInfo AllocatorCreateInfo, pAllocator ffi.Ref[Allocator]) vk.Result {
-	ret := C.vmaCreateAllocator((*C.VmaAllocatorCreateInfo)(pCreateInfo.Raw()), (*C.VmaAllocator)(pAllocator.Raw()))
+	ret := C.vmaCreateAllocator((*C.VmaAllocatorCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaAllocator)(pAllocator.Raw()))
 
 	return vk.Result(ret)
 }
@@ -567,7 +567,7 @@ func CreateAllocator(pCreateInfo AllocatorCreateInfo, pAllocator ffi.Ref[Allocat
   - With additional parameter `pMemoryAllocateNext` - see vmaCreateDedicatedBuffer().
 */
 func CreateBuffer(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pBuffer ffi.Ref[vk.Buffer], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaCreateBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaCreateBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -581,7 +581,7 @@ func CreateBuffer(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pA
   for interop with OpenGL.
 */
 func CreateBufferWithAlignment(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pAllocationCreateInfo AllocationCreateInfo, minAlignment vk.DeviceSize, pBuffer ffi.Ref[vk.Buffer], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaCreateBufferWithAlignment(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), C.VkDeviceSize(minAlignment), (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaCreateBufferWithAlignment(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), C.VkDeviceSize(minAlignment), (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -596,8 +596,8 @@ func CreateBufferWithAlignment(allocator Allocator, pBufferCreateInfo vk.BufferC
   which can be used to attach `pNext` chain to the `VkMemoryAllocateInfo` structure.
   It can be useful for importing external memory. For more information, see \ref other_api_interop.
 */
-func CreateDedicatedBuffer(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryAllocateNext unsafe.Pointer, pBuffer ffi.Ref[vk.Buffer], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaCreateDedicatedBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), pMemoryAllocateNext, (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+func CreateDedicatedBuffer(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryAllocateNext uintptr, pBuffer ffi.Ref[vk.Buffer], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
+	ret := C.vmaCreateDedicatedBuffer(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), unsafe.Pointer(pMemoryAllocateNext), (*C.VkBuffer)(pBuffer.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -612,8 +612,8 @@ func CreateDedicatedBuffer(allocator Allocator, pBufferCreateInfo vk.BufferCreat
   which can be used to attach `pNext` chain to the `VkMemoryAllocateInfo` structure.
   It can be useful for importing external memory. For more information, see \ref other_api_interop.
 */
-func CreateDedicatedImage(allocator Allocator, pImageCreateInfo vk.ImageCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryAllocateNext unsafe.Pointer, pImage ffi.Ref[vk.Image], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaCreateDedicatedImage(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(pImageCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), pMemoryAllocateNext, (*C.VkImage)(pImage.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+func CreateDedicatedImage(allocator Allocator, pImageCreateInfo vk.ImageCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryAllocateNext uintptr, pImage ffi.Ref[vk.Image], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
+	ret := C.vmaCreateDedicatedImage(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(unsafe.Pointer(pImageCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), unsafe.Pointer(pMemoryAllocateNext), (*C.VkImage)(pImage.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -626,7 +626,7 @@ func CreateDedicatedImage(allocator Allocator, pImageCreateInfo vk.ImageCreateIn
   which offers additional parameter `pMemoryAllocateNext`.
 */
 func CreateImage(allocator Allocator, pImageCreateInfo vk.ImageCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pImage ffi.Ref[vk.Image], pAllocation ffi.Ref[Allocation], pAllocationInfo AllocationInfo) vk.Result {
-	ret := C.vmaCreateImage(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(pImageCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), (*C.VkImage)(pImage.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	ret := C.vmaCreateImage(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(unsafe.Pointer(pImageCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), (*C.VkImage)(pImage.Raw()), (*C.VmaAllocation)(pAllocation.Raw()), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 
 	return vk.Result(ret)
 }
@@ -640,7 +640,7 @@ func CreateImage(allocator Allocator, pImageCreateInfo vk.ImageCreateInfo, pAllo
   \param[out] pPool Handle to created pool.
 */
 func CreatePool(allocator Allocator, pCreateInfo PoolCreateInfo, pPool ffi.Ref[Pool]) vk.Result {
-	ret := C.vmaCreatePool(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaPoolCreateInfo)(pCreateInfo.Raw()), (*C.VmaPool)(pPool.Raw()))
+	ret := C.vmaCreatePool(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaPoolCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaPool)(pPool.Raw()))
 
 	return vk.Result(ret)
 }
@@ -653,7 +653,7 @@ func CreatePool(allocator Allocator, pCreateInfo PoolCreateInfo, pPool ffi.Ref[P
   \param[out] pVirtualBlock Returned virtual block object or `VMA_NULL` if creation failed.
 */
 func CreateVirtualBlock(pCreateInfo VirtualBlockCreateInfo, pVirtualBlock ffi.Ref[VirtualBlock]) vk.Result {
-	ret := C.vmaCreateVirtualBlock((*C.VmaVirtualBlockCreateInfo)(pCreateInfo.Raw()), (*C.VmaVirtualBlock)(pVirtualBlock.Raw()))
+	ret := C.vmaCreateVirtualBlock((*C.VmaVirtualBlockCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaVirtualBlock)(pVirtualBlock.Raw()))
 
 	return vk.Result(ret)
 }
@@ -732,7 +732,7 @@ func DestroyVirtualBlock(virtualBlock VirtualBlock) {
   Use this function to finish defragmentation started by vmaBeginDefragmentation().
 */
 func EndDefragmentation(allocator Allocator, context DefragmentationContext, pStats DefragmentationStats) {
-	C.vmaEndDefragmentation(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationStats)(pStats.Raw()))
+	C.vmaEndDefragmentation(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationStats)(unsafe.Pointer(pStats)))
 }
 
 // EndDefragmentationPass wraps vmaEndDefragmentationPass.
@@ -756,7 +756,7 @@ func EndDefragmentation(allocator Allocator, context DefragmentationContext, pSt
   If no more moves are possible you can end whole defragmentation.
 */
 func EndDefragmentationPass(allocator Allocator, context DefragmentationContext, pPassInfo DefragmentationPassMoveInfo) vk.Result {
-	ret := C.vmaEndDefragmentationPass(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationPassMoveInfo)(pPassInfo.Raw()))
+	ret := C.vmaEndDefragmentationPass(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaDefragmentationContext(unsafe.Pointer(context)), (*C.VmaDefragmentationPassMoveInfo)(unsafe.Pointer(pPassInfo)))
 
 	return vk.Result(ret)
 }
@@ -779,7 +779,7 @@ func EndDefragmentationPass(allocator Allocator, context DefragmentationContext,
   resource, like image layout (`OPTIMAL` versus `LINEAR`) or mip level count.
 */
 func FindMemoryTypeIndex(allocator Allocator, memoryTypeBits uint32, pAllocationCreateInfo AllocationCreateInfo, pMemoryTypeIndex ffi.Ref[uint32]) vk.Result {
-	ret := C.vmaFindMemoryTypeIndex(C.VmaAllocator(unsafe.Pointer(allocator)), C.uint32_t(memoryTypeBits), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
+	ret := C.vmaFindMemoryTypeIndex(C.VmaAllocator(unsafe.Pointer(allocator)), C.uint32_t(memoryTypeBits), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
 
 	return vk.Result(ret)
 }
@@ -792,7 +792,7 @@ func FindMemoryTypeIndex(allocator Allocator, memoryTypeBits uint32, pAllocation
   It may need to internally create a temporary, dummy buffer that never has memory bound.
 */
 func FindMemoryTypeIndexForBufferInfo(allocator Allocator, pBufferCreateInfo vk.BufferCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryTypeIndex ffi.Ref[uint32]) vk.Result {
-	ret := C.vmaFindMemoryTypeIndexForBufferInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(pBufferCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
+	ret := C.vmaFindMemoryTypeIndexForBufferInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkBufferCreateInfo)(unsafe.Pointer(pBufferCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
 
 	return vk.Result(ret)
 }
@@ -805,7 +805,7 @@ func FindMemoryTypeIndexForBufferInfo(allocator Allocator, pBufferCreateInfo vk.
   It may need to internally create a temporary, dummy image that never has memory bound.
 */
 func FindMemoryTypeIndexForImageInfo(allocator Allocator, pImageCreateInfo vk.ImageCreateInfo, pAllocationCreateInfo AllocationCreateInfo, pMemoryTypeIndex ffi.Ref[uint32]) vk.Result {
-	ret := C.vmaFindMemoryTypeIndexForImageInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(pImageCreateInfo.Raw()), (*C.VmaAllocationCreateInfo)(pAllocationCreateInfo.Raw()), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
+	ret := C.vmaFindMemoryTypeIndexForImageInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VkImageCreateInfo)(unsafe.Pointer(pImageCreateInfo)), (*C.VmaAllocationCreateInfo)(unsafe.Pointer(pAllocationCreateInfo)), (*C.uint32_t)(pMemoryTypeIndex.Raw()))
 
 	return vk.Result(ret)
 }
@@ -915,7 +915,7 @@ func FreeVirtualBlockStatsString(virtualBlock VirtualBlock, pStatsString ffi.CSt
   about the allocation, returned using new structure #VmaAllocationInfo2.
 */
 func GetAllocationInfo(allocator Allocator, allocation Allocation, pAllocationInfo AllocationInfo) {
-	C.vmaGetAllocationInfo(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VmaAllocationInfo)(pAllocationInfo.Raw()))
+	C.vmaGetAllocationInfo(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VmaAllocationInfo)(unsafe.Pointer(pAllocationInfo)))
 }
 
 // GetAllocationInfo2 wraps vmaGetAllocationInfo2.
@@ -928,7 +928,7 @@ func GetAllocationInfo(allocator Allocator, allocation Allocation, pAllocationIn
   It can be useful e.g. for interop with OpenGL.
 */
 func GetAllocationInfo2(allocator Allocator, allocation Allocation, pAllocationInfo AllocationInfo2) {
-	C.vmaGetAllocationInfo2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VmaAllocationInfo2)(pAllocationInfo.Raw()))
+	C.vmaGetAllocationInfo2(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*C.VmaAllocationInfo2)(unsafe.Pointer(pAllocationInfo)))
 }
 
 // GetAllocationMemoryProperties wraps vmaGetAllocationMemoryProperties.
@@ -950,7 +950,7 @@ func GetAllocationMemoryProperties(allocator Allocator, allocation Allocation, p
   `VkPhysicalDevice`, `VkDevice` etc. every time using this function.
 */
 func GetAllocatorInfo(allocator Allocator, pAllocatorInfo AllocatorInfo) {
-	C.vmaGetAllocatorInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaAllocatorInfo)(pAllocatorInfo.Raw()))
+	C.vmaGetAllocatorInfo(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaAllocatorInfo)(unsafe.Pointer(pAllocatorInfo)))
 }
 
 // GetHeapBudgets wraps vmaGetHeapBudgets.
@@ -967,7 +967,7 @@ func GetAllocatorInfo(allocator Allocator, pAllocatorInfo AllocatorInfo) {
   become outdated.
 */
 func GetHeapBudgets(allocator Allocator, pBudgets Budget) {
-	C.vmaGetHeapBudgets(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaBudget)(pBudgets.Raw()))
+	C.vmaGetHeapBudgets(C.VmaAllocator(unsafe.Pointer(allocator)), (*C.VmaBudget)(unsafe.Pointer(pBudgets)))
 }
 
 // vmaGetMemoryProperties.ppPhysicalDeviceMemoryProperties is unsupported: category pointer2 type VkPhysicalDeviceMemoryProperties.
@@ -1009,14 +1009,14 @@ func GetPoolName(allocator Allocator, pool Pool, ppName ffi.Ref[ffi.CString]) {
   become outdated.
 */
 func GetPoolStatistics(allocator Allocator, pool Pool, pPoolStats Statistics) {
-	C.vmaGetPoolStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaPool(unsafe.Pointer(pool)), (*C.VmaStatistics)(pPoolStats.Raw()))
+	C.vmaGetPoolStatistics(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaPool(unsafe.Pointer(pool)), (*C.VmaStatistics)(unsafe.Pointer(pPoolStats)))
 }
 
 // GetVirtualAllocationInfo wraps vmaGetVirtualAllocationInfo.
 //
 //	\brief Returns information about a specific virtual allocation within a virtual block, like its size and `pUserData` pointer.
 func GetVirtualAllocationInfo(virtualBlock VirtualBlock, allocation VirtualAllocation, pVirtualAllocInfo VirtualAllocationInfo) {
-	C.vmaGetVirtualAllocationInfo(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), C.VmaVirtualAllocation(allocation), (*C.VmaVirtualAllocationInfo)(pVirtualAllocInfo.Raw()))
+	C.vmaGetVirtualAllocationInfo(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), C.VmaVirtualAllocation(allocation), (*C.VmaVirtualAllocationInfo)(unsafe.Pointer(pVirtualAllocInfo)))
 }
 
 // GetVirtualBlockStatistics wraps vmaGetVirtualBlockStatistics.
@@ -1026,7 +1026,7 @@ func GetVirtualAllocationInfo(virtualBlock VirtualBlock, allocation VirtualAlloc
   This function is fast to call. For more detailed statistics, see vmaCalculateVirtualBlockStatistics().
 */
 func GetVirtualBlockStatistics(virtualBlock VirtualBlock, pStats Statistics) {
-	C.vmaGetVirtualBlockStatistics(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaStatistics)(pStats.Raw()))
+	C.vmaGetVirtualBlockStatistics(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaStatistics)(unsafe.Pointer(pStats)))
 }
 
 // InvalidateAllocation wraps vmaInvalidateAllocation.
@@ -1132,7 +1132,7 @@ func IsVirtualBlockEmpty(virtualBlock VirtualBlock) bool {
   If the allocation is made from a memory types that is not `HOST_COHERENT`,
   you also need to use vmaInvalidateAllocation() / vmaFlushAllocation(), as required by Vulkan specification.
 */
-func MapMemory(allocator Allocator, allocation Allocation, ppData ffi.Ref[unsafe.Pointer]) vk.Result {
+func MapMemory(allocator Allocator, allocation Allocation, ppData ffi.Ref[uintptr]) vk.Result {
 	ret := C.vmaMapMemory(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), (*unsafe.Pointer)(ppData.Raw()))
 
 	return vk.Result(ret)
@@ -1160,8 +1160,8 @@ func SetAllocationName(allocator Allocator, allocation Allocation, pName ffi.CSt
   It is opaque, so you can use it however you want - e.g.
   as a pointer, ordinal number or some handle to you own data.
 */
-func SetAllocationUserData(allocator Allocator, allocation Allocation, pUserData unsafe.Pointer) {
-	C.vmaSetAllocationUserData(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), pUserData)
+func SetAllocationUserData(allocator Allocator, allocation Allocation, pUserData uintptr) {
+	C.vmaSetAllocationUserData(C.VmaAllocator(unsafe.Pointer(allocator)), C.VmaAllocation(unsafe.Pointer(allocation)), unsafe.Pointer(pUserData))
 }
 
 // SetCurrentFrameIndex wraps vmaSetCurrentFrameIndex.
@@ -1185,8 +1185,8 @@ func SetPoolName(allocator Allocator, pool Pool, pName ffi.CString) {
 // SetVirtualAllocationUserData wraps vmaSetVirtualAllocationUserData.
 //
 //	\brief Changes custom pointer associated with given virtual allocation.
-func SetVirtualAllocationUserData(virtualBlock VirtualBlock, allocation VirtualAllocation, pUserData unsafe.Pointer) {
-	C.vmaSetVirtualAllocationUserData(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), C.VmaVirtualAllocation(allocation), pUserData)
+func SetVirtualAllocationUserData(virtualBlock VirtualBlock, allocation VirtualAllocation, pUserData uintptr) {
+	C.vmaSetVirtualAllocationUserData(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), C.VmaVirtualAllocation(allocation), unsafe.Pointer(pUserData))
 }
 
 // UnmapMemory wraps vmaUnmapMemory.
@@ -1217,7 +1217,7 @@ func UnmapMemory(allocator Allocator, allocation Allocation) {
   \param[out] pOffset Returned offset of the new allocation. Optional, can be null.
 */
 func VirtualAllocate(virtualBlock VirtualBlock, pCreateInfo VirtualAllocationCreateInfo, pAllocation ffi.Ref[VirtualAllocation], pOffset ffi.Ref[vk.DeviceSize]) vk.Result {
-	ret := C.vmaVirtualAllocate(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaVirtualAllocationCreateInfo)(pCreateInfo.Raw()), (*C.VmaVirtualAllocation)(pAllocation.Raw()), (*C.VkDeviceSize)(pOffset.Raw()))
+	ret := C.vmaVirtualAllocate(C.VmaVirtualBlock(unsafe.Pointer(virtualBlock)), (*C.VmaVirtualAllocationCreateInfo)(unsafe.Pointer(pCreateInfo)), (*C.VmaVirtualAllocation)(pAllocation.Raw()), (*C.VkDeviceSize)(pOffset.Raw()))
 
 	return vk.Result(ret)
 }

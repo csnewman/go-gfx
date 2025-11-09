@@ -106,7 +106,7 @@ func (g *Graphics) allocateDescriptorSet(
 	info := vk.DescriptorSetLayoutCreateInfoAlloc(arena, 1)
 	info.SetSType(vk.STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO)
 	info.SetFlags(vk.DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT)
-	info.SetPNext(extendedInfo.Raw())
+	info.SetPNext(uintptr(extendedInfo))
 
 	binding := vk.DescriptorSetLayoutBindingAlloc(arena, 1)
 	binding.SetDescriptorType(desType)
@@ -134,7 +134,7 @@ func (g *Graphics) allocateDescriptorSet(
 	alloc.SetDescriptorPool(pool)
 	alloc.SetDescriptorSetCount(1)
 	alloc.SetPSetLayouts(layoutRef)
-	alloc.SetPNext(countInfo.Raw())
+	alloc.SetPNext(uintptr(countInfo))
 
 	setRef := ffi.RefAlloc[vk.DescriptorSet](arena, 1)
 

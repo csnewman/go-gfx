@@ -94,7 +94,7 @@ func (g *Graphics) CreateSurface(handle gfx.SurfaceHandle, size gfx.PhysicalSize
 
 	// TODO: min & max width height
 
-	g.logger.Debug("Surface capabilities", "capabilities", capabilities.Raw())
+	g.logger.Debug("Surface capabilities", "capabilities", capabilities)
 
 	formatCountRef := ffi.RefAlloc[uint32](arena, 1)
 
@@ -293,7 +293,7 @@ func (s *Surface) createSwapchain(arena *ffi.Arena) error {
 
 func (s *Surface) destroySwapchain() {
 	s.logger.Debug("Destroying swapchain", "dev", s.graphics.device, "swapchain", s.swapchain)
-	
+
 	for _, image := range s.images {
 		vk.DestroyImageView(s.graphics.device, image.view, vk.AllocationCallbacksNil)
 	}
@@ -322,7 +322,7 @@ func (s *Surface) Resize(size gfx.PhysicalSize) error {
 
 	// TODO: min & max width height
 
-	s.logger.Debug("Surface capabilities", "capabilities", capabilities.Raw())
+	s.logger.Debug("Surface capabilities", "capabilities", capabilities)
 
 	if err := mapError(vk.DeviceWaitIdle(s.graphics.device)); err != nil {
 		return err

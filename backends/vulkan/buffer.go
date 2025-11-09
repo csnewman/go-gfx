@@ -74,7 +74,7 @@ func (g *Graphics) CreateBuffer(des gfx.BufferDescriptor) (gfx.Buffer, error) {
 		graphics:   g,
 		buffer:     bufferRef.Get(),
 		allocation: allocationRef.Get(),
-		mappedPtr:  allocationInfo.GetPMappedData(),
+		mappedPtr:  unsafe.Pointer(allocationInfo.GetPMappedData()),
 		size:       des.Size,
 	}
 
@@ -105,13 +105,13 @@ func (b *Buffer) Map() (unsafe.Pointer, error) {
 	arena := ffi.NewArena()
 	defer arena.Close()
 
-	ptrRef := ffi.RefAlloc[unsafe.Pointer](arena, 1)
+	ptrRef := ffi.RefAlloc[uintptr](arena, 1)
 
 	if err := mapError(vma.MapMemory(b.graphics.memoryAllocator, b.allocation, ptrRef)); err != nil {
 		return nil, err
 	}
 
-	b.mappedPtr = ptrRef.Get()
+	b.mappedPtr = unsafe.Pointer(ptrRef.Get())
 
 	b.mapped++
 
