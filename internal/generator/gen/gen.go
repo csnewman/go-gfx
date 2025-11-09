@@ -283,6 +283,8 @@ func (g *Generator) generateHandleType(ty *repo.Type) {
 	switch ty.HandleSize {
 	case 0:
 	// do nothing
+	case 16:
+		cType = "uint16"
 	case 32:
 		cType = "uint32"
 	default:

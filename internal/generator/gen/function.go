@@ -66,7 +66,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 				retMappedType = jen.Qual(memberPkg, memberType.MappedName)
 
 				postCall = append(postCall, jen.Return(
-					jen.Qual(memberPkg, memberType.MappedName+"FromPtr").Call(
+					jen.Qual(memberPkg, memberType.MappedName).Call(
 						jen.Qual("unsafe", "Pointer").Call(jen.Id(tmpRetVar)),
 					),
 				))
@@ -123,7 +123,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 
 					callBlock = append(callBlock, jen.Call(jen.Id("*C."+member.Type)).
 						Call(
-							jen.Id("p").Dot("Raw").Call(),
+							jen.Qual("unsafe", "Pointer").Call(jen.Id("p")),
 						),
 					)
 					continue
@@ -195,7 +195,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 
 				callBlock = append(callBlock, jen.Op("*").Call(jen.Id("*C."+member.Type)).
 					Call(
-						jen.Id(safeName).Dot("Raw").Call(),
+						jen.Qual("unsafe", "Pointer").Call(jen.Id(safeName)),
 					),
 				)
 
@@ -208,8 +208,8 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 			}
 		case repo.FieldCategoryPointer:
 			if member.Type == "void" {
-				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual("unsafe", "Pointer"))
-				callBlock = append(callBlock, jen.Id(safeName))
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Id("uintptr"))
+				callBlock = append(callBlock, jen.Qual("unsafe", "Pointer").Call(jen.Id(safeName)))
 
 				break
 			}
@@ -252,7 +252,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 
 				callBlock = append(callBlock, jen.Call(jen.Id("*C."+member.Type)).
 					Call(
-						jen.Id(safeName).Dot("Raw").Call(),
+						jen.Qual("unsafe", "Pointer").Call(jen.Id(safeName)),
 					),
 				)
 
@@ -274,7 +274,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 
 		case repo.FieldCategoryPointer2:
 			if member.Type == "void" {
-				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "Ref").Types(jen.Qual("unsafe", "Pointer")))
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(ffiPath, "Ref").Types(jen.Id("uintptr")))
 				callBlock = append(callBlock, jen.Call(jen.Id("*unsafe.Pointer")).
 					Call(
 						jen.Id(safeName).Dot("Raw").Call(),
