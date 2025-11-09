@@ -76,17 +76,22 @@ func (g *Generator) generateStructType(ty *repo.Type) {
 			)
 	}
 
-	g.OStructs.Commentf("%sAlloc allocates a continuous block of %s.", ty.MappedName, ty.MappedName)
-	g.OStructs.Func().Id(ty.MappedName+"Alloc").
-		Params(jen.Id("alloc").Qual(ffiPath, "Allocator"), jen.Id("count").Id("int")).
-		Id(ty.MappedName).
-		Block(
-			jen.Id("ptr").Op(":=").Id("alloc").Dot("Allocate").Call(jen.Id(sizeOfName).Op("*").Id("count")),
+	if ty.SuppressAlloc {
+		g.OStructs.Commentf("%s allocator is suppressed.", ty.Name)
+		g.OStructs.Line()
+	} else {
+		g.OStructs.Commentf("%sAlloc allocates a continuous block of %s.", ty.MappedName, ty.MappedName)
+		g.OStructs.Func().Id(ty.MappedName+"Alloc").
+			Params(jen.Id("alloc").Qual(ffiPath, "Allocator"), jen.Id("count").Id("int")).
+			Id(ty.MappedName).
+			Block(
+				jen.Id("ptr").Op(":=").Id("alloc").Dot("Allocate").Call(jen.Id(sizeOfName).Op("*").Id("count")),
 
-			jen.Return(jen.Id(ty.MappedName).Values(
-				jen.Id("ptr").Op(":").Parens(jen.Id("*"+cName)).Params(jen.Id("ptr"))),
-			),
-		)
+				jen.Return(jen.Id(ty.MappedName).Values(
+					jen.Id("ptr").Op(":").Parens(jen.Id("*"+cName)).Params(jen.Id("ptr"))),
+				),
+			)
+	}
 
 	for _, name := range slices.Sorted(maps.Keys(ty.Aliases)) {
 		alias := ty.Aliases[name]
@@ -147,6 +152,7 @@ var nativeTypes = map[string]string{
 	"uint64_t": "uint64",
 	"int64_t":  "int64",
 	"float":    "float32",
+	"bool":     "bool",
 }
 
 func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
@@ -464,15 +470,27 @@ func (g *Generator) generateStructField(ty *repo.Type, field *repo.Field) {
 	}
 
 	g.OStructs.Line()
-	g.OStructs.Commentf("Get%s returns the value in %s.", field.MappedName, field.Name)
-	g.OStructs.Func().Params(jen.Id("p").Id(ty.MappedName)).Id("Get" + field.MappedName).
-		Params().
-		Add(mappedType).
-		Block(getBody...)
+
+	if field.SuppressGet {
+		g.OStructs.Commentf("%s.%s setter is suppressed.", ty.MappedName, field.Name)
+		g.OStructs.Line()
+	} else {
+		g.OStructs.Commentf("Get%s returns the value in %s.", field.MappedName, field.Name)
+		g.OStructs.Func().Params(jen.Id("p").Id(ty.MappedName)).Id("Get" + field.MappedName).
+			Params().
+			Add(mappedType).
+			Block(getBody...)
+	}
 
 	g.OStructs.Line()
-	g.OStructs.Commentf("Set%s sets the value in %s.", field.MappedName, field.Name)
-	g.OStructs.Func().Params(jen.Id("p").Id(ty.MappedName)).Id("Set" + field.MappedName).
-		Params(jen.Id("value").Add(mappedType)).
-		Block(setBody...)
+
+	if field.SuppressSet {
+		g.OStructs.Commentf("%s.%s getter is suppressed.", ty.MappedName, field.Name)
+		g.OStructs.Line()
+	} else {
+		g.OStructs.Commentf("Set%s sets the value in %s.", field.MappedName, field.Name)
+		g.OStructs.Func().Params(jen.Id("p").Id(ty.MappedName)).Id("Set" + field.MappedName).
+			Params(jen.Id("value").Add(mappedType)).
+			Block(setBody...)
+	}
 }

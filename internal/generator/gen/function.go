@@ -19,42 +19,67 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 	if fun.ReturnType == nil {
 		tmpRetVar = ""
 	} else {
-		if fun.ReturnType.Category != repo.FieldCategoryDirect {
-			g.OFunctions.Commentf("%s is unsupported: unknown return category %s.", fun.Name, fun.ReturnType.Category)
-			g.OFunctions.Line()
+		switch fun.ReturnType.Category {
+		case repo.FieldCategoryDirect:
+			if mapping, ok := nativeTypes[fun.ReturnType.Type]; ok {
+				retMappedType = jen.Id(mapping)
+				postCall = append(postCall, jen.Return(jen.Id(mapping).Call(jen.Id(tmpRetVar))))
+			} else if fun.ReturnType.Type == "VkBool32" {
+				retMappedType = jen.Id("bool")
+				postCall = append(
+					postCall,
+					jen.If(jen.Id(tmpRetVar).Op(">").Id("0")).
+						Block(jen.Return(jen.True())).
+						Else().
+						Block(jen.Return(jen.False())),
+				)
+			} else if fun.ReturnType.Type == "PFN_vkVoidFunction" {
+				retMappedType = jen.Qual("unsafe", "Pointer")
+				postCall = append(postCall, jen.Return(jen.Qual("unsafe", "Pointer").Call(jen.Id(tmpRetVar))))
+			} else if fieldType, pkgName, ok := g.LookupType(fun.ReturnType.Type); ok {
+				switch fieldType.Category {
+				case repo.TypeCategoryEnum, repo.TypeCategoryHandleNonDispatchable:
+					retMappedType = jen.Qual(pkgName, fieldType.MappedName)
+					postCall = append(postCall, jen.Return(jen.Add(retMappedType).Call(jen.Id(tmpRetVar))))
+				default:
+					g.OFunctions.Commentf("%s is unsupported: unknown category %s.", fun.Name, fieldType.Category)
+					g.OFunctions.Line()
 
-			return
-		}
-
-		if mapping, ok := nativeTypes[fun.ReturnType.Type]; ok {
-			retMappedType = jen.Id(mapping)
-			postCall = append(postCall, jen.Return(jen.Id(mapping).Call(jen.Id(tmpRetVar))))
-		} else if fun.ReturnType.Type == "VkBool32" {
-			retMappedType = jen.Id("bool")
-			postCall = append(
-				postCall,
-				jen.If(jen.Id(tmpRetVar).Op(">").Id("0")).
-					Block(jen.Return(jen.True())).
-					Else().
-					Block(jen.Return(jen.False())),
-			)
-		} else if fun.ReturnType.Type == "PFN_vkVoidFunction" {
-			retMappedType = jen.Qual("unsafe", "Pointer")
-			postCall = append(postCall, jen.Return(jen.Qual("unsafe", "Pointer").Call(jen.Id(tmpRetVar))))
-		} else if fieldType, pkgName, ok := g.LookupType(fun.ReturnType.Type); ok {
-			switch fieldType.Category {
-			case repo.TypeCategoryEnum:
-				retMappedType = jen.Qual(pkgName, fieldType.MappedName)
-				postCall = append(postCall, jen.Return(jen.Add(retMappedType).Call(jen.Id(tmpRetVar))))
-			default:
-				g.OFunctions.Commentf("%s is unsupported: unknown category %s.", fun.Name, fieldType.Category)
+					return
+				}
+			} else {
+				g.OFunctions.Commentf("%s is unsupported: unknown direct return type %s.", fun.Name, fun.ReturnType.Type)
+				g.OFunctions.Line()
+				return
+			}
+		case repo.FieldCategoryPointer:
+			memberType, memberPkg, ok := g.LookupType(fun.ReturnType.Type)
+			if !ok {
+				g.OFunctions.Commentf("%s is unsupported: return pointer type -> ?? %s.", fun.Name, fun.ReturnType.Type)
 				g.OFunctions.Line()
 
 				return
 			}
-		} else {
-			g.OFunctions.Commentf("%s is unsupported: unknown return type %s.", fun.Name, fun.ReturnType.Type)
+
+			switch memberType.Category {
+			case repo.TypeCategoryStruct:
+				retMappedType = jen.Qual(memberPkg, memberType.MappedName)
+
+				postCall = append(postCall, jen.Return(
+					jen.Qual(memberPkg, memberType.MappedName+"FromPtr").Call(
+						jen.Qual("unsafe", "Pointer").Call(jen.Id(tmpRetVar)),
+					),
+				))
+			default:
+				g.OFunctions.Commentf("%s is unsupported: unknown pointer return type category %s.", fun.Name, memberType.Category)
+				g.OFunctions.Line()
+				return
+			}
+
+		default:
+			g.OFunctions.Commentf("%s is unsupported: unknown return category %s.", fun.Name, fun.ReturnType.Category)
 			g.OFunctions.Line()
+
 			return
 		}
 	}
@@ -69,9 +94,50 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 		paramsBlock []jen.Code
 		callBlock   []jen.Code
 		preCall     []jen.Code
+
+		thisBlock []jen.Code
 	)
 
 	for _, member := range fun.Members {
+
+		if member.IsSelf {
+
+			switch member.Category {
+			case repo.FieldCategoryPointer:
+
+				memberType, memberPkg, ok := g.LookupType(member.Type)
+				if !ok {
+					g.OFunctions.Commentf("%s.%s is unsupported: category %s -> ?? %s.", fun.Name, member.Name, member.Category, member.Type)
+					g.OFunctions.Line()
+
+					return
+				}
+
+				switch memberType.Category {
+				case repo.TypeCategoryStruct:
+					thisBlock = append(thisBlock,
+
+						jen.Params(
+							jen.Id("p").Qual(memberPkg, memberType.MappedName),
+						))
+
+					callBlock = append(callBlock, jen.Call(jen.Id("*C."+member.Type)).
+						Call(
+							jen.Id("p").Dot("Raw").Call(),
+						),
+					)
+					continue
+				default:
+					panic("unsupported self type category: " + memberType.Category)
+
+				}
+
+			default:
+				panic("unsupported self category: " + member.Category)
+			}
+
+		}
+
 		safeName := member.MappedName
 
 		if token.IsKeyword(safeName) {
@@ -123,6 +189,15 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 			case repo.TypeCategoryHandle:
 				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(memberPkg, memberType.MappedName))
 				callBlock = append(callBlock, jen.Qual("C", member.Type).Call(jen.Qual("unsafe", "Pointer").Call(jen.Id(safeName))))
+
+			case repo.TypeCategoryStruct:
+				paramsBlock = append(paramsBlock, jen.Id(safeName).Qual(memberPkg, memberType.MappedName))
+
+				callBlock = append(callBlock, jen.Op("*").Call(jen.Id("*C."+member.Type)).
+					Call(
+						jen.Id(safeName).Dot("Raw").Call(),
+					),
+				)
 
 			default:
 				g.OFunctions.Commentf("%s.%s is unsupported: direct category %s.", fun.Name, member.Name, memberType.Category)
@@ -253,7 +328,7 @@ func (g *Generator) generateFunction(fun *repo.Function) {
 		g.OFunctions.Comment(fun.Comment)
 	}
 
-	g.OFunctions.Func().Id(fun.MappedName).Params(paramsBlock...).Add(retTypeBlock...).Block(
+	g.OFunctions.Func().Add(thisBlock...).Id(fun.MappedName).Params(paramsBlock...).Add(retTypeBlock...).Block(
 		body...,
 	)
 }

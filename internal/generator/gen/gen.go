@@ -63,6 +63,8 @@ func Generate(cfg *Config) {
 		g.OFunctions.CgoPreamble(cfg.CPreamble)
 	}
 
+	hasHandles := false
+
 	for _, name := range slices.Sorted(maps.Keys(cfg.Repo.Types)) {
 		ty := cfg.Repo.Types[name]
 
@@ -75,6 +77,7 @@ func Generate(cfg *Config) {
 
 		case repo.TypeCategoryHandle, repo.TypeCategoryHandleNonDispatchable:
 			g.generateHandleType(ty)
+			hasHandles = true
 
 		case repo.TypeCategoryStruct:
 			g.generateStructType(ty)
@@ -99,8 +102,10 @@ func Generate(cfg *Config) {
 		panic(err)
 	}
 
-	if err := g.OHandles.Save(filepath.Join(cfg.Path, "handles.gen.go")); err != nil {
-		panic(err)
+	if hasHandles {
+		if err := g.OHandles.Save(filepath.Join(cfg.Path, "handles.gen.go")); err != nil {
+			panic(err)
+		}
 	}
 
 	if err := g.OStructs.Save(filepath.Join(cfg.Path, "structs.gen.go")); err != nil {
@@ -198,7 +203,18 @@ func (g *Generator) generateEnumType(ty *repo.Type) {
 		g.OEnums.Comment(ty.Comment)
 	}
 
-	g.OEnums.Type().Id(ty.MappedName).Id("int32")
+	var goType string
+
+	switch ty.BitmaskWidth {
+	case 32, 0:
+		goType = "int32"
+	case 8:
+		goType = "int8"
+	default:
+		panic(fmt.Sprintf("bitmask bit width %d", ty.BitmaskWidth))
+	}
+
+	g.OEnums.Type().Id(ty.MappedName).Id(goType)
 
 	for _, name := range slices.Sorted(maps.Keys(ty.Aliases)) {
 		alias := ty.Aliases[name]
@@ -262,6 +278,15 @@ func (g *Generator) generateHandleType(ty *repo.Type) {
 
 	if ty.Category == repo.TypeCategoryHandleNonDispatchable {
 		cType = "uint64"
+	}
+
+	switch ty.HandleSize {
+	case 0:
+	// do nothing
+	case 32:
+		cType = "uint32"
+	default:
+		panic(fmt.Sprintf("handle size %d", ty.HandleSize))
 	}
 
 	g.OHandles.Commentf("%s wraps the handle %s.", ty.MappedName, ty.Name)

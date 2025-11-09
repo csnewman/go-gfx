@@ -29,8 +29,15 @@ type Type struct {
 	// for TypeCategoryBitmask & TypeCategoryEnum
 	EnumValues map[string]*EnumValue `json:"enum_values,omitempty"`
 
+	// for TypeCategoryEnum
+	EnumSize int `json:"enum_size,omitempty"`
+
 	// for TypeCategoryStruct
-	StructFields map[string]*Field `json:"struct_fields,omitempty"`
+	StructFields  map[string]*Field `json:"struct_fields,omitempty"`
+	SuppressAlloc bool              `json:"suppress_alloc,omitempty"`
+
+	// for TypeCategoryHandleNonDispatchable
+	HandleSize int `json:"handle_size,omitempty"`
 }
 
 type EnumValueCategory string
@@ -52,11 +59,12 @@ type Alias struct {
 type FieldCategory string
 
 const (
-	FieldCategoryDirect      FieldCategory = "direct"
-	FieldCategoryPointer     FieldCategory = "pointer"
-	FieldCategoryPointer2    FieldCategory = "pointer2"
-	FieldCategoryArray       FieldCategory = "array"
-	FieldCategoryUnsupported FieldCategory = "unsupported"
+	FieldCategoryDirect       FieldCategory = "direct"
+	FieldCategoryPointer      FieldCategory = "pointer"
+	FieldCategoryPointer2     FieldCategory = "pointer2"
+	FieldCategoryPointerArray FieldCategory = "pointer-array"
+	FieldCategoryArray        FieldCategory = "array"
+	FieldCategoryUnsupported  FieldCategory = "unsupported"
 )
 
 type Field struct {
@@ -68,6 +76,10 @@ type Field struct {
 
 	// For FieldCategoryArray
 	ArraySize int `json:"array_size,omitempty"`
+
+	IsSelf      bool `json:"is_self,omitempty"`
+	SuppressSet bool `json:"suppress_set,omitempty"`
+	SuppressGet bool `json:"suppress_get,omitempty"`
 }
 
 type Function struct {
