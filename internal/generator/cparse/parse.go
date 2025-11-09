@@ -5,7 +5,6 @@ import (
 	"generator/repo"
 	"log"
 	"log/slog"
-	"strconv"
 	"strings"
 
 	"github.com/go-clang/bootstrap/clang"
@@ -15,20 +14,27 @@ type Parser struct {
 	path string
 	repo *repo.Repo
 	tu   clang.TranslationUnit
+	cfg  *ParseConfig
 }
 
-func (p *Parser) ParseFile(indent string, path string) {
-	p.path = path
+func (p *Parser) ParseFile(indent string) {
+	p.path = p.cfg.Path
 
 	idx := clang.NewIndex(0, 1)
 	defer idx.Dispose()
 
+	cliArgs := []string{
+		"-fparse-all-comments",
+		"-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Headers/",
+	}
+
+	for _, define := range p.cfg.Defines {
+		cliArgs = append(cliArgs, "-D"+define)
+	}
+
 	tu := idx.ParseTranslationUnit(
-		path,
-		[]string{
-			"-fparse-all-comments",
-			"-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Headers/",
-		},
+		p.cfg.Path,
+		cliArgs,
 		nil,
 		clang.TranslationUnit_IncludeBriefCommentsInCodeCompletion|clang.TranslationUnit_DetailedPreprocessingRecord,
 	)
@@ -60,9 +66,9 @@ func (p *Parser) parseTopLevel(indent string, c clang.Cursor) {
 	case clang.Cursor_TypedefDecl:
 		p.parseTypedef(indent, c)
 	//
-	//case clang.Cursor_VarDecl:
-	//	log.Println("vardecl", "name", c.Spelling())
-	//	log.Println(" ", c.Type().Spelling())
+	case clang.Cursor_VarDecl:
+		log.Println("vardecl", "name", c.Spelling())
+		log.Println(" ", c.Type().Spelling())
 	//
 	case clang.Cursor_FunctionDecl:
 		p.parseFunction(indent, c)
@@ -100,9 +106,11 @@ func (p *Parser) parseTopLevel(indent string, c clang.Cursor) {
 
 			slog.Info("Found handle", "name", item)
 
+			op := p.convertEnumName(item)
+
 			converted := &repo.Type{
 				Name:       item,
-				MappedName: convertEnumName(item),
+				MappedName: op.Name,
 				Category:   repo.TypeCategoryHandle,
 			}
 
@@ -148,9 +156,15 @@ func (p *Parser) parseStruct(indent string, c clang.Cursor, typedef bool) {
 
 	comment := processComment(c.RawCommentText())
 
+	op := p.convertStructName(name)
+
+	if op.Skip {
+		return
+	}
+
 	s := &repo.Type{
 		Name:         name,
-		MappedName:   convertStructName(name),
+		MappedName:   op.Name,
 		Category:     repo.TypeCategoryStruct,
 		Comment:      comment,
 		StructFields: make(map[string]*repo.Field),
@@ -169,11 +183,14 @@ func (p *Parser) parseStruct(indent string, c clang.Cursor, typedef bool) {
 
 			fIndent := fmt.Sprintf("%v[%v]", indent, name)
 
+			ty := p.parseType(fIndent, cursor.Type())
+
 			if val := cursor.FieldDeclBitWidth(); val != -1 {
-				panic("bitfield not supported: " + strconv.Itoa(int(val)))
+				ty.Category = repo.FieldCategoryUnsupported
+
+				//panic("bitfield not supported: " + strconv.Itoa(int(val)))
 			}
 
-			ty := p.parseType(fIndent, cursor.Type())
 			ty.Name = name
 			ty.MappedName = strings.ToUpper(name[:1]) + name[1:]
 			ty.Comment = cmt
@@ -202,9 +219,11 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 
 	slog.Info("comment", "comment", comment)
 
+	op := p.convertEnumName(name)
+
 	enum := &repo.Type{
 		Name:       name,
-		MappedName: convertEnumName(name),
+		MappedName: op.Name,
 		Category:   repo.TypeCategoryEnum,
 		Comment:    comment,
 		EnumValues: make(map[string]*repo.EnumValue),
@@ -213,7 +232,7 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 	if strings.Contains(name, "FlagBits") {
 		convName := strings.ReplaceAll(name, "FlagBits", "Flags")
 		enum.Name = convName
-		enum.MappedName = convertEnumName(convName)
+		enum.MappedName = p.convertEnumName(convName).Name
 		enum.Category = repo.TypeCategoryBitmask
 		enum.BitmaskWidth = 32
 		enum.Aliases = map[string]*repo.Alias{
@@ -239,9 +258,11 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 		comment := processComment(cursor.RawCommentText())
 		name := cursor.Spelling()
 
+		op := p.convertEnumItem(name)
+
 		enum.EnumValues[name] = &repo.EnumValue{
 			Name:       name,
-			MappedName: convertEnumItem(name),
+			MappedName: op.Name,
 			Comment:    comment,
 		}
 
@@ -251,20 +272,13 @@ func (p *Parser) parseEnum(indent string, c clang.Cursor, typedef bool) {
 	})
 }
 
-func convertEnumItem(in string) string {
-	name, ok := strings.CutPrefix(in, "VMA_")
-	if !ok {
-		panic(fmt.Sprintf("item does not have prefix: %s", in))
-	}
-
-	return name
-}
-
 func (p *Parser) parseFunction(indent string, c clang.Cursor) {
 	name := c.Spelling()
 
 	log.Println("Parsing function", name)
 	indent = fmt.Sprintf("%v[%v]", indent, name)
+
+	op := p.convertFuncName(name)
 
 	comment := processComment(c.RawCommentText())
 
@@ -305,19 +319,10 @@ func (p *Parser) parseFunction(indent string, c clang.Cursor) {
 
 	p.repo.Functions[name] = &repo.Function{
 		Name:       name,
-		MappedName: convertFuncName(name),
+		MappedName: op.Name,
 		Aliases:    nil,
 		ReturnType: result,
 		Members:    members,
 		Comment:    comment,
 	}
-}
-
-func convertFuncName(in string) string {
-	name, ok := strings.CutPrefix(in, "vma")
-	if !ok {
-		panic(fmt.Sprintf("cmd does not have prefix: %s", in))
-	}
-
-	return name
 }

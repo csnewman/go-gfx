@@ -1,10 +1,9 @@
 package vma
 
 import (
-	"unsafe"
-
 	ffi "github.com/csnewman/go-gfx/ffi"
 	vk "github.com/csnewman/go-gfx/vk"
+	"unsafe"
 )
 
 // #include "vma.h"

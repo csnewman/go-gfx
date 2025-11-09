@@ -105,11 +105,21 @@ func (p *Parser) parseType(indent string, t clang.Type) *repo.Field {
 			Category: repo.FieldCategoryDirect,
 			Type:     "void",
 		}
-	case clang.Type_Int, clang.Type_UInt, clang.Type_Long, clang.Type_ULong, clang.Type_UChar, clang.Type_Char_S,
-		clang.Type_Float, clang.Type_Double:
+	case clang.Type_Int, clang.Type_UInt, clang.Type_Long, clang.Type_ULong, clang.Type_UChar, clang.Type_Char_S, clang.Type_SChar,
+		clang.Type_Float, clang.Type_Double, clang.Type_Bool, clang.Type_Short, clang.Type_UShort:
 		log.Println(indent, "Parsing type", t.Spelling(), "as ident")
 		name := t.CanonicalType().Spelling()
 		name = strings.TrimPrefix(name, "const ")
+
+		name, ok := strings.CutPrefix(name, "unsigned ")
+		if ok {
+			name = "u" + name
+		}
+
+		name, ok = strings.CutPrefix(name, "signed ")
+		if ok {
+			name = "s" + name
+		}
 
 		if strings.Contains(name, " ") {
 			panic(name + " contains spaces")
@@ -134,6 +144,10 @@ func (p *Parser) parseType(indent string, t clang.Type) *repo.Field {
 			return &repo.Field{
 				Category: repo.FieldCategoryPointer2,
 				Type:     inner.Type,
+			}
+		case repo.FieldCategoryUnsupported:
+			return &repo.Field{
+				Category: repo.FieldCategoryUnsupported,
 			}
 		default:
 			panic("unexpected category " + string(inner.Category))
@@ -166,9 +180,26 @@ func (p *Parser) parseType(indent string, t clang.Type) *repo.Field {
 				Type:      inner.Type,
 				ArraySize: int(size),
 			}
+		case repo.FieldCategoryPointer:
+			return &repo.Field{
+				Category:  repo.FieldCategoryPointerArray,
+				Type:      inner.Type,
+				ArraySize: int(size),
+			}
+		case repo.FieldCategoryUnsupported:
+			return &repo.Field{
+				Category: repo.FieldCategoryUnsupported,
+			}
 		default:
 			panic("unexpected category " + string(inner.Category))
 		}
+
+	case clang.Type_FunctionProto:
+
+		return &repo.Field{
+			Category: repo.FieldCategoryUnsupported,
+		}
+
 	default:
 		log.Println(indent, "Parsing type", t.Spelling(), "as ???")
 		log.Panicln(indent, "Unknown type", t.Kind().Spelling())
