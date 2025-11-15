@@ -22,11 +22,14 @@ type StructMember struct {
 }
 
 type StructAndEnums struct {
-	Enums     map[string][]*EnumValue    `json:"enums"`
-	EnumTypes map[string]string          `json:"enumtypes"`
-	Locations map[string]string          `json:"locations"`
-	Structs   map[string][]*StructMember `json:"structs"`
-	NonPOD    map[string]bool            `json:"nonPOD"`
+	Enums            map[string][]*EnumValue    `json:"enums"`
+	EnumTypes        map[string]string          `json:"enumtypes"`
+	Locations        map[string]string          `json:"locations"`
+	Structs          map[string][]*StructMember `json:"structs"`
+	NonPOD           map[string]bool            `json:"nonPOD"`
+	TemplatedStructs map[string][]*StructMember `json:"templated_structs"`
+	TemplatesDone    map[string]map[string]bool `json:"templates_done"`
+	TypeNames        map[string]string          `json:"typenames"`
 }
 
 type DefArg struct {
@@ -35,13 +38,16 @@ type DefArg struct {
 }
 
 type Definition struct {
-	Location    string    `json:"location"`
-	Args        []*DefArg `json:"argsT"`
-	Ret         string    `json:"ret"`
-	Templated   bool      `json:"templated"`
-	Constructor bool      `json:"constructor"`
-	StaticFunc  bool      `json:"is_static_function"`
-	STName      string    `json:"stname"`
+	Location       string    `json:"location"`
+	Args           []*DefArg `json:"argsT"`
+	Ret            string    `json:"ret"`
+	Templated      bool      `json:"templated"`
+	Constructor    bool      `json:"constructor"`
+	StaticFunc     bool      `json:"is_static_function"`
+	STName         string    `json:"stname"`
+	Name           string    `json:"cimguiname"`
+	OverloadedName string    `json:"ov_cimguiname"`
+	Namespace      string    `json:"namespace"`
 }
 
 func Parse(path string) *repo.Repo {
@@ -57,10 +63,19 @@ func Parse(path string) *repo.Repo {
 		HandleSize: 32,
 	}
 
+	out.Types["ImDrawIdx"] = &repo.Type{
+		Name:       "ImDrawIdx",
+		MappedName: "DrawIdx",
+		Category:   repo.TypeCategoryHandleNonDispatchable,
+		HandleSize: 16,
+	}
+
 	structEnums := readJson[*StructAndEnums](filepath.Join(path, "structs_and_enums.json"))
 
 	convertEnums(out, structEnums)
 	convertStructs(out, structEnums)
+
+	convertTemplated(out, structEnums)
 
 	defs := readJson[map[string][]*Definition](filepath.Join(path, "definitions.json"))
 
@@ -71,118 +86,190 @@ func Parse(path string) *repo.Repo {
 	return out
 }
 
-func convertDefinitions(out *repo.Repo, structEnums *StructAndEnums, defs map[string][]*Definition) {
-	for name, inner := range defs {
-		var def *Definition
+func convertTemplated(out *repo.Repo, enums *StructAndEnums) {
 
-		for _, cdef := range inner {
-			if strings.Contains(cdef.Location, "internal") {
+	for name, members := range enums.TemplatedStructs {
+		slog.Info("Processing template type", "name", name)
+
+		done, ok := enums.TemplatesDone[name]
+		if !ok {
+			slog.Info("Skipping template type", "name", name)
+
+			continue
+		}
+
+		tyName, ok := enums.TypeNames[name]
+		if !ok {
+			panic("missing type: " + name)
+		}
+
+		if tyName != "T" {
+			slog.Info("Skipping template type", "name", name)
+
+			continue
+		}
+
+		for doneName := range done {
+			mappedName := doneName
+
+			if mappedName, ok = strings.CutSuffix(mappedName, "*"); ok {
+				mappedName += "Ptr"
+			}
+
+			mappedName = strings.ReplaceAll(mappedName, " ", "_")
+			mappedName = name + "_" + mappedName
+
+			ty := &repo.Type{
+				Name:         mappedName,
+				MappedName:   convertStructName(mappedName),
+				Category:     repo.TypeCategoryStruct,
+				StructFields: make(map[string]*repo.Field),
+			}
+
+			for _, member := range members {
+				memCopy := *member
+
+				memCopy.Type = strings.ReplaceAll(memCopy.Type, tyName, doneName)
+
+				convertStructItem(ty, enums, &memCopy)
+			}
+
+			out.Types[mappedName] = ty
+		}
+	}
+
+}
+
+func convertDefinitions(out *repo.Repo, structEnums *StructAndEnums, defs map[string][]*Definition) {
+	for _, inner := range defs {
+
+		validOverloads := 0
+
+		for _, def := range inner {
+			if strings.Contains(def.Location, "internal") {
 				continue
 			}
 
-			def = cdef
+			validOverloads++
 		}
 
-		if def == nil {
-			continue
-		}
-
-		if def.Templated {
-			continue
-		}
-
-		fun := &repo.Function{
-			Name:       name,
-			MappedName: name,
-			Aliases:    nil,
-			ReturnType: nil,
-			Members:    nil,
-			Comment:    "",
-		}
-
-		if def.STName == "" {
-			var (
-				foundIG bool
-				foundIM bool
-			)
-
-			fun.MappedName, foundIG = strings.CutPrefix(fun.MappedName, "ig")
-			fun.MappedName, foundIM = strings.CutPrefix(fun.MappedName, "Im")
-
-			if !foundIM && !foundIG {
-				panic("missing prefix: " + name)
+		for _, def := range inner {
+			if strings.Contains(def.Location, "internal") {
+				continue
 			}
-		}
 
-		for _, arg := range def.Args {
-			ty := parseType(structEnums, arg.Type)
+			if def.Templated {
+				continue
+			}
 
-			ty.Name = arg.Name
-			ty.MappedName = arg.Name
+			if def.Namespace == "ImGuiFreeType" {
+				continue
+			}
 
-			fun.Members = append(fun.Members, ty)
-		}
+			name := def.Name
+			mappedName := def.Name
 
-		if def.STName != "" && !def.Constructor && !def.StaticFunc {
-			foundSelf := false
+			if def.OverloadedName != "" {
+				name = def.OverloadedName
 
-			for _, member := range fun.Members {
-				if member.Category == repo.FieldCategoryPointer && member.Type == def.STName && member.Name == "self" {
-					foundSelf = true
-					member.IsSelf = true
-
-					break
+				if validOverloads != 1 {
+					mappedName = def.OverloadedName
 				}
 			}
 
-			if !foundSelf {
-				panic("missing self: " + name)
+			fun := &repo.Function{
+				Name:       name,
+				MappedName: mappedName,
+				Aliases:    nil,
+				ReturnType: nil,
+				Members:    nil,
+				Comment:    "",
 			}
 
-			var ok bool
+			if def.STName == "" {
+				var (
+					foundIG bool
+					foundIM bool
+				)
 
-			fun.MappedName, ok = strings.CutPrefix(fun.MappedName, def.STName+"_")
-			if !ok {
-				panic("missing self prefix: " + fun.MappedName)
-			}
-		}
+				fun.MappedName, foundIG = strings.CutPrefix(fun.MappedName, "ig")
+				fun.MappedName, foundIM = strings.CutPrefix(fun.MappedName, "Im")
 
-		if def.Constructor {
-			var ok bool
-
-			fun.MappedName, ok = strings.CutPrefix(fun.MappedName, def.STName+"_"+def.STName)
-			if !ok {
-				panic("missing stname prefix: " + fun.MappedName)
+				if !foundIM && !foundIG {
+					panic("missing prefix: " + name)
+				}
 			}
 
-			fun.MappedName = convertStructName(def.STName) + "New" + fun.MappedName
+			for _, arg := range def.Args {
+				ty := parseType(structEnums, arg.Type)
 
-			fun.ReturnType = &repo.Field{
-				Category: repo.FieldCategoryPointer,
-				Type:     def.STName,
+				ty.Name = arg.Name
+				ty.MappedName = arg.Name
+
+				fun.Members = append(fun.Members, ty)
 			}
 
-		} else if def.Ret != "void" {
-			fun.ReturnType = parseType(structEnums, def.Ret)
-		}
+			if def.STName != "" && !def.Constructor && !def.StaticFunc {
+				foundSelf := false
 
-		fun.MappedName = strings.ToUpper(fun.MappedName[:1]) + fun.MappedName[1:]
+				for _, member := range fun.Members {
+					if member.Category == repo.FieldCategoryPointer && member.Type == def.STName && member.Name == "self" {
+						foundSelf = true
+						member.IsSelf = true
 
-		out.Functions[name] = fun
+						break
+					}
+				}
 
-		if def.STName != "" {
-			ty, ok := out.Types[def.STName]
-			if !ok {
-				panic("missing type: " + def.STName)
+				if !foundSelf {
+					panic("missing self: " + name)
+				}
+
+				var ok bool
+
+				fun.MappedName, ok = strings.CutPrefix(fun.MappedName, def.STName+"_")
+				if !ok {
+					panic("missing self prefix: " + fun.MappedName)
+				}
 			}
 
-			if ty.Category != repo.TypeCategoryStruct {
-				panic("wrong type: " + def.STName)
+			if def.Constructor {
+				var ok bool
+
+				fun.MappedName, ok = strings.CutPrefix(fun.MappedName, def.STName+"_"+def.STName)
+				if !ok {
+					panic("missing stname prefix: " + fun.MappedName)
+				}
+
+				fun.MappedName = convertStructName(def.STName) + "New" + fun.MappedName
+
+				fun.ReturnType = &repo.Field{
+					Category: repo.FieldCategoryPointer,
+					Type:     def.STName,
+				}
+
+			} else if def.Ret != "void" {
+				fun.ReturnType = parseType(structEnums, def.Ret)
 			}
 
-			for _, field := range ty.StructFields {
-				if strings.EqualFold("set"+field.MappedName, fun.MappedName) {
-					field.SuppressSet = true
+			fun.MappedName = strings.ToUpper(fun.MappedName[:1]) + fun.MappedName[1:]
+
+			out.Functions[name] = fun
+
+			if def.STName != "" {
+				ty, ok := out.Types[def.STName]
+				if !ok {
+					panic("missing type: " + def.STName)
+				}
+
+				if ty.Category != repo.TypeCategoryStruct {
+					panic("wrong type: " + def.STName)
+				}
+
+				for _, field := range ty.StructFields {
+					if strings.EqualFold("set"+field.MappedName, fun.MappedName) {
+						field.SuppressSet = true
+					}
 				}
 			}
 		}
@@ -193,12 +280,9 @@ func convertEnums(out *repo.Repo, structEnums *StructAndEnums) {
 	for name, vals := range structEnums.Enums {
 		slog.Info("Parsing enum", "name", name)
 
-		cleaned, foundPrefix := strings.CutPrefix(name, "Im")
-		if !foundPrefix {
-			panic("missing prefix: " + name)
+		if strings.Contains(name, "FreeType") {
+			continue
 		}
-
-		cleaned = strings.TrimSuffix(cleaned, "_")
 
 		width := 32
 
@@ -211,6 +295,13 @@ func convertEnums(out *repo.Repo, structEnums *StructAndEnums) {
 			default:
 				panic("unknown enum type mapping " + mappping)
 			}
+		}
+
+		name = strings.TrimSuffix(name, "_")
+
+		cleaned, foundPrefix := strings.CutPrefix(name, "Im")
+		if !foundPrefix {
+			panic("missing prefix: " + name)
 		}
 
 		ty := &repo.Type{
@@ -264,6 +355,10 @@ func convertStructs(out *repo.Repo, structEnums *StructAndEnums) {
 			continue
 		}
 
+		if strings.Contains(name, "FreeType") {
+			continue
+		}
+
 		cleaned := convertStructName(name)
 
 		_, nonPOD := structEnums.NonPOD[name]
@@ -290,13 +385,17 @@ var nativeMapping = map[string]string{
 	"float":          "float",
 	"unsigned short": "uint16_t",
 	"ImU32":          "uint32_t",
+	"ImU16":          "uint16_t",
+	"ImU8":           "uint8_t",
 	"int":            "int32_t",
+	"unsigned int":   "uint32_t",
 	"bool":           "bool",
 	"char":           "char",
-	"unsigned char":  "char",
+	"unsigned char":  "uint8_t",
 	"void":           "void",
 
 	"ImFontAtlasRectId": "ImFontAtlasRectId",
+	"ImDrawIdx":         "ImDrawIdx",
 }
 
 func convertStructItem(ty *repo.Type, enums *StructAndEnums, val *StructMember) {
@@ -310,7 +409,7 @@ func convertStructItem(ty *repo.Type, enums *StructAndEnums, val *StructMember) 
 
 	var out *repo.Field
 
-	if val.BitFieldSize != "" || val.Size != 0 || val.TemplateType != "" {
+	if val.BitFieldSize != "" || val.Size != 0 {
 		out = &repo.Field{
 			Category: repo.FieldCategoryUnsupported,
 		}
@@ -353,7 +452,7 @@ func parseType(enums *StructAndEnums, in string) *repo.Field {
 	if _, ok := enums.Enums[in+"_"]; ok {
 		return &repo.Field{
 			Category: repo.FieldCategoryDirect,
-			Type:     in + "_",
+			Type:     in,
 		}
 	}
 
@@ -377,6 +476,25 @@ func parseType(enums *StructAndEnums, in string) *repo.Field {
 			}
 		default:
 			panic("unexpected inner type: " + inner.Category)
+		}
+	}
+
+	if before, after, ok := strings.Cut(in, "_"); ok {
+		_, ok := enums.TemplatedStructs[before]
+		done, doneOk := enums.TemplatesDone[before]
+
+		if ok && doneOk {
+			after, ok = strings.CutSuffix(after, "Ptr")
+			if ok {
+				after += "*"
+			}
+
+			if _, ok := done[after]; ok {
+				return &repo.Field{
+					Category: repo.FieldCategoryDirect,
+					Type:     in,
+				}
+			}
 		}
 	}
 

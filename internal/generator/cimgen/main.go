@@ -14,6 +14,6 @@ func main() {
 		Repo:      parsed,
 		PKGName:   "imgui",
 		Path:      "../../imgui",
-		CPreamble: `#include "imgui.h"`,
+		CPreamble: `#include "imgui_wrapper.h"`,
 	})
 }
