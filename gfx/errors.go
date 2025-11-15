@@ -16,5 +16,6 @@ var (
 	ErrIncompatibleDriver       = errors.New("incompatible driver")
 	ErrNoSuitableDevice         = errors.New("could not find a suitable device")
 	ErrMissingFeature           = errors.New("feature missing")
+	ErrUnsupportedDevice        = errors.New("unsupported device")
 	ErrInitializationFailed     = errors.New("initialization failed")
 )

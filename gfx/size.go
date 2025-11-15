@@ -13,6 +13,10 @@ func (l LogicalSize) PhysicalSize() PhysicalSize {
 	}
 }
 
+func (l LogicalSize) Ratio() float64 {
+	return l.Width / l.Height
+}
+
 type PhysicalSize struct {
 	Width  int
 	Height int
