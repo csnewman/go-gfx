@@ -11,25 +11,6 @@ type Allocator interface {
 	Allocate(size int) unsafe.Pointer
 }
 
-type Arena struct {
-}
-
-func NewArena() *Arena {
-	return &Arena{}
-}
-
-func (a *Arena) Checkpoint() func() {
-	return func() {}
-}
-
-func (a *Arena) Close() {}
-
-func (a *Arena) Allocate(size int) unsafe.Pointer {
-	// TODO: replace
-	//return C.malloc(C.size_t(size))
-	return C.calloc(C.size_t(size), C.size_t(1))
-}
-
 type CString struct {
 	ptr unsafe.Pointer
 }
@@ -57,7 +38,7 @@ func (p CString) Raw() unsafe.Pointer {
 }
 
 type Primitive interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr | ~float32 | ~float64 | CString | unsafe.Pointer
+	~bool | ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr | ~float32 | ~float64 | CString | unsafe.Pointer
 }
 
 type Ref[T Primitive] struct {
